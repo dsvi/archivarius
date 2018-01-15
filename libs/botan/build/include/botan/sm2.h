@@ -1,0 +1,1 @@
+../../../src/lib/pubkey/sm2/sm2.h

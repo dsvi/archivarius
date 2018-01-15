@@ -1,0 +1,11 @@
+links { "zstd" }
+
+includedirs {
+  ".",
+}
+
+defines{
+
+}
+
+

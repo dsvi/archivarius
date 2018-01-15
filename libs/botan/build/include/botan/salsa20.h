@@ -1,0 +1,1 @@
+../../../src/lib/stream/salsa20/salsa20.h

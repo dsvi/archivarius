@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+// refresh me by
+// protoc -I=. --cpp_out=. format.proto
+
+
+option optimize_for = LITE_RUNTIME;
+
+package proto;
+
+message ZSTD_Compression_filter{
+
+}
+
+message AES256_Encryption_filter{
+  bytes salt = 1;
+}
+
+message Filter{
+  oneof filter {
+    ZSTD_Compression_filter   zstd_compression = 1;
+    AES256_Encryption_filter  aes_encryption  = 2;
+  }
+}
+
+message Ref{
+  string content_fname = 1;
+  uint64 from = 2;
+  uint64 to = 3;
+  uint64 xxhash = 4;
+}
+
+enum File_type{
+  FILE = 0;
+  DIR = 1;
+  SYMLINK = 2;
+}
+
+message Fs_record{
+  string pathname = 1;
+  uint32 unix_permissions = 2; // equal to std::filesystem::perms
+  File_type type = 3;
+  uint64 modified_seconds = 4; // POSIX time
+  Ref ref = 5;                // only exists for regular files of sizes more than 0
+  string symlink_target = 6;
+  string posix_acl = 7;
+  string posix_default_acl = 8;
+}
+
+message Fs_state{
+  repeated Fs_record rec = 1;
+}
+
+message File_desc{
+  string name = 1;
+  repeated Filter filters = 2; // in order in which applied. decode in reverse order
+  repeated Ref_count refs = 3; // only present for content files
+  uint64  time_created = 4; // only present for filesystem state files
+}
+
+message Ref_count{
+  uint64 from = 1;
+  uint64 to = 2;
+  uint64 xxhash = 3;
+  uint64 ref_count = 4;
+  uint64 compressed_size = 5;  // optional
+}
+
+message Catalogue{
+  repeated File_desc used_files = 1; // files which are not in the list can be deleted
+                                     // catalogue itself is not here
+}
+
+message Catalog_header{
+  repeated Filter filters = 2;
+}
