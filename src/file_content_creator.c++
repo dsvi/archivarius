@@ -5,13 +5,13 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-File_content_creator::File_content_creator(std::filesystem::path &arc_path)
+File_content_creator::File_content_creator(const std::filesystem::path &arc_path)
 {
 	arc_path_ = arc_path;
-	buff_.resize(10'000'000);
+	buff_.resize(50'000'000);
 }
 
-File_content_ref File_content_creator::add(std::filesystem::path &file_name)
+File_content_ref File_content_creator::add(const std::filesystem::path &file_name)
 {
 	if ((file_.bytes_written() > min_file_size_) || !file_){
 		create_file();
@@ -33,6 +33,8 @@ File_content_ref File_content_creator::add(std::filesystem::path &file_name)
 	}while (!res.eof);
 	ref.to = bytes_written_;
 	ref.xxhash = cs_.digest();
+	if (file_.bytes_written() > min_file_size_)
+		out_.finish();
 	ref.compressed_size = file_.bytes_written() - actually_wirtten;
 	if (ref.compressed_size == 0)
 		ref.compressed_size = 1;
@@ -56,5 +58,5 @@ void File_content_creator::create_file()
 	cs_.sink(&file_);
 	out_.sink(&cs_);
 	out_.name(file);
-	file_ = move(file);
+	file_ = file;
 }

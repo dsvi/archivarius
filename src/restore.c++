@@ -53,7 +53,7 @@ void restore(Restore_settings &cfg)
 			}
 		}
 		{ // restore non empty files
-			map<File_content_ref&, Filesystem_state::File&> sorted_by_refs;
+			map<File_content_ref, Filesystem_state::File> sorted_by_refs;
 			for (auto &file : state.files()){
 				if (file.content_ref)
 					sorted_by_refs[file.content_ref.value()] = file;

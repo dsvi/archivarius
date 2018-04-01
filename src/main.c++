@@ -3,7 +3,7 @@
 using namespace std;
 
 int main(int argc, char *argv[]){
-	report_warning = [](std::string_view w){
+	auto report_warning = [](std::string &&w){
 		cerr << w << flush;
 	};
 	init_epoch();

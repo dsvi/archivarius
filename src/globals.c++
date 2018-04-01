@@ -6,17 +6,17 @@
 using namespace std;
 namespace fs = filesystem;
 
-string exec(const char *cmd)
-{
-	array<char, 1024> buffer;
-	string result;
-	unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
-	if (!pipe)
-		throw std::runtime_error("popen() failed!");
-	while (fgets(&buffer.front(), buffer.size(), pipe.get()) != nullptr)
-		result += &buffer.front();
-	return result;
-}
+//string exec(const char *cmd)
+//{
+//	array<char, 1024> buffer;
+//	string result;
+//	unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
+//	if (!pipe)
+//		throw std::runtime_error("popen() failed!");
+//	while (fgets(&buffer.front(), buffer.size(), pipe.get()) != nullptr)
+//		result += &buffer.front();
+//	return result;
+//}
 
 const char *tr_text(const char *s)
 {
@@ -90,4 +90,12 @@ std::filesystem::path home_dir()
 	if (env)
 		return env;
 	return fs::path();
+}
+
+void find_and_replace(string &where, const string &what, const string &replace_to)
+{
+	for(string::size_type i = 0; (i = where.find(what, i)) != string::npos;){
+		where.replace(i, what.length(), replace_to);
+		i += replace_to.length();
+	}
 }

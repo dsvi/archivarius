@@ -96,7 +96,7 @@ Filesystem_state Catalogue::latest_fs_state()
 	if (fs_state_files_.empty())
 		return Filesystem_state(cat_file_.parent_path());
 	auto &state_desc = fs_state_files_.back();
-	returnFilesystem_state(
+	return Filesystem_state(
 	  cat_file_.parent_path(),
 	  state_desc.name,
 	  state_desc.time_created);

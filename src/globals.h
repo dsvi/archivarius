@@ -4,9 +4,11 @@
 #include "file_content_creator.h"
 
 
-std::string exec(const char *cmd);
+//std::string exec(const char *cmd);
 
 const char* tr_text(const char *);
+
+void find_and_replace(std::string& where, const std::string &what, const std::string &replace_to);
 
 extern
 std::function<void(std::string_view)> report_warning;
@@ -21,7 +23,7 @@ std::filesystem::file_time_type from_posix_time(ui64 posix_seconds);
 
 // just add content_ref to it
 std::tuple<Filesystem_state::File, bool> make_file(
-    std::filesystem::directory_entry &entry,
+    std::filesystem::path &entry,
     std::filesystem::path &&archive_path);
 
 std::filesystem::path home_dir(); // might be empty

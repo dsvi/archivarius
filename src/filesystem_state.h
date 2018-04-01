@@ -26,6 +26,7 @@ public:
 		std::string default_acl; // posix long format
 	};
 	// creates empty state
+	explicit
 	Filesystem_state(const std::filesystem::path &arc_path);
 	// loads state from disc
 	Filesystem_state(const std::filesystem::path &arc_path, std::string_view name, ui64 time_created_posix);

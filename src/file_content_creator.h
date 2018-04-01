@@ -4,18 +4,17 @@
 #include "stream.h"
 #include "piping_xxhash.h"
 
-void extract(File_content_ref &from, std::filesystem::path &to);
-
 class File_content_creator
 {
 public:
-	File_content_creator(std::filesystem::path &arc_path);
+	explicit
+	File_content_creator(const std::filesystem::path &arc_path);
 
 	void min_file_size(ui64 bytes);
 	ui64 min_file_size();
 
 	/// @param file_name full path to file, which content will be added to archive
-	File_content_ref add(std::filesystem::path &file_name);
+	File_content_ref add(const std::filesystem::path &file_name);
 
 	void finish();
 private:
