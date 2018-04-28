@@ -32,7 +32,7 @@ class Sink{
 public:
 	Sink(Sink&) = delete;
 	Sink(Sink&&) = default;
-	Sink(){};
+	Sink(){}
 
 	Sink & operator =(Sink&&) = default;
 

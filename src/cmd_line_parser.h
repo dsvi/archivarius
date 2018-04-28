@@ -6,9 +6,10 @@
 class Cmd_line{
 public:
 	std::string_view command();
-	std::optional<std::string_view> param_str(std::string_view name);
-	std::optional<uint> param_uint(std::string_view name);
-	std::optional<bool> param_bool(std::string_view name);
+	std::string_view param_str(std::string_view name);
+	std::optional<std::string_view> param_str_opt(std::string_view name);
+	std::optional<uint> param_uint_opt(std::string_view name);
+	std::optional<bool> param_bool_opt(std::string_view name);
 private:
 	std::string cmd_;
 	std::unordered_map<std::string, std::string> params_;

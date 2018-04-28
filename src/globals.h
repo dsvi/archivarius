@@ -10,9 +10,6 @@ const char* tr_text(const char *);
 
 void find_and_replace(std::string& where, const std::string &what, const std::string &replace_to);
 
-extern
-std::function<void(std::string_view)> report_warning;
-
 // example 2017-03-04 23:04:17
 std::string current_time_to_filename();
 

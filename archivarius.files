@@ -1,3 +1,5 @@
+src/cmd_line_parser.c++
+src/cmd_line_parser.h
 src/archive.c++
 src/archive.h
 src/buffer.c++

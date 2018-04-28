@@ -2,11 +2,11 @@
 #include "precomp.h"
 
 struct Restore_settings{
-	std::string name;
+	std::string name; //optional
 	std::filesystem::path from;
-	int from_ndx;
+	size_t from_ndx;
 	std::filesystem::path to;
 	std::function<void(std::string&&)> warning;
 };
 
-void restore(Restore_settings &cfg);
+void restore(Restore_settings &&cfg);

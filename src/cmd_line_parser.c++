@@ -64,3 +64,11 @@ std::optional<bool> Cmd_line::param_bool(std::string_view name)
 		return {false};
 	throw Exception("value for '%1%' must be either 'on' or 'off'") << name;
 }
+
+std::string_view Cmd_line::param_str(std::string_view name)
+{
+	auto s = param_str_opt(name);
+	if (!s)
+		throw Exception("Required parameter '%1%' missing") << name;
+	return s.value();
+}

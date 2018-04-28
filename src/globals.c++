@@ -23,8 +23,6 @@ const char *tr_text(const char *s)
 	return s;
 }
 
-std::function<void(std::string_view)> report_warning;
-
 static
 std::filesystem::file_time_type posix_epoch;
 
@@ -52,9 +50,8 @@ string current_time_to_filename()
 	if (t == -1)
 		throw Exception("Can't get current time");
 	auto st = gmtime(&t);
-	std::ostringstream name;
-	name << to_string(st->tm_year + 1900) << "-" << to_string(st->tm_mon + 1) << "-" << to_string(st->tm_mday) << " "
-	     << to_string(st->tm_hour) << ":" << to_string(st->tm_min) << ":" << to_string(st->tm_sec);
+	ostringstream name;
+	name << put_time(st, "%Y-%m-%d %H:%M:%S");
 	return name.str();
 }
 

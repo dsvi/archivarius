@@ -56,15 +56,28 @@ void get_max_storage_time(Config &get_to, ptree pt){
 	}
 }
 
-std::vector<Config> read_config(const std::filesystem::path &dir)
+std::vector<Config> read_config()
 {
-	auto cfg_path = dir / "archivarius.conf";
-	try{
-		if (!exists(cfg_path))
-			throw Exception("File doesn't exist");
-		ptree root_pt;
+	forward_list<fs::path> folders{"/usr/local/etc", "/etc"};
+	auto hf = getenv("HOME");
+	if (hf)
+		folders.push_front(string(hf) + "/.config");
+	fs::path cfg_path;
+	for (auto &dir : folders){
+		cfg_path = dir / "archivarius.conf";
 		if (exists(cfg_path))
-			read_info(cfg_path, root_pt);
+			break;
+		cfg_path = fs::path();
+	}
+	if (cfg_path.empty()){
+		string paths;
+		for (auto &dir : folders)
+			paths += "\n" + dir.string();
+		throw Exception("'archivarius.conf' was not found at: %1%\n") << paths;
+	}
+	try{
+		ptree root_pt;
+		read_info(cfg_path, root_pt);
 		unordered_set<std::string_view> names;
 		unordered_set<fs::path> arc_paths;
 		vector<Config> cfgs;
@@ -87,11 +100,13 @@ std::vector<Config> read_config(const std::filesystem::path &dir)
 				cfg.root = get_non_empty("root", sub);
 				for (auto &src : sub.get_child("include"))
 					cfg.files_to_archive.push_back(src.first);
+				for (auto &src : sub.get_child("exclude"))
+					cfg.files_to_ignore.push_back(src.first);
 				if (cfg.files_to_archive.empty())
 					throw Exception("there must be something to 'include' into archive.");
 				get_max_storage_time(cfg, sub);
 			} catch (...) {
-				throw_with_nested(Exception("In task %1%") << cfg.name);
+				throw_with_nested(Exception("In task %1%:") << cfg.name);
 			}
 			cfgs.push_back(move(cfg));
 		}

@@ -31,7 +31,7 @@ void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 	fs::permissions(target, static_cast<fs::perms>(attr.unix_permissions));
 }
 
-void restore(Restore_settings &cfg)
+void restore(Restore_settings &&cfg)
 {
 	try{
 		Buffer tmp;
@@ -105,7 +105,11 @@ void restore(Restore_settings &cfg)
 		}
 	}
 	catch(std::exception &e){
-		string msg = str(boost::format(tr_text("Error while restoring %1% to %2%:\n")) % cfg.name % cfg.to);
+		string msg;
+		if (cfg.name.empty())
+			msg = str(boost::format(tr_text("Error while restoring %1% to %2%:\n")) % cfg.from % cfg.to);
+		else
+			msg = str(boost::format(tr_text("Error while restoring %1% to %2%:\n")) % cfg.name % cfg.to);
 		msg += message(e);
 		cfg.warning(move(msg));
 	}

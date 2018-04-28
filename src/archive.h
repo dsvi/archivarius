@@ -7,7 +7,7 @@ class Archiver{
 public:
 	std::string name;
 	std::filesystem::path archive_path;
-	std::filesystem::path root; // common path for files_to_archive
+	std::filesystem::path root;
 	std::vector<std::filesystem::path> files_to_archive; // if not set, then archive all from root (not including the root)
 	std::function<void(std::string&&)> warning;
 	Catalogue *catalog;
