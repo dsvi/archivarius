@@ -4,7 +4,6 @@
 #include "piping_xxhash.h"
 #include "stream.h"
 #include "buffer.h"
-#include "globals.h"
 
 #include "format.pb.h"
 
@@ -19,8 +18,9 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 {
 	fs::create_directories(arc_path);
 	cat_file_ = arc_path / cat_filename;
-	if (!fs::exists(cat_file_)){
-		{	File_sink f(cat_file_);	}
+	if (!fs::exists(cat_file_))
+		File_sink f(cat_file_);
+	if (fs::file_size(cat_file_) == 0){
 		file_lock_ = lock(cat_file_);
 		return;
 	}
@@ -34,7 +34,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 		in.source(&cs_pipe);
 
 		if (auto version = in.get_uint(); version > current_version)
-			throw Exception("Unsupported file version %1%. Max supported is %2%") << version << current_version;
+			throw Exception("Unsupported file version {0}. Max supported is {1}")(version, current_version);
 
 		Buffer buf;
 
@@ -68,7 +68,6 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 					ref.compressed_size = r.compressed_size();
 					if (ref.compressed_size == 0)
 						ref.compressed_size = ref.to - ref.from;
-					ref.xxhash = r.xxhash();
 					content_refs_.insert(ref);
 				}
 			}
@@ -76,14 +75,14 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 		clean_up();
 	}
 	catch (...){
-		throw_with_nested( Exception("Can't read %1%") << cat_file_ );
+		throw_with_nested( Exception("Can't read {0}")(cat_file_) );
 	}
 }
 
 Filesystem_state Catalogue::fs_state(size_t ndx)
 {
 	if (ndx >= fs_state_files_.size())
-		throw Exception("State #%1% doesn't exist") << ndx;
+		throw Exception("State #{0} doesn't exist")(ndx);
 	auto &state_desc = fs_state_files_[ndx];
 	return Filesystem_state(
 	  cat_file_.parent_path(),
@@ -112,29 +111,28 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	for (auto &file : fs.files()){
 		if (!file.content_ref.has_value())
 			continue;
-		auto [cit, was_inserted] = content_refs_.insert(file.content_ref.value());
-		auto &ref = const_cast<File_content_ref&>(*cit);
+		auto [it, was_inserted] = content_refs_.insert(file.content_ref.value());
+		File_content_ref &ref = const_cast<File_content_ref&>(*it);
 		ref.ref_count_++;
 	}
 }
 
 void Catalogue::remove_fs_state(Filesystem_state &fs)
 {
-	auto sz = fs_state_files_.size();
-	remove_if(fs_state_files_.begin(), fs_state_files_.end(), [&](auto &a){
+	auto end = remove_if(fs_state_files_.begin(), fs_state_files_.end(), [&](auto &a){
 		return a.name == fs.file_name();
 	});
-	ASSERT(sz != fs_state_files_.size()); // trying to remove state which wasn't there
-	if (sz == fs_state_files_.size())
+	if (end != --fs_state_files_.end())
 		throw_inconsistent();
+	fs_state_files_.pop_back();
 	for (auto &file : fs.files()){
 		if (!file.content_ref.has_value())
 			continue;
-		auto cit = content_refs_.find(file.content_ref.value());
-		ASSERT(cit != content_refs_.end());
-		if (cit == content_refs_.end())
+		auto it = content_refs_.find(file.content_ref.value());
+		ASSERT(it != content_refs_.end());
+		if (it == content_refs_.end())
 			throw_inconsistent();
-		auto &ref = const_cast<File_content_ref&>(*cit);
+		auto &ref = const_cast<File_content_ref&>(*it);
 		if (--ref.ref_count_ == 0)
 			content_refs_.erase(file.content_ref.value());
 	}
@@ -174,12 +172,12 @@ void Catalogue::commit()
 			if (fn != r.fname){
 				fd = cat_msg.add_used_files();
 				fn = r.fname;
+				fd->set_name(r.fname);
 			}
 			//TODO: filters
 			auto ref = fd->add_refs();
 			ref->set_from(r.from);
 			ref->set_to(r.to);
-			ref->set_xxhash(r.xxhash);
 			ref->set_compressed_size(r.compressed_size);
 			ref->set_ref_count(r.ref_count_);
 		}
@@ -191,7 +189,7 @@ void Catalogue::commit()
 		clean_up();
 	}
 	catch (...){
-		throw_with_nested( Exception( "Can't save %1%" ) << cat_file_ );
+		throw_with_nested( Exception( "Can't save {0}" )(cat_file_) );
 	}
 }
 
@@ -220,7 +218,7 @@ void Catalogue::clean_up()
 
 void Catalogue::throw_inconsistent()
 {
-	throw Exception("Archive is in inconsistent state, better recreate: %1%") << cat_file_.parent_path();
+	throw Exception("Archive is in inconsistent state, better recreate: {0}")(cat_file_.parent_path());
 }
 
 

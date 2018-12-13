@@ -1,1 +1,0 @@
-../../../src/lib/pubkey/sm2/sm2_enc.h

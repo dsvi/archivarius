@@ -551,12 +551,6 @@ class Ref : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(c
   ::google::protobuf::uint64 to() const;
   void set_to(::google::protobuf::uint64 value);
 
-  // uint64 xxhash = 4;
-  void clear_xxhash();
-  static const int kXxhashFieldNumber = 4;
-  ::google::protobuf::uint64 xxhash() const;
-  void set_xxhash(::google::protobuf::uint64 value);
-
   // @@protoc_insertion_point(class_scope:proto.Ref)
  private:
 
@@ -564,7 +558,6 @@ class Ref : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(c
   ::google::protobuf::internal::ArenaStringPtr content_fname_;
   ::google::protobuf::uint64 from_;
   ::google::protobuf::uint64 to_;
-  ::google::protobuf::uint64 xxhash_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
   friend void ::protobuf_format_2eproto::InitDefaultsRefImpl();
@@ -1085,21 +1078,15 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::uint64 to() const;
   void set_to(::google::protobuf::uint64 value);
 
-  // uint64 xxhash = 3;
-  void clear_xxhash();
-  static const int kXxhashFieldNumber = 3;
-  ::google::protobuf::uint64 xxhash() const;
-  void set_xxhash(::google::protobuf::uint64 value);
-
-  // uint64 ref_count = 4;
+  // uint64 ref_count = 3;
   void clear_ref_count();
-  static const int kRefCountFieldNumber = 4;
+  static const int kRefCountFieldNumber = 3;
   ::google::protobuf::uint64 ref_count() const;
   void set_ref_count(::google::protobuf::uint64 value);
 
-  // uint64 compressed_size = 5;
+  // uint64 compressed_size = 4;
   void clear_compressed_size();
-  static const int kCompressedSizeFieldNumber = 5;
+  static const int kCompressedSizeFieldNumber = 4;
   ::google::protobuf::uint64 compressed_size() const;
   void set_compressed_size(::google::protobuf::uint64 value);
 
@@ -1109,7 +1096,6 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
   ::google::protobuf::uint64 from_;
   ::google::protobuf::uint64 to_;
-  ::google::protobuf::uint64 xxhash_;
   ::google::protobuf::uint64 ref_count_;
   ::google::protobuf::uint64 compressed_size_;
   mutable int _cached_size_;
@@ -1566,20 +1552,6 @@ inline void Ref::set_to(::google::protobuf::uint64 value) {
   
   to_ = value;
   // @@protoc_insertion_point(field_set:proto.Ref.to)
-}
-
-// uint64 xxhash = 4;
-inline void Ref::clear_xxhash() {
-  xxhash_ = GOOGLE_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 Ref::xxhash() const {
-  // @@protoc_insertion_point(field_get:proto.Ref.xxhash)
-  return xxhash_;
-}
-inline void Ref::set_xxhash(::google::protobuf::uint64 value) {
-  
-  xxhash_ = value;
-  // @@protoc_insertion_point(field_set:proto.Ref.xxhash)
 }
 
 // -------------------------------------------------------------------
@@ -2087,21 +2059,7 @@ inline void Ref_count::set_to(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:proto.Ref_count.to)
 }
 
-// uint64 xxhash = 3;
-inline void Ref_count::clear_xxhash() {
-  xxhash_ = GOOGLE_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 Ref_count::xxhash() const {
-  // @@protoc_insertion_point(field_get:proto.Ref_count.xxhash)
-  return xxhash_;
-}
-inline void Ref_count::set_xxhash(::google::protobuf::uint64 value) {
-  
-  xxhash_ = value;
-  // @@protoc_insertion_point(field_set:proto.Ref_count.xxhash)
-}
-
-// uint64 ref_count = 4;
+// uint64 ref_count = 3;
 inline void Ref_count::clear_ref_count() {
   ref_count_ = GOOGLE_ULONGLONG(0);
 }
@@ -2115,7 +2073,7 @@ inline void Ref_count::set_ref_count(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:proto.Ref_count.ref_count)
 }
 
-// uint64 compressed_size = 5;
+// uint64 compressed_size = 4;
 inline void Ref_count::clear_compressed_size() {
   compressed_size_ = GOOGLE_ULONGLONG(0);
 }

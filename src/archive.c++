@@ -11,7 +11,12 @@ void Archiver::recursive_add_from_dir(const fs::path &dir_path)
 try {
 	std::vector<fs::path> dirs;
 	for (auto &e : fs::directory_iterator(dir_path)){
-		add(e.path());
+		auto p = e.path();
+		for (auto &file : files_to_exclude){
+			if (p == file)
+				continue;
+		}
+		add(p);
 		if (e.is_directory())
 			dirs.push_back(e.path());
 	}
@@ -19,9 +24,8 @@ try {
 		recursive_add_from_dir(dir);
 }
 catch(std::exception &exp){
-	string msg = str(boost::format(tr_text("%1%: Can't get directory contents for %2%\n")) % name % dir_path.string());
+	string msg = fmt::format(tr_txt("Can't get directory contents for {0}:\n"), dir_path);
 	msg += message(exp);
-	//find_and_replace(msg, "\n", "\n  ");
 	warning(move(msg));
 }
 
@@ -43,9 +47,8 @@ void Archiver::add(const fs::path &file_path)
 		next_->add(move(file));
 	}
 	catch(std::exception &exp){
-		string msg = str(boost::format(tr_text("%1%: Skipping %2%:\n")) %name % file_path.string());
+		string msg = fmt::format(tr_txt("Skipping {0}:\n"), file_path);
 		msg += message(exp);
-		//find_and_replace(msg, "\n", "\n  ");
 		warning(move(msg));
 	}
 }
@@ -54,21 +57,31 @@ void Archiver::archive()
 {
 	try{
 		auto fcc = File_content_creator(archive_path);
+		fcc.min_file_size(min_content_file_size);
 		creator_ = &fcc;
 		auto prev = catalog->latest_fs_state();
 		auto next = Filesystem_state(archive_path);
 		prev_ = &prev;
 		next_ = &next;
+		if (!root.empty()){
+			for (auto &file : files_to_archive)
+				file = root / file;
+			for (auto &file : files_to_exclude)
+				file = root / file;
+		}
 		if (files_to_archive.empty()){
 			recursive_add_from_dir(root);
 		}
 		else{
 			for (auto &file : files_to_archive){
-				auto full_path = root / file;
-				if (fs::is_directory(full_path))
-					recursive_add_from_dir(full_path);
+				if (!exists(file)){
+					warning(fmt::format(tr_txt("Path {0} does not exist at {1}\n"), file, root));
+					continue;
+				}
+				if (fs::is_directory(file))
+					recursive_add_from_dir(file);
 				else
-					add(full_path);
+					add(file);
 			}
 		}
 		creator_->finish();
@@ -76,7 +89,7 @@ void Archiver::archive()
 		catalog->add_fs_state(next);
 	}
 	catch(std::exception &e){
-		string msg = str(boost::format(tr_text("Error while archiving %1%:\n")) % name);
+		string msg = fmt::format(tr_txt("Error while archiving {0}:\n"), name);
 		msg += message(e);
 		warning(move(msg));
 	}

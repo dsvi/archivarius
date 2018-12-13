@@ -8,32 +8,40 @@ class Stream_in : public Pipe_in
 {
 public:
 	Stream_in();
+	explicit
 	Stream_in(std::string &&name);
 
 	void name(std::string &&name);
 	std::string_view name();
 
-	ui64 get_uint(); // ... or die trying
-	Source::Pump_result pump(ui8 *to, ui64 size);
+	/// var length encoding
+	u64 get_uint(); // ... or die trying
+	/// not var length version. always takes 8 bytes in the stream
+	u64 get_uint64(); // ... or die trying
+	Source::Pump_result pump(u8 *to, u64 size);
 private:
 	std::string name_;
-	std::vector<ui8> buff_;
+	std::vector<u8> buff_;
 };
 
 class Stream_out : public Pipe_out
 {
 public:
 	Stream_out();
+	explicit
 	Stream_out(std::string &&name);
 
 	void name(std::string &&name);
 	std::string_view name();
 
-	void put_uint(ui64 v);
-	void pump(ui8 *from, ui64 size);
+	/// var length encoding
+	void put_uint(u64 v);
+	/// puts as is. e.g. always 8 bytes
+	void put_uint64(u64 v);
+	void pump(u8 *from, u64 size);
 private:
 	std::string name_;
-	std::vector<ui8> buff_;
+	std::vector<u8> buff_;
 };
 
 inline

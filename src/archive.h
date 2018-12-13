@@ -9,6 +9,10 @@ public:
 	std::filesystem::path archive_path;
 	std::filesystem::path root;
 	std::vector<std::filesystem::path> files_to_archive; // if not set, then archive all from root (not including the root)
+	std::vector<std::filesystem::path> files_to_exclude;
+	//TODO: maybe better to swap this to force_to_archive
+	std::unordered_set<std::filesystem::path> to_compact;// relative to archive_path. list of files to 'compact'
+	u64 min_content_file_size;
 	std::function<void(std::string&&)> warning;
 	Catalogue *catalog;
 	void archive();

@@ -5,6 +5,8 @@
 using namespace std;
 namespace fs = std::filesystem;
 
+std::string File_content_creator::prefix = "c";
+
 File_content_creator::File_content_creator(const std::filesystem::path &arc_path)
 {
 	arc_path_ = arc_path;
@@ -28,11 +30,12 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 	Source::Pump_result res;
 	do{
 		res = in_.pump(buff_.raw(), buff_.size());
-		out_.pump(buff_.raw(), buff_.size());
+		out_.pump(buff_.raw(), res.pumped_size);
 		bytes_written_ += res.pumped_size;
 	}while (!res.eof);
 	ref.to = bytes_written_;
-	ref.xxhash = cs_.digest();
+	out_.put_uint64(cs_.digest());
+	bytes_written_ += sizeof(cs_.digest());
 	if (file_.bytes_written() > min_file_size_)
 		out_.finish();
 	ref.compressed_size = file_.bytes_written() - actually_wirtten;
@@ -50,10 +53,12 @@ void File_content_creator::create_file()
 {
 	out_.finish();
 	auto file = arc_path_;
-	file /= string("c") + current_time_to_filename();
+	file /= prefix + current_time_to_filename();
 	int count = 0;
+	auto ofile = file;
 	while (fs::exists(file)){
-		file += string("#") + to_string(count);
+		file = ofile;
+		file += string("#") + to_string(count++);
 	}
 	cs_.sink(&file_);
 	out_.sink(&cs_);

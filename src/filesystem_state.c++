@@ -14,6 +14,7 @@ Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path)
 	arc_path_ = arc_path;
 }
 
+#pragma GCC diagnostic ignored "-Wreturn-type"
 static Filesystem_state::File_type from_proto(proto::File_type ft){
 	switch(ft){
 	case proto::File_type::FILE:
@@ -27,7 +28,7 @@ static Filesystem_state::File_type from_proto(proto::File_type ft){
 	}
 }
 
-Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::string_view name, ui64 time_created)
+Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::string_view name, u64 time_created)
 {
 	filename_ = name;
 	arc_path_ = arc_path;
@@ -54,7 +55,6 @@ Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::s
 			fref.fname = ref.content_fname();
 			fref.from = ref.from();
 			fref.to = ref.to();
-			fref.xxhash = ref.xxhash();
 		}
 		if (f.type == SYMLINK)
 			f.symlink_target = r.symlink_target();
@@ -70,7 +70,7 @@ void Filesystem_state::add(Filesystem_state::File &&f)
 	files_[f.path] = move(f);
 }
 
-std::optional<File_content_ref> Filesystem_state::get_ref_if_exist(std::filesystem::path &archive_path, ui64 modified_seconds)
+std::optional<File_content_ref> Filesystem_state::get_ref_if_exist(std::filesystem::path &archive_path, u64 modified_seconds)
 {
 	auto it = files_.find(archive_path);
 	if (it == files_.end())
@@ -96,6 +96,8 @@ static proto::File_type to_proto(Filesystem_state::File_type ft){
 void Filesystem_state::commit()
 {
 	auto fn = arc_path_ / file_name();
+	if (fs::exists(fn))
+		throw Exception("File {0} already exist")(fn.native());
 	File_sink file(fn);
 	Pipe_xxhash_out cs;
 	Stream_out out(fn);
@@ -115,7 +117,6 @@ void Filesystem_state::commit()
 			ref->set_content_fname(fref.fname);
 			ref->set_from(fref.from);
 			ref->set_to(fref.to);
-			ref->set_xxhash(fref.xxhash);
 		}
 		if (SYMLINK == f.type)
 			rec->set_symlink_target(f.symlink_target);

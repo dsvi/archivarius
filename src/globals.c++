@@ -18,7 +18,7 @@ namespace fs = filesystem;
 //	return result;
 //}
 
-const char *tr_text(const char *s)
+const char *tr_txt(const char *s)
 {
 	return s;
 }
@@ -28,18 +28,24 @@ std::filesystem::file_time_type posix_epoch;
 
 void init_epoch()
 {
-	struct tm start = {.tm_year=70, .tm_mon=0, .tm_mday=1, .tm_hour=0, .tm_min=0, .tm_sec=0};
+	tm start;
+	start.tm_year=70;
+	start.tm_mon=0;
+	start.tm_mday=1;
+	start.tm_hour=0;
+	start.tm_min=0;
+	start.tm_sec=0;
 	time_t t = mktime(&start);
 	posix_epoch = std::filesystem::file_time_type::clock::from_time_t(t);
 }
 
 
-ui64 to_posix_time(std::filesystem::file_time_type time)
+u64 to_posix_time(std::filesystem::file_time_type time)
 {
 	return chrono::duration_cast<chrono::seconds>(time - posix_epoch).count();
 }
 
-std::filesystem::file_time_type from_posix_time(ui64 posix_seconds)
+std::filesystem::file_time_type from_posix_time(u64 posix_seconds)
 {
 	return posix_epoch + std::chrono::seconds(posix_seconds);
 }
@@ -55,7 +61,7 @@ string current_time_to_filename()
 	return name.str();
 }
 
-std::tuple<Filesystem_state::File, bool> make_file(std::filesystem::path &file_path, std::filesystem::path &&archive_path)
+std::tuple<Filesystem_state::File, bool> make_file(const std::filesystem::path &file_path, std::filesystem::path &&archive_path)
 {
 	auto sts = symlink_status(file_path);
 	Filesystem_state::File f;
@@ -95,4 +101,14 @@ void find_and_replace(string &where, const string &what, const string &replace_t
 		where.replace(i, what.length(), replace_to);
 		i += replace_to.length();
 	}
+}
+
+void trim(string &s)
+{
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+		  return !std::isspace(ch);
+	}));
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+		  return !std::isspace(ch);
+	}).base(), s.end());
 }

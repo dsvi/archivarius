@@ -1,14 +1,19 @@
 #include "exception.h"
 #include "globals.h"
 
-Exception::Exception(const char *fmt_string) :fmt_(tr_text(fmt_string))
+Exception::Exception(std::string &&error_message) : fmt_(error_message)
 {
 
 }
 
-std::string Exception::message()
+Exception::Exception(const char *fmt_string) :fmt_(tr_txt(fmt_string))
 {
-	return fmt_.str();
+
+}
+
+std::string_view Exception::message()
+{
+	return fmt_;
 }
 
 std::string message(std::exception &e)

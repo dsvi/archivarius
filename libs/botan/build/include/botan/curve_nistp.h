@@ -1,1 +1,0 @@
-../../../src/lib/math/ec_gfp/curve_nistp.h

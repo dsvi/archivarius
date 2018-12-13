@@ -12,11 +12,11 @@ public:
 	virtual
 	~Source();
 	struct Pump_result{
-		ui64 pumped_size;
+		u64 pumped_size;
 		bool eof;
 	};
 	virtual
-	Pump_result pump(ui8 *to, ui64 size) = 0; // should pump exactly the size, if not eof
+	Pump_result pump(u8 *to, u64 size) = 0; // should pump exactly the size, if not eof
 };
 
 class Pipe_in: public Source{
@@ -40,7 +40,7 @@ public:
 	~Sink();
 	// returns new size
 	virtual
-	void pump(ui8 *from, ui64 size) = 0;
+	void pump(u8 *from, u64 size) = 0;
 	virtual
 	void finish() = 0;
 };
@@ -52,7 +52,7 @@ public:
 	}
 	void finish() override;
 protected:
-	Sink *next_;
+	Sink *next_ = nullptr;
 };
 
 
@@ -62,7 +62,7 @@ public:
 	File_source();
 	File_source(const std::filesystem::path &path);
 	virtual
-	Pump_result pump(ui8 *to, ui64 size) override;
+	Pump_result pump(u8 *to, u64 size) override;
 private:
 	typedef std::unique_ptr<std::FILE, decltype(&fclose)> File_ptr;
 	File_ptr file_;
@@ -74,21 +74,21 @@ public:
 	File_sink();
 	File_sink(const std::filesystem::path &path);
 	virtual
-	void pump(ui8 *to, ui64 size) override;
+	void pump(u8 *to, u64 size) override;
 	virtual
 	void finish() override;
-	ui64 bytes_written();
+	u64 bytes_written();
 	operator bool(){
 		return static_cast<bool>(file_);
 	}
 private:
 	typedef std::unique_ptr<std::FILE, decltype(&fclose)> File_ptr;
 	File_ptr file_;
-	ui64 bytes_written_ = 0;
+	u64 bytes_written_ = 0;
 };
 
 inline
-ui64 File_sink::bytes_written()
+u64 File_sink::bytes_written()
 {
 	return bytes_written_;
 }

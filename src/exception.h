@@ -5,16 +5,17 @@ class Exception : public std::exception
 {
 public:
 	explicit
+	Exception(std::string &&error_message);
+	explicit
 	Exception(const char*fmt_string);
-	template<class T>
-	Exception & operator << (const T &t){
-		fmt_ % t;
+	template<class... Args>
+	Exception operator()(const Args&... a){
+		fmt_ = fmt::format(fmt_, a...);
 		return *this;
 	}
-	std::string message();
+	std::string_view message();
 private:
-	boost::format fmt_;
+	std::string fmt_;
 };
 
 std::string message(std::exception &e);
-

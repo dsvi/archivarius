@@ -3,18 +3,20 @@
 #include "catalogue.h"
 #include "globals.h"
 #include "platform.h"
+#include "piping.h"
 
 using namespace std;
+using namespace fmt;
 namespace fs = filesystem;
 
-void pump_to(File_source &in, ui64 to, File_sink *out, string_view fname, Buffer &tmp, ui64 &num_pumped )
+void pump_to(File_source &in, u64 to, Sink *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
 {
 	while (num_pumped < to){
 		auto num_left = to - num_pumped;
 		auto to_pump = num_left > tmp.size() ? tmp.size() : num_left;
 		auto ret = in.pump(tmp.raw(), to_pump);
 		if (ret.eof && ret.pumped_size != to_pump)
-			throw Exception( "Truncated content file %1%" ) << fname;
+			throw Exception( "Truncated content file {0}" )(fname);
 		if (out)
 			out->pump(tmp.raw(), to_pump);
 		num_pumped += to_pump;
@@ -47,7 +49,7 @@ void restore(Restore_settings &&cfg)
 				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
-				string msg = str(boost::format(tr_text("Can't restore directory %1% to %2%:\n")) % file.path % re_path);
+				string msg = format(tr_txt("Can't restore directory {0} to {1}:\n"), file.path, re_path);
 				msg += message(e);
 				cfg.warning(move(msg));
 			}
@@ -72,11 +74,19 @@ void restore(Restore_settings &&cfg)
 					}
 					pump_to(in, ref.from, nullptr, ref.fname, tmp, num_pumped);
 					File_sink out(re_path);
-					pump_to(in, ref.to, &out, ref.fname, tmp, num_pumped);
+					Pipe_xxhash_out cs;
+					cs.sink(&out);
+					pump_to(in, ref.to, &cs, ref.fname, tmp, num_pumped);
+					Stream_in sin(cfg.from / ref.fname);
+					sin.source(&in);
+					u64 original_cs = sin.get_uint64();
 					apply_attribs(re_path, file);
+					if (original_cs != cs.digest())
+						throw Exception( "Control sums do not match" );
 				}
 				catch(std::exception &e){
-					string msg = str(boost::format(tr_text("Can't restore %1% to %2%:\n")) % file.path % re_path );
+					/* TRANSLATORS: This is about path from and to  */
+					string msg = format(tr_txt("Can't restore {0} to {1}:\n"), file.path, re_path);
 					msg += message(e);
 					cfg.warning(move(msg));
 				}
@@ -98,7 +108,8 @@ void restore(Restore_settings &&cfg)
 				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
-				string msg = str(boost::format(tr_text("Can't restore %1% to %2%:\n")) % file.path % re_path);
+				/* TRANSLATORS: This is about path from and to  */
+				string msg = format(tr_txt("Can't restore {0} to {1}:\n"), file.path, re_path);
 				msg += message(e);
 				cfg.warning(move(msg));
 			}
@@ -107,9 +118,11 @@ void restore(Restore_settings &&cfg)
 	catch(std::exception &e){
 		string msg;
 		if (cfg.name.empty())
-			msg = str(boost::format(tr_text("Error while restoring %1% to %2%:\n")) % cfg.from % cfg.to);
+			/* TRANSLATORS: This is about path from and to  */
+			msg = format(tr_txt("Error while restoring from {0} to {1}:"), cfg.from, cfg.to);
 		else
-			msg = str(boost::format(tr_text("Error while restoring %1% to %2%:\n")) % cfg.name % cfg.to);
+			/* TRANSLATORS: First argument is name, second - path*/
+			msg = format(tr_txt("Error while restoring {0} to {1}:"), cfg.name, cfg.to);
 		msg += message(e);
 		cfg.warning(move(msg));
 	}

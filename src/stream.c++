@@ -14,31 +14,43 @@ Stream_in::Stream_in(string &&name)
 	name_ = move(name);
 }
 
-ui64 Stream_in::get_uint()
+u64 Stream_in::get_uint()
 {
-	ui64 v = 0;
-	ui8 sv;
+	u64 v = 0;
+	u8 sv;
 	size_t num_bytes = 0;
 	do{
 		Source::Pump_result read = pump(&sv, 1);
 		if (read.pumped_size != 1)
-			throw Exception( "Malformed file or wrong password: %1%" ) << name_;
+			throw Exception( "Malformed file or wrong password: {0}" )(name_);
 		v <<= 7;
 		v |= sv &127;
 		if (++num_bytes > sizeof(v) + 1 + (sizeof(v)-1)/8)
-			throw Exception( "Too big varint. Malformed file or wrong password? %1%" ) << name_;
+			throw Exception( "Too big varint. Malformed file or wrong password? {0}" )(name_);
 	}while(sv &128);
 	return v;
 }
 
-Source::Pump_result Stream_in::pump(ui8 *to, ui64 size)
+u64 Stream_in::get_uint64()
+{
+	u64 v;
+	pump((u8*) &v, sizeof(v));
+	return v;
+}
+
+Source::Pump_result Stream_in::pump(u8 *to, u64 size)
 {
 	try{
 		return next_->pump(to, size);
 	}
 	catch(...){
-		throw_with_nested( Exception("Can't read the file %1%") << name_);
+		throw_with_nested( Exception("Can't read the file {0}")(name_));
 	}
+}
+
+Stream_out::Stream_out()
+{
+
 }
 
 Stream_out::Stream_out(std::string &&name)
@@ -46,21 +58,21 @@ Stream_out::Stream_out(std::string &&name)
 	name_ = move(name);
 }
 
-void Stream_out::pump(ui8 *from, ui64 size)
+void Stream_out::pump(u8 *from, u64 size)
 {
 	try{
 		next_->pump(from, size);
 	}
 	catch(...){
-		throw_with_nested( Exception( "Error writing file %1%" ) << name_ );
+		throw_with_nested( Exception( "Error writing file {0}" )(name_) );
 	}
 }
 
-void Stream_out::put_uint(ui64 v)
+void Stream_out::put_uint(u64 v)
 {
 	buff_.resize(0);
 	do{
-		ui8 sv = v & 127;
+		u8 sv = v & 127;
 		v >>= 7;
 		if (v)
 			sv |= 128;
@@ -69,7 +81,10 @@ void Stream_out::put_uint(ui64 v)
 	pump(&buff_.front(), buff_.size());
 }
 
-
+void Stream_out::put_uint64(u64 v)
+{
+	pump((u8*)&v, sizeof(v));
+}
 
 void read_message(Buffer &message, Stream_in &in, Pipe_xxhash_in &cs_pipe)
 {
@@ -77,7 +92,7 @@ void read_message(Buffer &message, Stream_in &in, Pipe_xxhash_in &cs_pipe)
 	cs_pipe.reset();
 	auto res = in.pump(message.raw(), msize);
 	if (res.pumped_size != msize)
-		throw Exception("Malformed file or wrong password: %1%") << in.name();
+		throw Exception("Malformed file or wrong password: {0}")(in.name());
 	auto cs_now = cs_pipe.digest();
 	auto cs_was = in.get_uint();
 	if (cs_now != cs_was)

@@ -1,4 +1,4 @@
-workspace "µUI"
+workspace "archivarius"
 location ("build")
 configurations { "release", "debug" }
 
@@ -12,7 +12,7 @@ newaction {
 }
 
 path.iscppfile = function (fname)
-  return path.hasextension(fname, { ".cc", ".cpp", ".c++", ".cxx", ".c", ".s", ".m", ".mm" })
+  return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c++" })
 end
 
 --flags { "C++14", "StaticRuntime", "NoBufferSecurityCheck", "LinkTimeOptimization" }
@@ -71,12 +71,10 @@ project( "archivarius" )
   dofile "libs/botan/exports.lua"
   dofile "libs/zstd/exports.lua"
   includedirs {
-    "libs/boost",
     "libs"
   }
 
   filter "system:linux"
-    --links { "c++experimental" }
     links { "pthread" }
     links { "acl" }
   filter {}

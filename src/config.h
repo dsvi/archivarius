@@ -19,7 +19,7 @@ struct Config{
 	// if not set, then archive all from root (not including the root)
 	std::vector<std::filesystem::path> files_to_archive;
 	std::vector<std::filesystem::path> files_to_ignore;
-	std::optional<ui64>	 max_storage_time;
+	std::optional<u64>	 max_storage_time;
 	std::optional<Config_zstd> zstd;
 	std::optional<Config_aes>  aes;
 };

@@ -1,7 +1,9 @@
 #include "cmd_line_parser.h"
 #include "exception.h"
+#include "globals.h"
 
 using namespace std;
+using namespace fmt;
 
 Cmd_line parse_command_line(int argc, char *argv[])
 {
@@ -12,14 +14,13 @@ Cmd_line parse_command_line(int argc, char *argv[])
 		for(int i = 2; i < argc; i++){
 			string pstr = argv[i];
 			auto eq_pos = pstr.find("=");
-			if (eq_pos == pstr.npos)
-				throw Exception("Wrong parameter format %1%. Should be param=val") << pstr;
+			if (eq_pos == pstr.npos || eq_pos == 0)
+				throw Exception("Wrong parameter format {0}. Should be param=val")(pstr);
 			string pname = pstr.substr(0, eq_pos);
-			if (pname.empty())
-				throw Exception("Wrong parameter format %1%. Should be param=val") << pstr;
+			ASSERT(!pname.empty());
 			string pval  = pstr.substr(eq_pos + 1, pstr.size());
 			if (pval.empty())
-				throw Exception("No value for '%1%'") << pname;
+				throw Exception("No value for '{0}'")(pname);
 			ret.params_[pname] = pval;
 		}
 		return ret;
@@ -28,31 +29,33 @@ Cmd_line parse_command_line(int argc, char *argv[])
 	}
 }
 
-std::optional<std::string_view> Cmd_line::param_str(std::string_view name)
+std::optional<std::string> Cmd_line::param_str_opt(std::string_view name)
 {
 	auto n = std::string(name);
-	if (auto it = params_.find(n); it == params_.end())
+	auto it = params_.find(n);
+	if (it == params_.end())
 		return {};
-	else
-		return it->second;
+	auto ret = move(it->second);
+	params_.erase(it);
+	return ret;
 }
 
-std::optional<uint> Cmd_line::param_uint(std::string_view name)
+std::optional<uint> Cmd_line::param_uint_opt(std::string_view name)
 {
-	auto str = param_str(name);
+	auto str = param_str_opt(name);
 	if (!str)
 		return {};
 	try{
 		return stoul(string(str.value()));
 	}
 	catch(...){
-		throw_with_nested(Exception("Parameter '%1%' must be unsigned integer") << name);
+		throw_with_nested(Exception("Parameter '{0}' must be unsigned integer")(name));
 	}
 }
 
-std::optional<bool> Cmd_line::param_bool(std::string_view name)
+std::optional<bool> Cmd_line::param_bool_opt(std::string_view name)
 {
-	auto str = param_str(name);
+	auto str = param_str_opt(name);
 	if (!str)
 		return {};
 	string s{ str.value() };
@@ -62,13 +65,25 @@ std::optional<bool> Cmd_line::param_bool(std::string_view name)
 		return {true};
 	if ( s == "off")
 		return {false};
-	throw Exception("value for '%1%' must be either 'on' or 'off'") << name;
+	throw Exception("value for '{0}' must be either 'on' or 'off'")(name);
 }
 
-std::string_view Cmd_line::param_str(std::string_view name)
+void Cmd_line::check_unused_arguments()
+{
+	if (params_.empty())
+		return;
+	string msg = format(tr_txt("Following command line parameters are superfluous: "));
+	for (auto [key,v]: params_){
+		msg += key;
+		msg += ' ';
+	}
+	throw Exception(move(msg));
+}
+
+std::string Cmd_line::param_str(std::string_view name)
 {
 	auto s = param_str_opt(name);
 	if (!s)
-		throw Exception("Required parameter '%1%' missing") << name;
+		throw Exception("Required parameter '{0}' missing")(name);
 	return s.value();
 }

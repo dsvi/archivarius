@@ -968,7 +968,6 @@ void Ref::InitAsDefaultInstance() {
 const int Ref::kContentFnameFieldNumber;
 const int Ref::kFromFieldNumber;
 const int Ref::kToFieldNumber;
-const int Ref::kXxhashFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Ref::Ref()
@@ -989,16 +988,16 @@ Ref::Ref(const Ref& from)
     content_fname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_fname_);
   }
   ::memcpy(&from_, &from.from_,
-    static_cast<size_t>(reinterpret_cast<char*>(&xxhash_) -
-    reinterpret_cast<char*>(&from_)) + sizeof(xxhash_));
+    static_cast<size_t>(reinterpret_cast<char*>(&to_) -
+    reinterpret_cast<char*>(&from_)) + sizeof(to_));
   // @@protoc_insertion_point(copy_constructor:proto.Ref)
 }
 
 void Ref::SharedCtor() {
   content_fname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&from_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&xxhash_) -
-      reinterpret_cast<char*>(&from_)) + sizeof(xxhash_));
+      reinterpret_cast<char*>(&to_) -
+      reinterpret_cast<char*>(&from_)) + sizeof(to_));
   _cached_size_ = 0;
 }
 
@@ -1037,8 +1036,8 @@ void Ref::Clear() {
 
   content_fname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&from_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&xxhash_) -
-      reinterpret_cast<char*>(&from_)) + sizeof(xxhash_));
+      reinterpret_cast<char*>(&to_) -
+      reinterpret_cast<char*>(&from_)) + sizeof(to_));
   _internal_metadata_.Clear();
 }
 
@@ -1102,20 +1101,6 @@ bool Ref::MergePartialFromCodedStream(
         break;
       }
 
-      // uint64 xxhash = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
-                 input, &xxhash_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1162,11 +1147,6 @@ void Ref::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->to(), output);
   }
 
-  // uint64 xxhash = 4;
-  if (this->xxhash() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->xxhash(), output);
-  }
-
   output->WriteRaw((::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()).data(),
                    static_cast<int>((::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()).size()));
   // @@protoc_insertion_point(serialize_end:proto.Ref)
@@ -1199,13 +1179,6 @@ size_t Ref::ByteSizeLong() const {
         this->to());
   }
 
-  // uint64 xxhash = 4;
-  if (this->xxhash() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->xxhash());
-  }
-
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = cached_size;
@@ -1235,9 +1208,6 @@ void Ref::MergeFrom(const Ref& from) {
   if (from.to() != 0) {
     set_to(from.to());
   }
-  if (from.xxhash() != 0) {
-    set_xxhash(from.xxhash());
-  }
 }
 
 void Ref::CopyFrom(const Ref& from) {
@@ -1260,7 +1230,6 @@ void Ref::InternalSwap(Ref* other) {
   content_fname_.Swap(&other->content_fname_);
   swap(from_, other->from_);
   swap(to_, other->to_);
-  swap(xxhash_, other->xxhash_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }
@@ -2274,7 +2243,6 @@ void Ref_count::InitAsDefaultInstance() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Ref_count::kFromFieldNumber;
 const int Ref_count::kToFieldNumber;
-const int Ref_count::kXxhashFieldNumber;
 const int Ref_count::kRefCountFieldNumber;
 const int Ref_count::kCompressedSizeFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -2387,24 +2355,10 @@ bool Ref_count::MergePartialFromCodedStream(
         break;
       }
 
-      // uint64 xxhash = 3;
+      // uint64 ref_count = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
-
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
-                 input, &xxhash_)));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // uint64 ref_count = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
@@ -2415,10 +2369,10 @@ bool Ref_count::MergePartialFromCodedStream(
         break;
       }
 
-      // uint64 compressed_size = 5;
-      case 5: {
+      // uint64 compressed_size = 4;
+      case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
@@ -2465,19 +2419,14 @@ void Ref_count::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(2, this->to(), output);
   }
 
-  // uint64 xxhash = 3;
-  if (this->xxhash() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->xxhash(), output);
-  }
-
-  // uint64 ref_count = 4;
+  // uint64 ref_count = 3;
   if (this->ref_count() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->ref_count(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->ref_count(), output);
   }
 
-  // uint64 compressed_size = 5;
+  // uint64 compressed_size = 4;
   if (this->compressed_size() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(5, this->compressed_size(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->compressed_size(), output);
   }
 
   output->WriteRaw((::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()).data(),
@@ -2505,21 +2454,14 @@ size_t Ref_count::ByteSizeLong() const {
         this->to());
   }
 
-  // uint64 xxhash = 3;
-  if (this->xxhash() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->xxhash());
-  }
-
-  // uint64 ref_count = 4;
+  // uint64 ref_count = 3;
   if (this->ref_count() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt64Size(
         this->ref_count());
   }
 
-  // uint64 compressed_size = 5;
+  // uint64 compressed_size = 4;
   if (this->compressed_size() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt64Size(
@@ -2551,9 +2493,6 @@ void Ref_count::MergeFrom(const Ref_count& from) {
   if (from.to() != 0) {
     set_to(from.to());
   }
-  if (from.xxhash() != 0) {
-    set_xxhash(from.xxhash());
-  }
   if (from.ref_count() != 0) {
     set_ref_count(from.ref_count());
   }
@@ -2581,7 +2520,6 @@ void Ref_count::InternalSwap(Ref_count* other) {
   using std::swap;
   swap(from_, other->from_);
   swap(to_, other->to_);
-  swap(xxhash_, other->xxhash_);
   swap(ref_count_, other->ref_count_);
   swap(compressed_size_, other->compressed_size_);
   _internal_metadata_.Swap(&other->_internal_metadata_);

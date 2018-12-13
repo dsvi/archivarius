@@ -1,1 +1,0 @@
-../../../src/lib/block/sm4/sm4.h
