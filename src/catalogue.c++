@@ -20,13 +20,13 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 	cat_file_ = arc_path / cat_filename;
 	if (!fs::exists(cat_file_))
 		File_sink f(cat_file_);
+	file_lock_ = lock(cat_file_);
 	if (fs::file_size(cat_file_) == 0){
-		file_lock_ = lock(cat_file_);
+		clean_up();
 		return;
 	}
 
 	try {
-		file_lock_ = lock(cat_file_);
 		File_source src(cat_file_);
 		Pipe_xxhash_in cs_pipe;
 		cs_pipe.source(&src);
@@ -65,9 +65,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 					ref.from = r.from();
 					ref.to   = r.to();
 					ref.ref_count_ = r.ref_count();
-					ref.compressed_size = r.compressed_size();
-					if (ref.compressed_size == 0)
-						ref.compressed_size = ref.to - ref.from;
+					ref.space_taken = r.space_taken();
 					content_refs_.insert(ref);
 				}
 			}
@@ -142,7 +140,7 @@ void Catalogue::commit()
 {
 	try {
 		auto new_file = cat_file_;
-		new_file.append(".tmp");
+		new_file += ".tmp";
 		File_sink dst(new_file);
 		Pipe_xxhash_out cs_pipe;
 		cs_pipe.sink(&dst);
@@ -178,7 +176,7 @@ void Catalogue::commit()
 			auto ref = fd->add_refs();
 			ref->set_from(r.from);
 			ref->set_to(r.to);
-			ref->set_compressed_size(r.compressed_size);
+			ref->set_space_taken(r.space_taken);
 			ref->set_ref_count(r.ref_count_);
 		}
 		put_message(cat_msg, buf, out, cs_pipe);

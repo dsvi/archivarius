@@ -20,11 +20,12 @@ public:
 	static std::string prefix;
 private:
 	std::filesystem::path arc_path_;
+	std::string   fname_;
 	Stream_in     in_;
 	Stream_out    out_;
 	File_sink    file_;
 	Pipe_xxhash_out cs_;
-	u64 bytes_written_;
+	u64 bytes_pumped_;
 	u64 min_file_size_;
 	Buffer buff_;
 

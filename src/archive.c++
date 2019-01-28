@@ -18,7 +18,7 @@ try {
 		}
 		add(p);
 		if (e.is_directory())
-			dirs.push_back(e.path());
+			dirs.push_back(p);
 	}
 	for (auto &dir : dirs)
 		recursive_add_from_dir(dir);
@@ -87,6 +87,7 @@ void Archiver::archive()
 		creator_->finish();
 		next_->commit();
 		catalog->add_fs_state(next);
+		catalog->commit();
 	}
 	catch(std::exception &e){
 		string msg = fmt::format(tr_txt("Error while archiving {0}:\n"), name);

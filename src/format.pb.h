@@ -1084,11 +1084,11 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::uint64 ref_count() const;
   void set_ref_count(::google::protobuf::uint64 value);
 
-  // uint64 compressed_size = 4;
-  void clear_compressed_size();
-  static const int kCompressedSizeFieldNumber = 4;
-  ::google::protobuf::uint64 compressed_size() const;
-  void set_compressed_size(::google::protobuf::uint64 value);
+  // uint64 space_taken = 4;
+  void clear_space_taken();
+  static const int kSpaceTakenFieldNumber = 4;
+  ::google::protobuf::uint64 space_taken() const;
+  void set_space_taken(::google::protobuf::uint64 value);
 
   // @@protoc_insertion_point(class_scope:proto.Ref_count)
  private:
@@ -1097,7 +1097,7 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::uint64 from_;
   ::google::protobuf::uint64 to_;
   ::google::protobuf::uint64 ref_count_;
-  ::google::protobuf::uint64 compressed_size_;
+  ::google::protobuf::uint64 space_taken_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
   friend void ::protobuf_format_2eproto::InitDefaultsRef_countImpl();
@@ -2073,18 +2073,18 @@ inline void Ref_count::set_ref_count(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:proto.Ref_count.ref_count)
 }
 
-// uint64 compressed_size = 4;
-inline void Ref_count::clear_compressed_size() {
-  compressed_size_ = GOOGLE_ULONGLONG(0);
+// uint64 space_taken = 4;
+inline void Ref_count::clear_space_taken() {
+  space_taken_ = GOOGLE_ULONGLONG(0);
 }
-inline ::google::protobuf::uint64 Ref_count::compressed_size() const {
-  // @@protoc_insertion_point(field_get:proto.Ref_count.compressed_size)
-  return compressed_size_;
+inline ::google::protobuf::uint64 Ref_count::space_taken() const {
+  // @@protoc_insertion_point(field_get:proto.Ref_count.space_taken)
+  return space_taken_;
 }
-inline void Ref_count::set_compressed_size(::google::protobuf::uint64 value) {
+inline void Ref_count::set_space_taken(::google::protobuf::uint64 value) {
   
-  compressed_size_ = value;
-  // @@protoc_insertion_point(field_set:proto.Ref_count.compressed_size)
+  space_taken_ = value;
+  // @@protoc_insertion_point(field_set:proto.Ref_count.space_taken)
 }
 
 // -------------------------------------------------------------------

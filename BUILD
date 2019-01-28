@@ -8,5 +8,12 @@ cc_binary(
         "//libs/protobuf:protobuf_lite",
     ],
     linkopts = ["-lstdc++fs -lacl"],
+    defines = select({
+        ":debug": ["DEBUG"],
+    }),
+)
 
+config_setting(
+    name = "debug",
+    values = { "compilation_mode": "dbg" }
 )

@@ -2244,7 +2244,7 @@ void Ref_count::InitAsDefaultInstance() {
 const int Ref_count::kFromFieldNumber;
 const int Ref_count::kToFieldNumber;
 const int Ref_count::kRefCountFieldNumber;
-const int Ref_count::kCompressedSizeFieldNumber;
+const int Ref_count::kSpaceTakenFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Ref_count::Ref_count()
@@ -2261,15 +2261,15 @@ Ref_count::Ref_count(const Ref_count& from)
       _cached_size_(0) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::memcpy(&from_, &from.from_,
-    static_cast<size_t>(reinterpret_cast<char*>(&compressed_size_) -
-    reinterpret_cast<char*>(&from_)) + sizeof(compressed_size_));
+    static_cast<size_t>(reinterpret_cast<char*>(&space_taken_) -
+    reinterpret_cast<char*>(&from_)) + sizeof(space_taken_));
   // @@protoc_insertion_point(copy_constructor:proto.Ref_count)
 }
 
 void Ref_count::SharedCtor() {
   ::memset(&from_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&compressed_size_) -
-      reinterpret_cast<char*>(&from_)) + sizeof(compressed_size_));
+      reinterpret_cast<char*>(&space_taken_) -
+      reinterpret_cast<char*>(&from_)) + sizeof(space_taken_));
   _cached_size_ = 0;
 }
 
@@ -2306,8 +2306,8 @@ void Ref_count::Clear() {
   (void) cached_has_bits;
 
   ::memset(&from_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&compressed_size_) -
-      reinterpret_cast<char*>(&from_)) + sizeof(compressed_size_));
+      reinterpret_cast<char*>(&space_taken_) -
+      reinterpret_cast<char*>(&from_)) + sizeof(space_taken_));
   _internal_metadata_.Clear();
 }
 
@@ -2369,14 +2369,14 @@ bool Ref_count::MergePartialFromCodedStream(
         break;
       }
 
-      // uint64 compressed_size = 4;
+      // uint64 space_taken = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(32u /* 32 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
-                 input, &compressed_size_)));
+                 input, &space_taken_)));
         } else {
           goto handle_unusual;
         }
@@ -2424,9 +2424,9 @@ void Ref_count::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->ref_count(), output);
   }
 
-  // uint64 compressed_size = 4;
-  if (this->compressed_size() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->compressed_size(), output);
+  // uint64 space_taken = 4;
+  if (this->space_taken() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(4, this->space_taken(), output);
   }
 
   output->WriteRaw((::google::protobuf::internal::GetProto3PreserveUnknownsDefault()   ? _internal_metadata_.unknown_fields()   : _internal_metadata_.default_instance()).data(),
@@ -2461,11 +2461,11 @@ size_t Ref_count::ByteSizeLong() const {
         this->ref_count());
   }
 
-  // uint64 compressed_size = 4;
-  if (this->compressed_size() != 0) {
+  // uint64 space_taken = 4;
+  if (this->space_taken() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->compressed_size());
+        this->space_taken());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -2496,8 +2496,8 @@ void Ref_count::MergeFrom(const Ref_count& from) {
   if (from.ref_count() != 0) {
     set_ref_count(from.ref_count());
   }
-  if (from.compressed_size() != 0) {
-    set_compressed_size(from.compressed_size());
+  if (from.space_taken() != 0) {
+    set_space_taken(from.space_taken());
   }
 }
 
@@ -2521,7 +2521,7 @@ void Ref_count::InternalSwap(Ref_count* other) {
   swap(from_, other->from_);
   swap(to_, other->to_);
   swap(ref_count_, other->ref_count_);
-  swap(compressed_size_, other->compressed_size_);
+  swap(space_taken_, other->space_taken_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(_cached_size_, other->_cached_size_);
 }

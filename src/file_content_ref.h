@@ -5,7 +5,7 @@ struct File_content_ref{
 	std::string fname;
 	u64 from;
 	u64 to;
-	u64 compressed_size; // space taken in file. never 0
+	u64 space_taken; // space taken in file. never 0
 	u64 ref_count_ = 0;  // only Catalogue can change this
 };
 

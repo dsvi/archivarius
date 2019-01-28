@@ -32,7 +32,7 @@ int main(int argc, char *argv[]){
 					};
 					Catalogue cat(c.archive);
 					// TODO: remove recalculation of content file size???
-					arc.min_content_file_size = 1*1024*1024;
+					arc.min_content_file_size = 10*1024*1024;
 					arc.catalog = &cat;
 					// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 					auto max_ref = cat.max_ref_count();
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]){
 								auto &a = old_enough_to_compact.front();
 								a.path = &file.path;
 								a.content_fn = &file.content_ref->fname;
-								a.size = file.content_ref->compressed_size;
+								a.size = file.content_ref->space_taken;
 							}
 						}
 						unordered_map<string, u64> content_file_size;
