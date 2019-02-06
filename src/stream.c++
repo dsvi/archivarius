@@ -34,7 +34,9 @@ u64 Stream_in::get_uint()
 u64 Stream_in::get_uint64()
 {
 	u64 v;
-	pump((u8*) &v, sizeof(v));
+	auto res = pump((u8*) &v, sizeof(v));
+	if (res.pumped_size != sizeof(v))
+		throw Exception( "Malformed file or wrong password: {0}" )(name_);
 	return v;
 }
 

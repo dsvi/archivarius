@@ -9,7 +9,7 @@ using namespace std;
 using namespace fmt;
 namespace fs = filesystem;
 
-void pump_to(File_source &in, u64 to, Sink *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
+void pump_to(Source &in, u64 to, Sink *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
 {
 	while (num_pumped < to){
 		auto num_left = to - num_pumped;
@@ -40,13 +40,13 @@ void restore(Restore_settings &&cfg)
 		tmp.resize(10'000'000);
 		Catalogue catalog(cfg.from);
 		auto state = catalog.fs_state(cfg.from_ndx);
-		for (auto &file : state.files()){ // restore dirs
+		auto files = state.files();
+		for (auto &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
 				continue;
 			auto re_path = cfg.to / file.path;
 			try{
 				fs::create_directories(re_path);
-				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
 				string msg = format(tr_txt("Can't restore directory {0} to {1}:\n"), file.path, re_path);
@@ -55,32 +55,35 @@ void restore(Restore_settings &&cfg)
 			}
 		}
 		{ // restore non empty files
-			map<File_content_ref, Filesystem_state::File> sorted_by_refs;
-			for (auto &file : state.files()){
-				if (file.content_ref)
-					sorted_by_refs[file.content_ref.value()] = file;
-			}
+			auto refs_only = files | ranges::view::remove_if([](auto &a){return !a.content_ref.has_value();});
+			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs( refs_only.begin(), refs_only.end() );
+			ranges::action::sort(sorted_by_refs, [](auto a, auto b){
+				return a.get().content_ref.value() < b.get().content_ref.value();
+			});
 			File_source in;
+			Stream_in sin;
+			sin.source(&in);
 			decltype(File_content_ref::fname) fname;
 			decltype(File_content_ref::from)  num_pumped;
-			for (auto &p : sorted_by_refs){
-				auto &ref = p.first;
-				auto &file = p.second;
+			for (auto fr : sorted_by_refs){
+				auto &file = fr.get();
+				auto &ref = file.content_ref.value();
 				auto re_path = cfg.to / file.path;
 				try {
 					if (fname != ref.fname){
-						in = move(cfg.from / ref.fname);
+						auto content_path = cfg.from / ref.fname;
+						in = content_path;
+						sin.name(content_path);
 						num_pumped = 0;
+						fname = ref.fname;
 					}
-					pump_to(in, ref.from, nullptr, ref.fname, tmp, num_pumped);
+					pump_to(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
 					File_sink out(re_path);
 					Pipe_xxhash_out cs;
 					cs.sink(&out);
-					pump_to(in, ref.to, &cs, ref.fname, tmp, num_pumped);
-					Stream_in sin(cfg.from / ref.fname);
-					sin.source(&in);
+					pump_to(sin, ref.to, &cs, ref.fname, tmp, num_pumped);
 					u64 original_cs = sin.get_uint64();
-					apply_attribs(re_path, file);
+					num_pumped += sizeof(sin.get_uint64());
 					if (original_cs != cs.digest())
 						throw Exception( "Control sums do not match" );
 				}
@@ -92,7 +95,7 @@ void restore(Restore_settings &&cfg)
 				}
 			}
 		}
-		for (auto &file : state.files()){ // restore links and empty files
+		for (auto &file : files){ // restore links and empty files
 			if (file.type == Filesystem_state::DIR)
 				continue;
 			auto re_path = cfg.to / file.path;
@@ -105,11 +108,25 @@ void restore(Restore_settings &&cfg)
 				else if (file.type == Filesystem_state::SYMLINK){
 					std::filesystem::create_symlink(file.symlink_target, re_path);
 				}
-				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
 				string msg = format(tr_txt("Can't restore {0} to {1}:\n"), file.path, re_path);
+				msg += message(e);
+				cfg.warning(move(msg));
+			}
+		}
+		vector<reference_wrapper<Filesystem_state::File>> sorted_files( files.begin(), files.end() );
+		ranges::action::sort(sorted_files, [](auto a, auto b){
+			return a.get().path > b.get().path;
+		});
+		for (Filesystem_state::File &file : sorted_files){// restore attributes
+			auto re_path = cfg.to / file.path;
+			try{
+				apply_attribs(re_path, file);
+			}
+			catch(std::exception &e){
+				string msg = format(tr_txt("Can't restore attributes for {0}:\n"), re_path);
 				msg += message(e);
 				cfg.warning(move(msg));
 			}

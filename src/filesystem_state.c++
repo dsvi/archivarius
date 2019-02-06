@@ -50,11 +50,11 @@ Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::s
 		f.type = from_proto(r.type());
 		f.mod_time = r.modified_seconds();
 		if (r.has_ref()){
-			File_content_ref fref;
+			f.content_ref.emplace();
 			auto &ref = r.ref();
-			fref.fname = ref.content_fname();
-			fref.from = ref.from();
-			fref.to = ref.to();
+			f.content_ref->fname = ref.content_fname();
+			f.content_ref->from = ref.from();
+			f.content_ref->to = ref.to();
 		}
 		if (f.type == SYMLINK)
 			f.symlink_target = r.symlink_target();
@@ -67,6 +67,7 @@ Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::s
 
 void Filesystem_state::add(Filesystem_state::File &&f)
 {
+	ASSERT(!f.path.empty());
 	files_[f.path] = move(f);
 }
 

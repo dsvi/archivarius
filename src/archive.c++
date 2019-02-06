@@ -39,7 +39,7 @@ void Archiver::add(const fs::path &file_path)
 		if (file.type == Filesystem_state::FILE){
 			auto sz = fs::file_size(file_path);
 			if (sz != 0){
-				file.content_ref = prev_->get_ref_if_exist(rel_path, file.mod_time);
+				file.content_ref = prev_->get_ref_if_exist(file.path, file.mod_time);
 				if (!file.content_ref)
 					file.content_ref = creator_->add(file_path);
 			}

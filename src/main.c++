@@ -117,12 +117,13 @@ int main(int argc, char *argv[]){
 			fs::path restore_path{cmd_line.param_str("target-dir")};
 			auto id_opt = cmd_line.param_uint_opt("id");
 			Catalogue cat(archive_path);
-			auto num_ids = cat.state_times().size();
+			auto state_times = cat.state_times();
+			auto num_ids = state_times.size();
 			if (num_ids == 0){
 				cout << tr_txt("Archive is empty.") << endl;
 				return 0;
 			}
-			size_t id = id_opt.value_or(cat.state_times().size() - 1);
+			size_t id = id_opt.value_or(state_times.size() - 1);
 			auto report_warning = [](std::string &&w){
 				cerr << w << endl;
 			};
