@@ -30,6 +30,7 @@ INCLUDEPATH += libs/fmt/include
 INCLUDEPATH += libs/botan
 INCLUDEPATH += libs/protobuf/src
 INCLUDEPATH += libs/range-v3
+INCLUDEPATH += libs/zstd
 
 SOURCES += \
 src/cmd_line_parser.c++ \

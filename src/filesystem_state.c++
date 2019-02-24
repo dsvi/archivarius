@@ -1,6 +1,7 @@
 #include "filesystem_state.h"
 #include "globals.h"
 #include "exception.h"
+#include "piping_zstd.h"
 
 #include "format.pb.h"
 
@@ -36,10 +37,10 @@ Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::s
 
 	auto fn = arc_path_ / file_name();
 	File_source file(fn);
+	Pipe_zstd_in zin;
 	Pipe_xxhash_in cs;
 	Stream_in in(fn);
-	cs.source(&file);
-	in.source(&cs);
+	in << cs << zin << file;
 
 	Buffer buf;
 	auto state = get_message<proto::Fs_state>(buf, in, cs);
@@ -100,10 +101,10 @@ void Filesystem_state::commit()
 	if (fs::exists(fn))
 		throw Exception("File {0} already exist")(fn.native());
 	File_sink file(fn);
+	Pipe_zstd_out zout(22);
 	Pipe_xxhash_out cs;
 	Stream_out out(fn);
-	cs.sink(&file);
-	out.sink(&cs);
+	out >> cs >> zout >> file;
 
 	proto::Fs_state state;
 	for (auto &f : files()){
@@ -129,5 +130,8 @@ void Filesystem_state::commit()
 	Buffer buf;
 	put_message(state, buf, out, cs);
 	out.finish();
+  #ifdef COMPRESS_STAT
+	fmt::print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state.ByteSizeLong());
+  #endif
 }
 

@@ -4,7 +4,7 @@
 #include "piping_xxhash.h"
 #include "buffer.h"
 
-class Stream_in : public Pipe_in
+class Stream_in: public Pipe_in
 {
 public:
 	Stream_in();
@@ -18,13 +18,13 @@ public:
 	u64 get_uint(); // ... or die trying
 	/// not var length version. always takes 8 bytes in the stream
 	u64 get_uint64(); // ... or die trying
-	Source::Pump_result pump(u8 *to, u64 size);
+	Source::Pump_result pump(u8 *to, u64 size) override;
 private:
 	std::string name_;
 	std::vector<u8> buff_;
 };
 
-class Stream_out : public Pipe_out
+class Stream_out: public Pipe_out
 {
 public:
 	Stream_out();
@@ -38,7 +38,8 @@ public:
 	void put_uint(u64 v);
 	/// puts as is. e.g. always 8 bytes
 	void put_uint64(u64 v);
-	void pump(u8 *from, u64 size);
+	void pump(u8 *from, u64 size) override;
+	void finish() override;
 private:
 	std::string name_;
 	std::vector<u8> buff_;

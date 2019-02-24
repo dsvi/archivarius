@@ -9,57 +9,25 @@
  */
 
 
-/*- Dependencies -*/
+ /******************************************
+ *  Includes
+ ******************************************/
+#include <stddef.h>    /* size_t, ptrdiff_t */
+#include <string.h>    /* memcpy */
+
 #include "zstd_v04.h"
 #include "error_private.h"
 
 
 /* ******************************************************************
-   mem.h
-   low-level memory access routines
-   Copyright (C) 2013-2015, Yann Collet.
-
-   BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are
-   met:
-
-       * Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-       * Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following disclaimer
-   in the documentation and/or other materials provided with the
-   distribution.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-    You can contact the author at :
-    - FSE source repository : https://github.com/Cyan4973/FiniteStateEntropy
-    - Public forum : https://groups.google.com/forum/#!forum/lz4c
-****************************************************************** */
+ *   mem.h
+ *******************************************************************/
 #ifndef MEM_H_MODULE
 #define MEM_H_MODULE
 
 #if defined (__cplusplus)
 extern "C" {
 #endif
-
-/******************************************
-*  Includes
-******************************************/
-#include <stddef.h>    /* size_t, ptrdiff_t */
-#include <string.h>    /* memcpy */
 
 
 /******************************************
@@ -100,6 +68,15 @@ extern "C" {
   typedef   signed int        S32;
   typedef unsigned long long  U64;
   typedef   signed long long  S64;
+#endif
+
+
+/*-*************************************
+*  Debug
+***************************************/
+#include "debug.h"
+#ifndef assert
+#  define assert(condition) ((void)0)
 #endif
 
 
@@ -255,61 +232,15 @@ MEM_STATIC size_t MEM_readLEST(const void* memPtr)
 /*
     zstd - standard compression library
     Header File for static linking only
-    Copyright (C) 2014-2015, Yann Collet.
-
-    BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are
-    met:
-    * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-    copyright notice, this list of conditions and the following disclaimer
-    in the documentation and/or other materials provided with the
-    distribution.
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-    You can contact the author at :
-    - zstd source repository : https://github.com/Cyan4973/zstd
-    - ztsd public forum : https://groups.google.com/forum/#!forum/lz4c
 */
 #ifndef ZSTD_STATIC_H
 #define ZSTD_STATIC_H
 
-/* The objects defined into this file shall be considered experimental.
- * They are not considered stable, as their prototype may change in the future.
- * You can use them for tests, provide feedback, or if you can endure risks of future changes.
- */
-
-#if defined (__cplusplus)
-extern "C" {
-#endif
 
 /* *************************************
 *  Types
 ***************************************/
-#define ZSTD_WINDOWLOG_MAX 26
-#define ZSTD_WINDOWLOG_MIN 18
 #define ZSTD_WINDOWLOG_ABSOLUTEMIN 11
-#define ZSTD_CONTENTLOG_MAX (ZSTD_WINDOWLOG_MAX+1)
-#define ZSTD_CONTENTLOG_MIN 4
-#define ZSTD_HASHLOG_MAX 28
-#define ZSTD_HASHLOG_MIN 4
-#define ZSTD_SEARCHLOG_MAX (ZSTD_CONTENTLOG_MAX-1)
-#define ZSTD_SEARCHLOG_MIN 1
-#define ZSTD_SEARCHLENGTH_MAX 7
-#define ZSTD_SEARCHLENGTH_MIN 4
 
 /** from faster to stronger */
 typedef enum { ZSTD_fast, ZSTD_greedy, ZSTD_lazy, ZSTD_lazy2, ZSTD_btlazy2 } ZSTD_strategy;
@@ -381,9 +312,6 @@ static size_t ZSTD_decompressContinue(ZSTD_DCtx* dctx, void* dst, size_t maxDstS
 */
 
 
-#if defined (__cplusplus)
-}
-#endif
 
 
 #endif  /* ZSTD_STATIC_H */
@@ -392,41 +320,9 @@ static size_t ZSTD_decompressContinue(ZSTD_DCtx* dctx, void* dst, size_t maxDstS
 /*
     zstd_internal - common functions to include
     Header File for include
-    Copyright (C) 2014-2015, Yann Collet.
-
-    BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are
-    met:
-    * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above
-    copyright notice, this list of conditions and the following disclaimer
-    in the documentation and/or other materials provided with the
-    distribution.
-    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-    You can contact the author at :
-    - zstd source repository : https://github.com/Cyan4973/zstd
-    - ztsd public forum : https://groups.google.com/forum/#!forum/lz4c
 */
 #ifndef ZSTD_CCOMMON_H_MODULE
 #define ZSTD_CCOMMON_H_MODULE
-
-#if defined (__cplusplus)
-extern "C" {
-#endif
 
 /* *************************************
 *  Common macros
@@ -499,44 +395,10 @@ static void ZSTD_wildcopy(void* dst, const void* src, ptrdiff_t length)
 }
 
 
-#if defined (__cplusplus)
-}
-#endif
-
 
 /* ******************************************************************
    FSE : Finite State Entropy coder
    header file
-   Copyright (C) 2013-2015, Yann Collet.
-
-   BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
-
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are
-   met:
-
-       * Redistributions of source code must retain the above copyright
-   notice, this list of conditions and the following disclaimer.
-       * Redistributions in binary form must reproduce the above
-   copyright notice, this list of conditions and the following disclaimer
-   in the documentation and/or other materials provided with the
-   distribution.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-   You can contact the author at :
-   - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
-   - Public forum : https://groups.google.com/forum/#!forum/lz4c
 ****************************************************************** */
 #ifndef FSE_H
 #define FSE_H
@@ -1221,6 +1083,7 @@ static size_t FSE_buildDTable(FSE_DTable* dt, const short* normalizedCounter, un
     if (tableLog > FSE_MAX_TABLELOG) return ERROR(tableLog_tooLarge);
 
     /* Init, lay down lowprob symbols */
+    memset(tableDecode, 0, sizeof(FSE_DECODE_TYPE) * (maxSymbolValue+1) );   /* useless init, but keep static analyzer happy, and we don't need to performance optimize legacy decoders */
     DTableH.tableLog = (U16)tableLog;
     for (s=0; s<=maxSymbolValue; s++)
     {
@@ -3070,7 +2933,7 @@ static size_t ZSTD_execSequence(BYTE* op,
     }
     else
     {
-        ZSTD_wildcopy(op, match, (ptrdiff_t)sequence.matchLength-8);   /* works even if matchLength < 8 */
+        ZSTD_wildcopy(op, match, (ptrdiff_t)sequence.matchLength-8);   /* works even if matchLength < 8, but must be signed */
     }
     return sequenceLength;
 }
@@ -3528,12 +3391,14 @@ static size_t ZBUFF_decompressContinue(ZBUFF_DCtx* zbc, void* dst, size_t* maxDs
     char* const oend = ostart + *maxDstSizePtr;
     U32 notDone = 1;
 
+    DEBUGLOG(5, "ZBUFF_decompressContinue");
     while (notDone)
     {
         switch(zbc->stage)
         {
 
         case ZBUFFds_init :
+            DEBUGLOG(5, "ZBUFF_decompressContinue: stage==ZBUFFds_init => ERROR(init_missing)");
             return ERROR(init_missing);
 
         case ZBUFFds_readHeader :
@@ -3733,7 +3598,7 @@ size_t ZSTDv04_decompressContinue(ZSTDv04_Dctx* dctx, void* dst, size_t maxDstSi
 
 
 ZBUFFv04_DCtx* ZBUFFv04_createDCtx(void) { return ZBUFF_createDCtx(); }
-size_t      ZBUFFv04_freeDCtx(ZBUFFv04_DCtx* dctx) { return ZBUFF_freeDCtx(dctx); }
+size_t ZBUFFv04_freeDCtx(ZBUFFv04_DCtx* dctx) { return ZBUFF_freeDCtx(dctx); }
 
 size_t ZBUFFv04_decompressInit(ZBUFFv04_DCtx* dctx) { return ZBUFF_decompressInit(dctx); }
 size_t ZBUFFv04_decompressWithDictionary(ZBUFFv04_DCtx* dctx, const void* src, size_t srcSize)
@@ -3741,13 +3606,9 @@ size_t ZBUFFv04_decompressWithDictionary(ZBUFFv04_DCtx* dctx, const void* src, s
 
 size_t ZBUFFv04_decompressContinue(ZBUFFv04_DCtx* dctx, void* dst, size_t* maxDstSizePtr, const void* src, size_t* srcSizePtr)
 {
+    DEBUGLOG(5, "ZBUFFv04_decompressContinue");
     return ZBUFF_decompressContinue(dctx, dst, maxDstSizePtr, src, srcSizePtr);
 }
 
 ZSTD_DCtx* ZSTDv04_createDCtx(void) { return ZSTD_createDCtx(); }
 size_t ZSTDv04_freeDCtx(ZSTD_DCtx* dctx) { return ZSTD_freeDCtx(dctx); }
-
-size_t ZSTDv04_getFrameParams(ZSTD_parameters* params, const void* src, size_t srcSize)
-{
-    return ZSTD_getFrameParams(params, src, srcSize);
-}

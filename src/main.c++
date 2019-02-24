@@ -21,6 +21,7 @@ int main(int argc, char *argv[]){
 		}
 		auto cmd_line = parse_command_line(argc, argv);
 		if (cmd_line.command() == "archive"){
+			cmd_line.check_unused_arguments();
 			auto cfgs = read_config();
 			Archiver arc;
 			for (auto &c : cfgs){
@@ -32,7 +33,11 @@ int main(int argc, char *argv[]){
 					};
 					Catalogue cat(c.archive);
 					// TODO: remove recalculation of content file size???
+#ifdef DEBUG
 					arc.min_content_file_size = 10*1024*1024;
+#else
+					arc.min_content_file_size = 2*1024*1024*1024;
+#endif
 					arc.catalog = &cat;
 					// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 					auto max_ref = cat.max_ref_count();
@@ -82,7 +87,7 @@ int main(int argc, char *argv[]){
 						auto total_waste = ranges::accumulate(content_file_size | ranges::view::values, u64(0));
 						if (total_waste > arc.min_content_file_size * 2){
 							for (auto &f : old_enough_to_compact)
-								arc.to_compact.insert(*f.path);
+								arc.force_to_archive.insert(*f.path);
 						}
 					}
 					// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -91,6 +96,10 @@ int main(int argc, char *argv[]){
 					arc.files_to_archive = c.files_to_archive;
 					arc.files_to_exclude = c.files_to_ignore;
 					arc.root = c.root;
+					if (c.zstd){
+						arc.zstd.emplace();
+						arc.zstd->compression_level = 11;
+					}
 					arc.warning = move(report_warning);
 					arc.archive();
 				} catch (std::exception &e) {
@@ -103,6 +112,7 @@ int main(int argc, char *argv[]){
 		else
 		if (cmd_line.command() == "list"){
 			fs::path archive_path{cmd_line.param_str("archive")};
+			cmd_line.check_unused_arguments();
 			Catalogue cat(archive_path);
 			auto times = cat.state_times();
 			for (size_t i = 0; i < times.size(); i++){
@@ -116,6 +126,7 @@ int main(int argc, char *argv[]){
 			fs::path archive_path{cmd_line.param_str("archive")};
 			fs::path restore_path{cmd_line.param_str("target-dir")};
 			auto id_opt = cmd_line.param_uint_opt("id");
+			cmd_line.check_unused_arguments();
 			Catalogue cat(archive_path);
 			auto state_times = cat.state_times();
 			auto num_ids = state_times.size();

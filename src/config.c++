@@ -7,7 +7,8 @@ using namespace std;
 namespace fs=filesystem;
 using namespace property_tree;
 
-void get_max_storage_time(Config &get_to, string_view str_time){
+static
+void fill_max_storage_time(Config &to, string_view str_time){
 	try {
 		u64 mult;
 		switch (str_time.back()){
@@ -26,11 +27,36 @@ void get_max_storage_time(Config &get_to, string_view str_time){
 		default:
 			throw Exception("'max-storage-time' value must end on 'd', 'w', 'm' or 'y'");
 		}
-		from_chars(str_time.begin(), str_time.end(), *get_to.max_storage_time);
-		*get_to.max_storage_time *= mult;
+		from_chars(str_time.begin(), str_time.end(), *to.max_storage_time);
+		*to.max_storage_time *= mult;
 	} catch (...) {
 		throw_with_nested(Exception("Wrong 'max-storage-time' value"));
 	}
+}
+
+static
+void fill_acl(Config &to, string_view val){
+	if (val == "on"){
+		to.process_acl = true;
+		return;
+	}
+	if (val == "off"){
+		to.process_acl = false;
+		return;
+	}
+	throw Exception("Value for 'acl' must be 'on' or 'off'");
+}
+
+
+static
+void fill_compression(Config &to, string_view val){
+	if (val == "on"){
+		to.zstd.emplace();
+		return;
+	}
+	if (val == "off")
+		return;
+	throw Exception("'compression' can only be 'on' or 'off'");
 }
 
 static const string conf_fn = "archivarius.conf"s;
@@ -77,27 +103,29 @@ std::vector<Config> read_config()
 							if (arc_paths.find(cfg.archive) != arc_paths.end())
 								throw Exception("'task' with such 'archive' attribute already exist. {0}")(cfg.archive);
 							arc_paths.insert(cfg.archive);
-							continue;
 						}
-						if (taskp.name() == "root"){
+						else if (taskp.name() == "root"){
 							cfg.root = taskp.value_str();
-							continue;
 						}
-						if (taskp.name() == "include"){
+						else if (taskp.name() == "include"){
 							for (auto &pt : taskp.subs())
 								cfg.files_to_archive.push_back(pt.text());
-							continue;
 						}
-						if (taskp.name() == "exclude"){
+						else if (taskp.name() == "exclude"){
 							for (auto &ex : taskp.subs())
 								cfg.files_to_ignore.push_back(ex.text());
-							continue;
 						}
-						if (taskp.name() == "max-storage-time"){
-							get_max_storage_time(cfg, taskp.value_str());
-							continue;
+						else if (taskp.name() == "max-storage-time"){
+							fill_max_storage_time(cfg, taskp.value_str());
 						}
-						throw Exception("unknown parameter {0}")(taskp.name());
+						else if (taskp.name() == "acl"){
+							fill_acl(cfg, taskp.value_str());
+						}
+						else if (taskp.name() == "compression"){
+							fill_compression(cfg, taskp.value_str());
+						}
+						else
+							throw Exception("unknown parameter {0}")(taskp.name());
 					}
 					//TODO: check if required stuff is set
 					// note that "root" is not one of them, either it or "include" must be set

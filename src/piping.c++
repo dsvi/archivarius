@@ -70,10 +70,21 @@ void File_sink::finish()
 	file_.reset(nullptr);
 }
 
-void Pipe_out::finish()
+void Pipe_out::finish_next()
 {
 	if (next_)
 		next_->finish();
+}
+
+void Pipe_out::finish()
+{
+	finish_next();
+}
+
+void Pipe_out::pump_next(u8 *from, u64 size)
+{
+	if (next_)
+		next_->pump(from, size);
 }
 
 Source::~Source()
@@ -84,4 +95,9 @@ Source::~Source()
 Sink::~Sink()
 {
 
+}
+
+Source::Pump_result Pipe_in::pump_next(u8 *to, u64 size)
+{
+	return next_->pump(to, size);
 }

@@ -4,11 +4,16 @@
 #include "stream.h"
 #include "piping_xxhash.h"
 
+struct Zstd_params{
+	int compression_level;
+};
+
 class File_content_creator
 {
 public:
 	explicit
 	File_content_creator(const std::filesystem::path &arc_path);
+	void enable_compression(Zstd_params &p);
 
 	void min_file_size(u64 bytes);
 	u64 min_file_size();
@@ -28,6 +33,7 @@ private:
 	u64 bytes_pumped_;
 	u64 min_file_size_;
 	Buffer buff_;
+	std::optional<Zstd_params> zstd_;
 
 	void create_file();
 };

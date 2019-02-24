@@ -43,7 +43,7 @@ u64 Stream_in::get_uint64()
 Source::Pump_result Stream_in::pump(u8 *to, u64 size)
 {
 	try{
-		return next_->pump(to, size);
+		return pump_next(to, size);
 	}
 	catch(...){
 		throw_with_nested( Exception("Can't read the file {0}")(name_));
@@ -63,11 +63,17 @@ Stream_out::Stream_out(std::string &&name)
 void Stream_out::pump(u8 *from, u64 size)
 {
 	try{
-		next_->pump(from, size);
+		if (size)
+			pump_next(from, size);
 	}
 	catch(...){
 		throw_with_nested( Exception( "Error writing file {0}" )(name_) );
 	}
+}
+
+void Stream_out::finish()
+{
+	finish_next();
 }
 
 void Stream_out::put_uint(u64 v)

@@ -20,6 +20,7 @@ struct Config{
 	std::vector<std::filesystem::path> files_to_archive;
 	std::vector<std::filesystem::path> files_to_ignore;
 	std::optional<u64>	 max_storage_time;
+	bool                 process_acl = false;
 	std::optional<Config_zstd> zstd;
 	std::optional<Config_aes>  aes;
 };

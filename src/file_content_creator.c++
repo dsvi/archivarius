@@ -13,6 +13,12 @@ File_content_creator::File_content_creator(const std::filesystem::path &arc_path
 	buff_.resize(50'000'000);
 }
 
+void File_content_creator::enable_compression(Zstd_params &p)
+{
+	ASSERT(!file_);
+	zstd_ = p;
+}
+
 File_content_ref File_content_creator::add(const std::filesystem::path &file_name)
 {
 	if (!file_ || file_.bytes_written() > min_file_size_ ){

@@ -5,6 +5,7 @@
 #include <cassert>
 #include <charconv>
 #include <cstdio>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <exception>
@@ -51,6 +52,7 @@ struct fmt::formatter<std::filesystem::path> {
 #ifdef DEBUG
 #define ASSERTS_ENABLED
 #define ASSERT(x) assert(x)
+#define COMPRESS_STAT
 #else
 #define ASSERT(x)
 #endif

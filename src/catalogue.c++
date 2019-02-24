@@ -2,6 +2,7 @@
 #include "catalogue.h"
 #include "exception.h"
 #include "piping_xxhash.h"
+#include "piping_zstd.h"
 #include "stream.h"
 #include "buffer.h"
 
@@ -29,19 +30,19 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 	try {
 		File_source src(cat_file_);
 		Pipe_xxhash_in cs_pipe;
-		cs_pipe.source(&src);
 		Stream_in in(cat_file_);
-		in.source(&cs_pipe);
+		Pipe_zstd_in zin;
+
+		in << cs_pipe << src;
 
 		if (auto version = in.get_uint(); version > current_version)
 			throw Exception("Unsupported file version {0}. Max supported is {1}")(version, current_version);
-
 		Buffer buf;
-
 		auto header = get_message<proto::Catalog_header>(buf, in, cs_pipe);
 		// TODO: setup piping
 	//	for (auto &f :header.filters()){
 	//	}
+		in << cs_pipe << zin << src;
 
 		auto catalog = get_message<proto::Catalogue>(buf, in, cs_pipe);
 		for (auto &file: catalog.used_files()){
@@ -142,17 +143,18 @@ void Catalogue::commit()
 		auto new_file = cat_file_;
 		new_file += ".tmp";
 		File_sink dst(new_file);
-		Pipe_xxhash_out cs_pipe;
-		cs_pipe.sink(&dst);
 		Stream_out out(new_file);
-		out.sink(&cs_pipe);
+		Pipe_xxhash_out cs_pipe;
+		out >> cs_pipe >> dst;
 
 		out.put_uint(current_version);
 		proto::Catalog_header hdr;
-		//TODO: filters
-
+		//TODO: put right filters
 		Buffer buf;
 		put_message(hdr, buf, out, cs_pipe);
+
+		Pipe_zstd_out zout(20);
+		out >> cs_pipe >> zout >> dst;
 
 		proto::Catalogue cat_msg;
 		for (auto &fsf : fs_state_files_){
@@ -181,6 +183,9 @@ void Catalogue::commit()
 		}
 		put_message(cat_msg, buf, out, cs_pipe);
 		out.finish();
+		#ifdef COMPRESS_STAT
+		fmt::print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg.ByteSizeLong());
+		#endif
 		fs_sync();
 		fs::rename(new_file, cat_file_);
 		fs_sync();

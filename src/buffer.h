@@ -14,7 +14,7 @@ public:
 	}
 private:
 	std::unique_ptr<u8[]> buff_{};
-	size_t size_;
+	size_t size_{};
 	size_t max_size_{};
 };
 

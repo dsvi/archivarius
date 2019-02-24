@@ -9,7 +9,7 @@ using namespace std;
 using namespace fmt;
 namespace fs = filesystem;
 
-void pump_to(Source &in, u64 to, Sink *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
+void pump_to(Stream_in &in, u64 to, Stream_out *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
 {
 	while (num_pumped < to){
 		auto num_left = to - num_pumped;
@@ -81,7 +81,9 @@ void restore(Restore_settings &&cfg)
 					File_sink out(re_path);
 					Pipe_xxhash_out cs;
 					cs.sink(&out);
-					pump_to(sin, ref.to, &cs, ref.fname, tmp, num_pumped);
+					Stream_out sout;
+					sout.sink(&cs);
+					pump_to(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
 					u64 original_cs = sin.get_uint64();
 					num_pumped += sizeof(sin.get_uint64());
 					if (original_cs != cs.digest())

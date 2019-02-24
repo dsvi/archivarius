@@ -3,6 +3,7 @@ cc_binary(
     srcs = glob(["src/*.c++"]) + glob(["src/*.cc"]) + glob(["src/*.h"]),
     deps = [
         "//libs/botan:botan",
+        "//libs/zstd:zstd",
         "//libs/fmt:fmt",
         "//libs/range-v3:range",
         "//libs/protobuf:protobuf_lite",
