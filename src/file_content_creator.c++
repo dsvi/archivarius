@@ -13,10 +13,16 @@ File_content_creator::File_content_creator(const std::filesystem::path &arc_path
 	buff_.resize(50'000'000);
 }
 
-void File_content_creator::enable_compression(Zstd_params &p)
+void File_content_creator::enable_compression(Zstd_out &p)
 {
 	ASSERT(!file_);
-	zstd_ = p;
+	filters_.compression(p);
+}
+
+void File_content_creator::enable_encryption()
+{
+	ASSERT(!file_);
+	enc_params_.emplace();
 }
 
 File_content_ref File_content_creator::add(const std::filesystem::path &file_name)
@@ -27,9 +33,10 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 	}
 	File_source src(file_name);
 	in_.name(file_name);
-	in_.source(&src);
+	in_ << src;
 	cs_.reset();
 	File_content_ref ref;
+	ref.filters = filters_.get_filters();
 	ref.fname = fname_;
 	ref.from = bytes_pumped_;
 	auto bytes_actually_wirtten = file_.bytes_written();
@@ -40,13 +47,17 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 		bytes_pumped_ += res.pumped_size;
 	}while (!res.eof);
 	ref.to = bytes_pumped_;
-	out_.put_uint64(cs_.digest());
+	ref.xxhash = cs_.digest();
 	bytes_pumped_ += sizeof(cs_.digest());
 	if (file_.bytes_written() > min_file_size_)
 		out_.finish();
+	// TODO: check if this shit actually works well
+	filters_.flush_der_kompressor();
 	ref.space_taken = file_.bytes_written() - bytes_actually_wirtten;
 	if (ref.space_taken == 0)
 		ref.space_taken = 1;
+	comp_ratio_.original += ref.to - ref.from;
+	comp_ratio_.compressed += ref.space_taken;
 	return ref;
 }
 
@@ -68,7 +79,10 @@ void File_content_creator::create_file()
 		file /= fname_;
 	}while (fs::exists(file));
 	file_ = file;
-	cs_.sink(&file_);
-	out_.sink(&cs_);
+	if (enc_params_){
+		enc_params_->randomize();
+		filters_.encryption(*enc_params_);
+	}
+	out_ >> cs_ >> filters_ >> file_;
 	out_.name(file);
 }

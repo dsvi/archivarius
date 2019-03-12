@@ -8,11 +8,12 @@
 using namespace std;
 namespace fs = filesystem;
 
-Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path)
+Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, Filters_out &f)
 {
 	filename_ = std::string("s") + current_time_to_filename();
 	time_created_ = to_posix_time(fs::file_time_type::clock::now());
 	arc_path_ = arc_path;
+	filtrator_.set_filters(f);
 }
 
 #pragma GCC diagnostic ignored "-Wreturn-type"
@@ -29,18 +30,23 @@ static Filesystem_state::File_type from_proto(proto::File_type ft){
 	}
 }
 
-Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::string_view name, u64 time_created)
+Filesystem_state::Filesystem_state(
+	const std::filesystem::path &arc_path,
+	std::string_view name,
+	u64 time_created_posix,
+	Filters_in &f,
+	std::function<File_content_ref(File_content_ref&)> ref_mapper)
 {
 	filename_ = name;
 	arc_path_ = arc_path;
-	time_created_ = time_created;
+	time_created_ = time_created_posix;
 
 	auto fn = arc_path_ / file_name();
+	Filtrator_in filtr(f);
 	File_source file(fn);
-	Pipe_zstd_in zin;
 	Pipe_xxhash_in cs;
 	Stream_in in(fn);
-	in << cs << zin << file;
+	in << cs << filtr << file;
 
 	Buffer buf;
 	auto state = get_message<proto::Fs_state>(buf, in, cs);
@@ -51,11 +57,11 @@ Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, std::s
 		f.type = from_proto(r.type());
 		f.mod_time = r.modified_seconds();
 		if (r.has_ref()){
-			f.content_ref.emplace();
+			File_content_ref incomplete_ref;
 			auto &ref = r.ref();
-			f.content_ref->fname = ref.content_fname();
-			f.content_ref->from = ref.from();
-			f.content_ref->to = ref.to();
+			incomplete_ref.fname = ref.content_fname();
+			incomplete_ref.from = ref.from();
+			f.content_ref = ref_mapper(*f.content_ref);
 		}
 		if (f.type == SYMLINK)
 			f.symlink_target = r.symlink_target();
@@ -101,10 +107,9 @@ void Filesystem_state::commit()
 	if (fs::exists(fn))
 		throw Exception("File {0} already exist")(fn.native());
 	File_sink file(fn);
-	Pipe_zstd_out zout(22);
 	Pipe_xxhash_out cs;
 	Stream_out out(fn);
-	out >> cs >> zout >> file;
+	out >> cs >> filtrator_ >> file;
 
 	proto::Fs_state state;
 	for (auto &f : files()){
@@ -118,7 +123,6 @@ void Filesystem_state::commit()
 			auto &fref = f.content_ref.value();
 			ref->set_content_fname(fref.fname);
 			ref->set_from(fref.from);
-			ref->set_to(fref.to);
 		}
 		if (SYMLINK == f.type)
 			rec->set_symlink_target(f.symlink_target);

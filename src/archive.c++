@@ -40,7 +40,8 @@ void Archiver::add(const fs::path &file_path)
 			auto sz = fs::file_size(file_path);
 			if (sz != 0){
 				file.content_ref = prev_->get_ref_if_exist(file.path, file.mod_time);
-				if (!file.content_ref)
+				// TODO: switch to c++2a contains
+				if (!file.content_ref or force_to_archive.find(file.path) != force_to_archive.end())
 					file.content_ref = creator_->add(file_path);
 			}
 		}
@@ -60,7 +61,7 @@ void Archiver::archive()
 		fcc.min_file_size(min_content_file_size);
 		creator_ = &fcc;
 		auto prev = catalog->latest_fs_state();
-		auto next = Filesystem_state(archive_path);
+		auto next = catalog->empty_fs_state();
 		prev_ = &prev;
 		next_ = &next;
 		if (!root.empty()){

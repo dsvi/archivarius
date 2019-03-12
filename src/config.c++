@@ -8,8 +8,9 @@ namespace fs=filesystem;
 using namespace property_tree;
 
 static
-void fill_max_storage_time(Config &to, string_view str_time){
+void fill_max_storage_time(Config &to, Property &p){
 	try {
+		auto str_time = p.value_str();
 		u64 mult;
 		switch (str_time.back()){
 		case 'd':
@@ -30,12 +31,13 @@ void fill_max_storage_time(Config &to, string_view str_time){
 		from_chars(str_time.begin(), str_time.end(), *to.max_storage_time);
 		*to.max_storage_time *= mult;
 	} catch (...) {
-		throw_with_nested(Exception("Wrong 'max-storage-time' value"));
+		throw_with_nested(Exception("line {0}: Wrong 'max-storage-time' value")(p.orig_line()));
 	}
 }
 
 static
-void fill_acl(Config &to, string_view val){
+void fill_acl(Config &to, Property &p){
+	auto val = p.value_str();
 	if (val == "on"){
 		to.process_acl = true;
 		return;
@@ -49,14 +51,16 @@ void fill_acl(Config &to, string_view val){
 
 
 static
-void fill_compression(Config &to, string_view val){
-	if (val == "on"){
-		to.zstd.emplace();
-		return;
-	}
-	if (val == "off")
-		return;
-	throw Exception("'compression' can only be 'on' or 'off'");
+void fill_compression(Config &to, Property &p){
+	//auto val = p.value_str();
+	to.zstd.emplace();
+//	if (val == "on"){
+//		to.zstd.emplace();
+//		return;
+//	}
+//	if (val == "off")
+//		return;
+//	throw Exception("'compression' can only be 'on' or 'off'");
 }
 
 static const string conf_fn = "archivarius.conf"s;
@@ -116,16 +120,22 @@ std::vector<Config> read_config()
 								cfg.files_to_ignore.push_back(ex.text());
 						}
 						else if (taskp.name() == "max-storage-time"){
-							fill_max_storage_time(cfg, taskp.value_str());
+							fill_max_storage_time(cfg, taskp);
 						}
 						else if (taskp.name() == "acl"){
-							fill_acl(cfg, taskp.value_str());
+							fill_acl(cfg, taskp);
 						}
 						else if (taskp.name() == "compression"){
-							fill_compression(cfg, taskp.value_str());
+							fill_compression(cfg, taskp);
+						}
+						else if (taskp.name() == "password"){
+							auto pwd = taskp.value_str();
+							if (pwd.empty())
+								throw Exception("line {0}: 'password' can not be empty")(taskp.orig_line());
+							cfg.enc.emplace().password = move(pwd);
 						}
 						else
-							throw Exception("unknown parameter {0}")(taskp.name());
+							throw Exception("line {0}: unknown parameter {1}")(taskp.orig_line(), taskp.name());
 					}
 					//TODO: check if required stuff is set
 					// note that "root" is not one of them, either it or "include" must be set

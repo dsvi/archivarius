@@ -26,9 +26,6 @@ private:
 
 class Pipe_in: public Source{
 public:
-	void source(Source *next){
-		next_ = next;
-	}
 	Pipe_in &operator <<(Pipe_in &s){
 		next_ = &s;
 		return s;
@@ -64,10 +61,6 @@ private:
 
 class Pipe_out: public Sink{
 public:
-	// TODO: remove
-	void sink(Sink *sink){
-		next_ = sink;
-	}
 	Pipe_out &operator >>(Pipe_out &s){
 		next_ = &s;
 		return s;

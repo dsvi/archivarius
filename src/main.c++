@@ -31,8 +31,7 @@ int main(int argc, char *argv[]){
 						find_and_replace(w, "\n", "\n  ");
 						cerr << w << endl;
 					};
-					Catalogue cat(c.archive);
-					// TODO: remove recalculation of content file size???
+					Catalogue cat(c.archive, c.enc ? c.enc->password : "");
 #ifdef DEBUG
 					arc.min_content_file_size = 10*1024*1024;
 #else
@@ -70,16 +69,11 @@ int main(int argc, char *argv[]){
 								content_file_size[*f.content_fn] = size;
 							total_content_size += size;
 						}
-						{
-							u64 new_min_content_size = total_content_size / 100;
-							if (new_min_content_size > arc.min_content_file_size)
-								arc.min_content_file_size = new_min_content_size;
-						}
 						for (auto it = old_enough_to_compact.begin(); it != old_enough_to_compact.end();){
 							auto &size = content_file_size[*it->content_fn];
 							size -= it->size;
 							ASSERT(size >= 0);
-							if (size == 0)
+							if (size < arc.min_content_file_size / 16)
 								it = old_enough_to_compact.erase(it);
 							else
 								++it;
@@ -112,8 +106,9 @@ int main(int argc, char *argv[]){
 		else
 		if (cmd_line.command() == "list"){
 			fs::path archive_path{cmd_line.param_str("archive")};
+			auto password = cmd_line.param_str_opt("password");
 			cmd_line.check_unused_arguments();
-			Catalogue cat(archive_path);
+			Catalogue cat(archive_path, password.value_or(""));
 			auto times = cat.state_times();
 			for (size_t i = 0; i < times.size(); i++){
 				auto time_t = fs::file_time_type::clock::to_time_t(times[i]);
@@ -126,8 +121,9 @@ int main(int argc, char *argv[]){
 			fs::path archive_path{cmd_line.param_str("archive")};
 			fs::path restore_path{cmd_line.param_str("target-dir")};
 			auto id_opt = cmd_line.param_uint_opt("id");
+			auto password = cmd_line.param_str_opt("password");
 			cmd_line.check_unused_arguments();
-			Catalogue cat(archive_path);
+			Catalogue cat(archive_path, password.value_or(""));
 			auto state_times = cat.state_times();
 			auto num_ids = state_times.size();
 			if (num_ids == 0){
@@ -139,10 +135,10 @@ int main(int argc, char *argv[]){
 				cerr << w << endl;
 			};
 			Restore_settings rs;
-			rs.from=archive_path;
-			rs.from_ndx=id;
-			rs.to=restore_path;
-			rs.warning=move(report_warning);
+			rs.cat = &cat;
+			rs.from_ndx = id;
+			rs.to = restore_path;
+			rs.warning = move(report_warning);
 			restore(move(rs));
 		}
 		return 0;

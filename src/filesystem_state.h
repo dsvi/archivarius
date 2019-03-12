@@ -1,6 +1,7 @@
 #pragma once
 #include "precomp.h"
 #include "file_content_ref.h"
+#include "filters.h"
 
 /*
 Describes everything about files, except their contentents. Holds refs to contents for that.
@@ -25,11 +26,6 @@ public:
 		std::string acl; // posix long format
 		std::string default_acl; // posix long format
 	};
-	// creates empty state
-	explicit
-	Filesystem_state(const std::filesystem::path &arc_path);
-	// loads state from disc
-	Filesystem_state(const std::filesystem::path &arc_path, std::string_view name, u64 time_created_posix);
 
 	void add(File &&f);
 
@@ -45,6 +41,8 @@ public:
 		return files_ | ranges::view::values;
 	}
 
+	Filters_in filters();
+
 	void commit();
 private:
 	// key is pathname
@@ -52,6 +50,19 @@ private:
 	std::string filename_;
 	std::filesystem::path arc_path_;
 	u64 time_created_;
+	Filtrator_out filtrator_;
+
+	// Only Catalogue allaws to create fstates
+	friend class Catalogue;
+	// creates empty state
+	Filesystem_state(const std::filesystem::path &arc_path, Filters_out &f);
+	// loads state from disc
+	Filesystem_state(
+	    const std::filesystem::path &arc_path,
+	    std::string_view name,
+	    u64 time_created_posix,
+	    Filters_in &f,
+	    std::function<File_content_ref(File_content_ref&)> ref_mapper);
 };
 
 inline
@@ -64,6 +75,12 @@ inline
 u64 Filesystem_state::time_created()
 {
 	return time_created_;
+}
+
+inline
+Filters_in Filesystem_state::filters()
+{
+	return filtrator_.get_filters();
 }
 
 

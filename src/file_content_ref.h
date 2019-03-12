@@ -1,11 +1,14 @@
 #pragma once
 #include "precomp.h"
+#include "filters.h"
 
 struct File_content_ref{
+	Filters_in filters;
 	std::string fname;
 	u64 from;
 	u64 to;
 	u64 space_taken; // space taken in file. never 0
+	u64 xxhash;
 	u64 ref_count_ = 0;  // only Catalogue can change this
 };
 

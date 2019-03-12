@@ -3,17 +3,16 @@
 #include "file_content_ref.h"
 #include "stream.h"
 #include "piping_xxhash.h"
-
-struct Zstd_params{
-	int compression_level;
-};
+#include "filters.h"
 
 class File_content_creator
 {
 public:
 	explicit
 	File_content_creator(const std::filesystem::path &arc_path);
-	void enable_compression(Zstd_params &p);
+
+	void enable_compression(Zstd_out &p);
+	void enable_encryption();
 
 	void min_file_size(u64 bytes);
 	u64 min_file_size();
@@ -22,6 +21,11 @@ public:
 	File_content_ref add(const std::filesystem::path &file_name);
 
 	void finish();
+	struct Compression_ratio{
+		u64 original;
+		u64 compressed;
+	};
+	Compression_ratio compression_statistic();
 	static std::string prefix;
 private:
 	std::filesystem::path arc_path_;
@@ -33,7 +37,9 @@ private:
 	u64 bytes_pumped_;
 	u64 min_file_size_;
 	Buffer buff_;
-	std::optional<Zstd_params> zstd_;
+	Filtrator_out filters_;
+	std::optional<Chapoly> enc_params_;
+	Compression_ratio comp_ratio_{0,0};
 
 	void create_file();
 };

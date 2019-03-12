@@ -7,8 +7,8 @@ struct Config_zstd{
 
 };
 
-struct Config_aes{
-
+struct Config_enc{
+	std::string password;
 };
 
 struct Config{
@@ -22,7 +22,7 @@ struct Config{
 	std::optional<u64>	 max_storage_time;
 	bool                 process_acl = false;
 	std::optional<Config_zstd> zstd;
-	std::optional<Config_aes>  aes;
+	std::optional<Config_enc>  enc;
 };
 
 

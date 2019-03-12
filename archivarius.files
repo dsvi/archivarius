@@ -15,10 +15,12 @@ src/file_content_creator.h
 src/file_content_ref.h
 src/filesystem_state.c++
 src/filesystem_state.h
+src/filters.c++
+src/filters.h
 src/piping.c++
 src/piping.h
-src/piping_aes.c++
-src/piping_aes.h
+src/piping_chapoly.c++
+src/piping_chapoly.h
 src/piping_xxhash.c++
 src/piping_xxhash.h
 src/piping_zstd.c++

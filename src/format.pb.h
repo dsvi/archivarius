@@ -36,25 +36,27 @@ namespace protobuf_format_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[10];
+  static const ::google::protobuf::internal::ParseTable schema[11];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
 };
 void InitDefaultsZSTD_Compression_filterImpl();
 void InitDefaultsZSTD_Compression_filter();
-void InitDefaultsAES256_Encryption_filterImpl();
-void InitDefaultsAES256_Encryption_filter();
-void InitDefaultsFilterImpl();
-void InitDefaultsFilter();
-void InitDefaultsRefImpl();
-void InitDefaultsRef();
+void InitDefaultsChapoly_Encryption_filterImpl();
+void InitDefaultsChapoly_Encryption_filter();
+void InitDefaultsFiltersImpl();
+void InitDefaultsFilters();
+void InitDefaultsRef_to_refcountImpl();
+void InitDefaultsRef_to_refcount();
 void InitDefaultsFs_recordImpl();
 void InitDefaultsFs_record();
 void InitDefaultsFs_stateImpl();
 void InitDefaultsFs_state();
-void InitDefaultsFile_descImpl();
-void InitDefaultsFile_desc();
+void InitDefaultsState_fileImpl();
+void InitDefaultsState_file();
+void InitDefaultsContent_fileImpl();
+void InitDefaultsContent_file();
 void InitDefaultsRef_countImpl();
 void InitDefaultsRef_count();
 void InitDefaultsCatalogueImpl();
@@ -63,45 +65,49 @@ void InitDefaultsCatalog_headerImpl();
 void InitDefaultsCatalog_header();
 inline void InitDefaults() {
   InitDefaultsZSTD_Compression_filter();
-  InitDefaultsAES256_Encryption_filter();
-  InitDefaultsFilter();
-  InitDefaultsRef();
+  InitDefaultsChapoly_Encryption_filter();
+  InitDefaultsFilters();
+  InitDefaultsRef_to_refcount();
   InitDefaultsFs_record();
   InitDefaultsFs_state();
-  InitDefaultsFile_desc();
+  InitDefaultsState_file();
+  InitDefaultsContent_file();
   InitDefaultsRef_count();
   InitDefaultsCatalogue();
   InitDefaultsCatalog_header();
 }
 }  // namespace protobuf_format_2eproto
 namespace proto {
-class AES256_Encryption_filter;
-class AES256_Encryption_filterDefaultTypeInternal;
-extern AES256_Encryption_filterDefaultTypeInternal _AES256_Encryption_filter_default_instance_;
 class Catalog_header;
 class Catalog_headerDefaultTypeInternal;
 extern Catalog_headerDefaultTypeInternal _Catalog_header_default_instance_;
 class Catalogue;
 class CatalogueDefaultTypeInternal;
 extern CatalogueDefaultTypeInternal _Catalogue_default_instance_;
-class File_desc;
-class File_descDefaultTypeInternal;
-extern File_descDefaultTypeInternal _File_desc_default_instance_;
-class Filter;
-class FilterDefaultTypeInternal;
-extern FilterDefaultTypeInternal _Filter_default_instance_;
+class Chapoly_Encryption_filter;
+class Chapoly_Encryption_filterDefaultTypeInternal;
+extern Chapoly_Encryption_filterDefaultTypeInternal _Chapoly_Encryption_filter_default_instance_;
+class Content_file;
+class Content_fileDefaultTypeInternal;
+extern Content_fileDefaultTypeInternal _Content_file_default_instance_;
+class Filters;
+class FiltersDefaultTypeInternal;
+extern FiltersDefaultTypeInternal _Filters_default_instance_;
 class Fs_record;
 class Fs_recordDefaultTypeInternal;
 extern Fs_recordDefaultTypeInternal _Fs_record_default_instance_;
 class Fs_state;
 class Fs_stateDefaultTypeInternal;
 extern Fs_stateDefaultTypeInternal _Fs_state_default_instance_;
-class Ref;
-class RefDefaultTypeInternal;
-extern RefDefaultTypeInternal _Ref_default_instance_;
 class Ref_count;
 class Ref_countDefaultTypeInternal;
 extern Ref_countDefaultTypeInternal _Ref_count_default_instance_;
+class Ref_to_refcount;
+class Ref_to_refcountDefaultTypeInternal;
+extern Ref_to_refcountDefaultTypeInternal _Ref_to_refcount_default_instance_;
+class State_file;
+class State_fileDefaultTypeInternal;
+extern State_fileDefaultTypeInternal _State_file_default_instance_;
 class ZSTD_Compression_filter;
 class ZSTD_Compression_filterDefaultTypeInternal;
 extern ZSTD_Compression_filterDefaultTypeInternal _ZSTD_Compression_filter_default_instance_;
@@ -212,24 +218,24 @@ class ZSTD_Compression_filter : public ::google::protobuf::MessageLite /* @@prot
 };
 // -------------------------------------------------------------------
 
-class AES256_Encryption_filter : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.AES256_Encryption_filter) */ {
+class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.Chapoly_Encryption_filter) */ {
  public:
-  AES256_Encryption_filter();
-  virtual ~AES256_Encryption_filter();
+  Chapoly_Encryption_filter();
+  virtual ~Chapoly_Encryption_filter();
 
-  AES256_Encryption_filter(const AES256_Encryption_filter& from);
+  Chapoly_Encryption_filter(const Chapoly_Encryption_filter& from);
 
-  inline AES256_Encryption_filter& operator=(const AES256_Encryption_filter& from) {
+  inline Chapoly_Encryption_filter& operator=(const Chapoly_Encryption_filter& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  AES256_Encryption_filter(AES256_Encryption_filter&& from) noexcept
-    : AES256_Encryption_filter() {
+  Chapoly_Encryption_filter(Chapoly_Encryption_filter&& from) noexcept
+    : Chapoly_Encryption_filter() {
     *this = ::std::move(from);
   }
 
-  inline AES256_Encryption_filter& operator=(AES256_Encryption_filter&& from) noexcept {
+  inline Chapoly_Encryption_filter& operator=(Chapoly_Encryption_filter&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -238,30 +244,30 @@ class AES256_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
     return *this;
   }
   #endif
-  static const AES256_Encryption_filter& default_instance();
+  static const Chapoly_Encryption_filter& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const AES256_Encryption_filter* internal_default_instance() {
-    return reinterpret_cast<const AES256_Encryption_filter*>(
-               &_AES256_Encryption_filter_default_instance_);
+  static inline const Chapoly_Encryption_filter* internal_default_instance() {
+    return reinterpret_cast<const Chapoly_Encryption_filter*>(
+               &_Chapoly_Encryption_filter_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     1;
 
-  void Swap(AES256_Encryption_filter* other);
-  friend void swap(AES256_Encryption_filter& a, AES256_Encryption_filter& b) {
+  void Swap(Chapoly_Encryption_filter* other);
+  friend void swap(Chapoly_Encryption_filter& a, Chapoly_Encryption_filter& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline AES256_Encryption_filter* New() const PROTOBUF_FINAL { return New(NULL); }
+  inline Chapoly_Encryption_filter* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  AES256_Encryption_filter* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  Chapoly_Encryption_filter* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
     PROTOBUF_FINAL;
-  void CopyFrom(const AES256_Encryption_filter& from);
-  void MergeFrom(const AES256_Encryption_filter& from);
+  void CopyFrom(const Chapoly_Encryption_filter& from);
+  void MergeFrom(const Chapoly_Encryption_filter& from);
   void Clear() PROTOBUF_FINAL;
   bool IsInitialized() const PROTOBUF_FINAL;
 
@@ -276,7 +282,7 @@ class AES256_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(AES256_Encryption_filter* other);
+  void InternalSwap(Chapoly_Encryption_filter* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -292,49 +298,64 @@ class AES256_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
 
   // accessors -------------------------------------------------------
 
-  // bytes salt = 1;
-  void clear_salt();
-  static const int kSaltFieldNumber = 1;
-  const ::std::string& salt() const;
-  void set_salt(const ::std::string& value);
+  // bytes iv = 1;
+  void clear_iv();
+  static const int kIvFieldNumber = 1;
+  const ::std::string& iv() const;
+  void set_iv(const ::std::string& value);
   #if LANG_CXX11
-  void set_salt(::std::string&& value);
+  void set_iv(::std::string&& value);
   #endif
-  void set_salt(const char* value);
-  void set_salt(const void* value, size_t size);
-  ::std::string* mutable_salt();
-  ::std::string* release_salt();
-  void set_allocated_salt(::std::string* salt);
+  void set_iv(const char* value);
+  void set_iv(const void* value, size_t size);
+  ::std::string* mutable_iv();
+  ::std::string* release_iv();
+  void set_allocated_iv(::std::string* iv);
 
-  // @@protoc_insertion_point(class_scope:proto.AES256_Encryption_filter)
+  // bytes key = 2;
+  void clear_key();
+  static const int kKeyFieldNumber = 2;
+  const ::std::string& key() const;
+  void set_key(const ::std::string& value);
+  #if LANG_CXX11
+  void set_key(::std::string&& value);
+  #endif
+  void set_key(const char* value);
+  void set_key(const void* value, size_t size);
+  ::std::string* mutable_key();
+  ::std::string* release_key();
+  void set_allocated_key(::std::string* key);
+
+  // @@protoc_insertion_point(class_scope:proto.Chapoly_Encryption_filter)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr salt_;
+  ::google::protobuf::internal::ArenaStringPtr iv_;
+  ::google::protobuf::internal::ArenaStringPtr key_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
-  friend void ::protobuf_format_2eproto::InitDefaultsAES256_Encryption_filterImpl();
+  friend void ::protobuf_format_2eproto::InitDefaultsChapoly_Encryption_filterImpl();
 };
 // -------------------------------------------------------------------
 
-class Filter : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.Filter) */ {
+class Filters : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.Filters) */ {
  public:
-  Filter();
-  virtual ~Filter();
+  Filters();
+  virtual ~Filters();
 
-  Filter(const Filter& from);
+  Filters(const Filters& from);
 
-  inline Filter& operator=(const Filter& from) {
+  inline Filters& operator=(const Filters& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Filter(Filter&& from) noexcept
-    : Filter() {
+  Filters(Filters&& from) noexcept
+    : Filters() {
     *this = ::std::move(from);
   }
 
-  inline Filter& operator=(Filter&& from) noexcept {
+  inline Filters& operator=(Filters&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -343,36 +364,30 @@ class Filter : public ::google::protobuf::MessageLite /* @@protoc_insertion_poin
     return *this;
   }
   #endif
-  static const Filter& default_instance();
-
-  enum FilterCase {
-    kZstdCompression = 1,
-    kAesEncryption = 2,
-    FILTER_NOT_SET = 0,
-  };
+  static const Filters& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Filter* internal_default_instance() {
-    return reinterpret_cast<const Filter*>(
-               &_Filter_default_instance_);
+  static inline const Filters* internal_default_instance() {
+    return reinterpret_cast<const Filters*>(
+               &_Filters_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     2;
 
-  void Swap(Filter* other);
-  friend void swap(Filter& a, Filter& b) {
+  void Swap(Filters* other);
+  friend void swap(Filters& a, Filters& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Filter* New() const PROTOBUF_FINAL { return New(NULL); }
+  inline Filters* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  Filter* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  Filters* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
     PROTOBUF_FINAL;
-  void CopyFrom(const Filter& from);
-  void MergeFrom(const Filter& from);
+  void CopyFrom(const Filters& from);
+  void MergeFrom(const Filters& from);
   void Clear() PROTOBUF_FINAL;
   bool IsInitialized() const PROTOBUF_FINAL;
 
@@ -387,7 +402,7 @@ class Filter : public ::google::protobuf::MessageLite /* @@protoc_insertion_poin
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(Filter* other);
+  void InternalSwap(Filters* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -412,57 +427,45 @@ class Filter : public ::google::protobuf::MessageLite /* @@protoc_insertion_poin
   ::proto::ZSTD_Compression_filter* mutable_zstd_compression();
   void set_allocated_zstd_compression(::proto::ZSTD_Compression_filter* zstd_compression);
 
-  // .proto.AES256_Encryption_filter aes_encryption = 2;
-  bool has_aes_encryption() const;
-  void clear_aes_encryption();
-  static const int kAesEncryptionFieldNumber = 2;
-  const ::proto::AES256_Encryption_filter& aes_encryption() const;
-  ::proto::AES256_Encryption_filter* release_aes_encryption();
-  ::proto::AES256_Encryption_filter* mutable_aes_encryption();
-  void set_allocated_aes_encryption(::proto::AES256_Encryption_filter* aes_encryption);
+  // .proto.Chapoly_Encryption_filter chapoly_encryption = 2;
+  bool has_chapoly_encryption() const;
+  void clear_chapoly_encryption();
+  static const int kChapolyEncryptionFieldNumber = 2;
+  const ::proto::Chapoly_Encryption_filter& chapoly_encryption() const;
+  ::proto::Chapoly_Encryption_filter* release_chapoly_encryption();
+  ::proto::Chapoly_Encryption_filter* mutable_chapoly_encryption();
+  void set_allocated_chapoly_encryption(::proto::Chapoly_Encryption_filter* chapoly_encryption);
 
-  FilterCase filter_case() const;
-  // @@protoc_insertion_point(class_scope:proto.Filter)
+  // @@protoc_insertion_point(class_scope:proto.Filters)
  private:
-  void set_has_zstd_compression();
-  void set_has_aes_encryption();
-
-  inline bool has_filter() const;
-  void clear_filter();
-  inline void clear_has_filter();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
-  union FilterUnion {
-    FilterUnion() {}
-    ::proto::ZSTD_Compression_filter* zstd_compression_;
-    ::proto::AES256_Encryption_filter* aes_encryption_;
-  } filter_;
+  ::proto::ZSTD_Compression_filter* zstd_compression_;
+  ::proto::Chapoly_Encryption_filter* chapoly_encryption_;
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
-
   friend struct ::protobuf_format_2eproto::TableStruct;
-  friend void ::protobuf_format_2eproto::InitDefaultsFilterImpl();
+  friend void ::protobuf_format_2eproto::InitDefaultsFiltersImpl();
 };
 // -------------------------------------------------------------------
 
-class Ref : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.Ref) */ {
+class Ref_to_refcount : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.Ref_to_refcount) */ {
  public:
-  Ref();
-  virtual ~Ref();
+  Ref_to_refcount();
+  virtual ~Ref_to_refcount();
 
-  Ref(const Ref& from);
+  Ref_to_refcount(const Ref_to_refcount& from);
 
-  inline Ref& operator=(const Ref& from) {
+  inline Ref_to_refcount& operator=(const Ref_to_refcount& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  Ref(Ref&& from) noexcept
-    : Ref() {
+  Ref_to_refcount(Ref_to_refcount&& from) noexcept
+    : Ref_to_refcount() {
     *this = ::std::move(from);
   }
 
-  inline Ref& operator=(Ref&& from) noexcept {
+  inline Ref_to_refcount& operator=(Ref_to_refcount&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -471,30 +474,30 @@ class Ref : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(c
     return *this;
   }
   #endif
-  static const Ref& default_instance();
+  static const Ref_to_refcount& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Ref* internal_default_instance() {
-    return reinterpret_cast<const Ref*>(
-               &_Ref_default_instance_);
+  static inline const Ref_to_refcount* internal_default_instance() {
+    return reinterpret_cast<const Ref_to_refcount*>(
+               &_Ref_to_refcount_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     3;
 
-  void Swap(Ref* other);
-  friend void swap(Ref& a, Ref& b) {
+  void Swap(Ref_to_refcount* other);
+  friend void swap(Ref_to_refcount& a, Ref_to_refcount& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline Ref* New() const PROTOBUF_FINAL { return New(NULL); }
+  inline Ref_to_refcount* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  Ref* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  Ref_to_refcount* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
     PROTOBUF_FINAL;
-  void CopyFrom(const Ref& from);
-  void MergeFrom(const Ref& from);
+  void CopyFrom(const Ref_to_refcount& from);
+  void MergeFrom(const Ref_to_refcount& from);
   void Clear() PROTOBUF_FINAL;
   bool IsInitialized() const PROTOBUF_FINAL;
 
@@ -509,7 +512,7 @@ class Ref : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(c
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(Ref* other);
+  void InternalSwap(Ref_to_refcount* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -545,22 +548,15 @@ class Ref : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(c
   ::google::protobuf::uint64 from() const;
   void set_from(::google::protobuf::uint64 value);
 
-  // uint64 to = 3;
-  void clear_to();
-  static const int kToFieldNumber = 3;
-  ::google::protobuf::uint64 to() const;
-  void set_to(::google::protobuf::uint64 value);
-
-  // @@protoc_insertion_point(class_scope:proto.Ref)
+  // @@protoc_insertion_point(class_scope:proto.Ref_to_refcount)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr content_fname_;
   ::google::protobuf::uint64 from_;
-  ::google::protobuf::uint64 to_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
-  friend void ::protobuf_format_2eproto::InitDefaultsRefImpl();
+  friend void ::protobuf_format_2eproto::InitDefaultsRef_to_refcountImpl();
 };
 // -------------------------------------------------------------------
 
@@ -700,14 +696,14 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* release_posix_default_acl();
   void set_allocated_posix_default_acl(::std::string* posix_default_acl);
 
-  // .proto.Ref ref = 5;
+  // .proto.Ref_to_refcount ref = 5;
   bool has_ref() const;
   void clear_ref();
   static const int kRefFieldNumber = 5;
-  const ::proto::Ref& ref() const;
-  ::proto::Ref* release_ref();
-  ::proto::Ref* mutable_ref();
-  void set_allocated_ref(::proto::Ref* ref);
+  const ::proto::Ref_to_refcount& ref() const;
+  ::proto::Ref_to_refcount* release_ref();
+  ::proto::Ref_to_refcount* mutable_ref();
+  void set_allocated_ref(::proto::Ref_to_refcount* ref);
 
   // uint32 unix_permissions = 2;
   void clear_unix_permissions();
@@ -735,7 +731,7 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::internal::ArenaStringPtr symlink_target_;
   ::google::protobuf::internal::ArenaStringPtr posix_acl_;
   ::google::protobuf::internal::ArenaStringPtr posix_default_acl_;
-  ::proto::Ref* ref_;
+  ::proto::Ref_to_refcount* ref_;
   ::google::protobuf::uint32 unix_permissions_;
   int type_;
   ::google::protobuf::uint64 modified_seconds_;
@@ -848,24 +844,24 @@ class Fs_state : public ::google::protobuf::MessageLite /* @@protoc_insertion_po
 };
 // -------------------------------------------------------------------
 
-class File_desc : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.File_desc) */ {
+class State_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.State_file) */ {
  public:
-  File_desc();
-  virtual ~File_desc();
+  State_file();
+  virtual ~State_file();
 
-  File_desc(const File_desc& from);
+  State_file(const State_file& from);
 
-  inline File_desc& operator=(const File_desc& from) {
+  inline State_file& operator=(const State_file& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  File_desc(File_desc&& from) noexcept
-    : File_desc() {
+  State_file(State_file&& from) noexcept
+    : State_file() {
     *this = ::std::move(from);
   }
 
-  inline File_desc& operator=(File_desc&& from) noexcept {
+  inline State_file& operator=(State_file&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -874,30 +870,30 @@ class File_desc : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
     return *this;
   }
   #endif
-  static const File_desc& default_instance();
+  static const State_file& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const File_desc* internal_default_instance() {
-    return reinterpret_cast<const File_desc*>(
-               &_File_desc_default_instance_);
+  static inline const State_file* internal_default_instance() {
+    return reinterpret_cast<const State_file*>(
+               &_State_file_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     6;
 
-  void Swap(File_desc* other);
-  friend void swap(File_desc& a, File_desc& b) {
+  void Swap(State_file* other);
+  friend void swap(State_file& a, State_file& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline File_desc* New() const PROTOBUF_FINAL { return New(NULL); }
+  inline State_file* New() const PROTOBUF_FINAL { return New(NULL); }
 
-  File_desc* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  State_file* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
   void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
     PROTOBUF_FINAL;
-  void CopyFrom(const File_desc& from);
-  void MergeFrom(const File_desc& from);
+  void CopyFrom(const State_file& from);
+  void MergeFrom(const State_file& from);
   void Clear() PROTOBUF_FINAL;
   bool IsInitialized() const PROTOBUF_FINAL;
 
@@ -912,7 +908,7 @@ class File_desc : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const;
-  void InternalSwap(File_desc* other);
+  void InternalSwap(State_file* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return NULL;
@@ -928,17 +924,127 @@ class File_desc : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
 
   // accessors -------------------------------------------------------
 
-  // repeated .proto.Filter filters = 2;
-  int filters_size() const;
+  // string name = 2;
+  void clear_name();
+  static const int kNameFieldNumber = 2;
+  const ::std::string& name() const;
+  void set_name(const ::std::string& value);
+  #if LANG_CXX11
+  void set_name(::std::string&& value);
+  #endif
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  ::std::string* mutable_name();
+  ::std::string* release_name();
+  void set_allocated_name(::std::string* name);
+
+  // .proto.Filters filters = 1;
+  bool has_filters() const;
   void clear_filters();
-  static const int kFiltersFieldNumber = 2;
-  const ::proto::Filter& filters(int index) const;
-  ::proto::Filter* mutable_filters(int index);
-  ::proto::Filter* add_filters();
-  ::google::protobuf::RepeatedPtrField< ::proto::Filter >*
-      mutable_filters();
-  const ::google::protobuf::RepeatedPtrField< ::proto::Filter >&
-      filters() const;
+  static const int kFiltersFieldNumber = 1;
+  const ::proto::Filters& filters() const;
+  ::proto::Filters* release_filters();
+  ::proto::Filters* mutable_filters();
+  void set_allocated_filters(::proto::Filters* filters);
+
+  // uint64 time_created = 3;
+  void clear_time_created();
+  static const int kTimeCreatedFieldNumber = 3;
+  ::google::protobuf::uint64 time_created() const;
+  void set_time_created(::google::protobuf::uint64 value);
+
+  // @@protoc_insertion_point(class_scope:proto.State_file)
+ private:
+
+  ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr name_;
+  ::proto::Filters* filters_;
+  ::google::protobuf::uint64 time_created_;
+  mutable int _cached_size_;
+  friend struct ::protobuf_format_2eproto::TableStruct;
+  friend void ::protobuf_format_2eproto::InitDefaultsState_fileImpl();
+};
+// -------------------------------------------------------------------
+
+class Content_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_point(class_definition:proto.Content_file) */ {
+ public:
+  Content_file();
+  virtual ~Content_file();
+
+  Content_file(const Content_file& from);
+
+  inline Content_file& operator=(const Content_file& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Content_file(Content_file&& from) noexcept
+    : Content_file() {
+    *this = ::std::move(from);
+  }
+
+  inline Content_file& operator=(Content_file&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const Content_file& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Content_file* internal_default_instance() {
+    return reinterpret_cast<const Content_file*>(
+               &_Content_file_default_instance_);
+  }
+  static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
+    7;
+
+  void Swap(Content_file* other);
+  friend void swap(Content_file& a, Content_file& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Content_file* New() const PROTOBUF_FINAL { return New(NULL); }
+
+  Content_file* New(::google::protobuf::Arena* arena) const PROTOBUF_FINAL;
+  void CheckTypeAndMergeFrom(const ::google::protobuf::MessageLite& from)
+    PROTOBUF_FINAL;
+  void CopyFrom(const Content_file& from);
+  void MergeFrom(const Content_file& from);
+  void Clear() PROTOBUF_FINAL;
+  bool IsInitialized() const PROTOBUF_FINAL;
+
+  size_t ByteSizeLong() const PROTOBUF_FINAL;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) PROTOBUF_FINAL;
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const PROTOBUF_FINAL;
+  void DiscardUnknownFields();
+  int GetCachedSize() const PROTOBUF_FINAL { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  void InternalSwap(Content_file* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return NULL;
+  }
+  inline void* MaybeArenaPtr() const {
+    return NULL;
+  }
+  public:
+
+  ::std::string GetTypeName() const PROTOBUF_FINAL;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
 
   // repeated .proto.Ref_count refs = 3;
   int refs_size() const;
@@ -952,9 +1058,9 @@ class File_desc : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   const ::google::protobuf::RepeatedPtrField< ::proto::Ref_count >&
       refs() const;
 
-  // string name = 1;
+  // string name = 2;
   void clear_name();
-  static const int kNameFieldNumber = 1;
+  static const int kNameFieldNumber = 2;
   const ::std::string& name() const;
   void set_name(const ::std::string& value);
   #if LANG_CXX11
@@ -966,23 +1072,25 @@ class File_desc : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // uint64 time_created = 4;
-  void clear_time_created();
-  static const int kTimeCreatedFieldNumber = 4;
-  ::google::protobuf::uint64 time_created() const;
-  void set_time_created(::google::protobuf::uint64 value);
+  // .proto.Filters filters = 1;
+  bool has_filters() const;
+  void clear_filters();
+  static const int kFiltersFieldNumber = 1;
+  const ::proto::Filters& filters() const;
+  ::proto::Filters* release_filters();
+  ::proto::Filters* mutable_filters();
+  void set_allocated_filters(::proto::Filters* filters);
 
-  // @@protoc_insertion_point(class_scope:proto.File_desc)
+  // @@protoc_insertion_point(class_scope:proto.Content_file)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::proto::Filter > filters_;
   ::google::protobuf::RepeatedPtrField< ::proto::Ref_count > refs_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::uint64 time_created_;
+  ::proto::Filters* filters_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
-  friend void ::protobuf_format_2eproto::InitDefaultsFile_descImpl();
+  friend void ::protobuf_format_2eproto::InitDefaultsContent_fileImpl();
 };
 // -------------------------------------------------------------------
 
@@ -1020,7 +1128,7 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
                &_Ref_count_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(Ref_count* other);
   friend void swap(Ref_count& a, Ref_count& b) {
@@ -1090,6 +1198,12 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::uint64 space_taken() const;
   void set_space_taken(::google::protobuf::uint64 value);
 
+  // uint64 xxhash = 5;
+  void clear_xxhash();
+  static const int kXxhashFieldNumber = 5;
+  ::google::protobuf::uint64 xxhash() const;
+  void set_xxhash(::google::protobuf::uint64 value);
+
   // @@protoc_insertion_point(class_scope:proto.Ref_count)
  private:
 
@@ -1098,6 +1212,7 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::uint64 to_;
   ::google::protobuf::uint64 ref_count_;
   ::google::protobuf::uint64 space_taken_;
+  ::google::protobuf::uint64 xxhash_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
   friend void ::protobuf_format_2eproto::InitDefaultsRef_countImpl();
@@ -1138,7 +1253,7 @@ class Catalogue : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
                &_Catalogue_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(Catalogue* other);
   friend void swap(Catalogue& a, Catalogue& b) {
@@ -1184,23 +1299,36 @@ class Catalogue : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
 
   // accessors -------------------------------------------------------
 
-  // repeated .proto.File_desc used_files = 1;
-  int used_files_size() const;
-  void clear_used_files();
-  static const int kUsedFilesFieldNumber = 1;
-  const ::proto::File_desc& used_files(int index) const;
-  ::proto::File_desc* mutable_used_files(int index);
-  ::proto::File_desc* add_used_files();
-  ::google::protobuf::RepeatedPtrField< ::proto::File_desc >*
-      mutable_used_files();
-  const ::google::protobuf::RepeatedPtrField< ::proto::File_desc >&
-      used_files() const;
+  // repeated .proto.State_file state_files = 1;
+  int state_files_size() const;
+  void clear_state_files();
+  static const int kStateFilesFieldNumber = 1;
+  const ::proto::State_file& state_files(int index) const;
+  ::proto::State_file* mutable_state_files(int index);
+  ::proto::State_file* add_state_files();
+  ::google::protobuf::RepeatedPtrField< ::proto::State_file >*
+      mutable_state_files();
+  const ::google::protobuf::RepeatedPtrField< ::proto::State_file >&
+      state_files() const;
+
+  // repeated .proto.Content_file content_files = 2;
+  int content_files_size() const;
+  void clear_content_files();
+  static const int kContentFilesFieldNumber = 2;
+  const ::proto::Content_file& content_files(int index) const;
+  ::proto::Content_file* mutable_content_files(int index);
+  ::proto::Content_file* add_content_files();
+  ::google::protobuf::RepeatedPtrField< ::proto::Content_file >*
+      mutable_content_files();
+  const ::google::protobuf::RepeatedPtrField< ::proto::Content_file >&
+      content_files() const;
 
   // @@protoc_insertion_point(class_scope:proto.Catalogue)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::proto::File_desc > used_files_;
+  ::google::protobuf::RepeatedPtrField< ::proto::State_file > state_files_;
+  ::google::protobuf::RepeatedPtrField< ::proto::Content_file > content_files_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
   friend void ::protobuf_format_2eproto::InitDefaultsCatalogueImpl();
@@ -1241,7 +1369,7 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
                &_Catalog_header_default_instance_);
   }
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(Catalog_header* other);
   friend void swap(Catalog_header& a, Catalog_header& b) {
@@ -1287,23 +1415,20 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
 
   // accessors -------------------------------------------------------
 
-  // repeated .proto.Filter filters = 2;
-  int filters_size() const;
+  // .proto.Filters filters = 1;
+  bool has_filters() const;
   void clear_filters();
-  static const int kFiltersFieldNumber = 2;
-  const ::proto::Filter& filters(int index) const;
-  ::proto::Filter* mutable_filters(int index);
-  ::proto::Filter* add_filters();
-  ::google::protobuf::RepeatedPtrField< ::proto::Filter >*
-      mutable_filters();
-  const ::google::protobuf::RepeatedPtrField< ::proto::Filter >&
-      filters() const;
+  static const int kFiltersFieldNumber = 1;
+  const ::proto::Filters& filters() const;
+  ::proto::Filters* release_filters();
+  ::proto::Filters* mutable_filters();
+  void set_allocated_filters(::proto::Filters* filters);
 
   // @@protoc_insertion_point(class_scope:proto.Catalog_header)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::proto::Filter > filters_;
+  ::proto::Filters* filters_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
   friend void ::protobuf_format_2eproto::InitDefaultsCatalog_headerImpl();
@@ -1321,237 +1446,287 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
 
 // -------------------------------------------------------------------
 
-// AES256_Encryption_filter
+// Chapoly_Encryption_filter
 
-// bytes salt = 1;
-inline void AES256_Encryption_filter::clear_salt() {
-  salt_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// bytes iv = 1;
+inline void Chapoly_Encryption_filter::clear_iv() {
+  iv_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& AES256_Encryption_filter::salt() const {
-  // @@protoc_insertion_point(field_get:proto.AES256_Encryption_filter.salt)
-  return salt_.GetNoArena();
+inline const ::std::string& Chapoly_Encryption_filter::iv() const {
+  // @@protoc_insertion_point(field_get:proto.Chapoly_Encryption_filter.iv)
+  return iv_.GetNoArena();
 }
-inline void AES256_Encryption_filter::set_salt(const ::std::string& value) {
+inline void Chapoly_Encryption_filter::set_iv(const ::std::string& value) {
   
-  salt_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:proto.AES256_Encryption_filter.salt)
+  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:proto.Chapoly_Encryption_filter.iv)
 }
 #if LANG_CXX11
-inline void AES256_Encryption_filter::set_salt(::std::string&& value) {
+inline void Chapoly_Encryption_filter::set_iv(::std::string&& value) {
   
-  salt_.SetNoArena(
+  iv_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:proto.AES256_Encryption_filter.salt)
+  // @@protoc_insertion_point(field_set_rvalue:proto.Chapoly_Encryption_filter.iv)
 }
 #endif
-inline void AES256_Encryption_filter::set_salt(const char* value) {
+inline void Chapoly_Encryption_filter::set_iv(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
-  salt_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:proto.AES256_Encryption_filter.salt)
+  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:proto.Chapoly_Encryption_filter.iv)
 }
-inline void AES256_Encryption_filter::set_salt(const void* value, size_t size) {
+inline void Chapoly_Encryption_filter::set_iv(const void* value, size_t size) {
   
-  salt_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:proto.AES256_Encryption_filter.salt)
+  // @@protoc_insertion_point(field_set_pointer:proto.Chapoly_Encryption_filter.iv)
 }
-inline ::std::string* AES256_Encryption_filter::mutable_salt() {
+inline ::std::string* Chapoly_Encryption_filter::mutable_iv() {
   
-  // @@protoc_insertion_point(field_mutable:proto.AES256_Encryption_filter.salt)
-  return salt_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:proto.Chapoly_Encryption_filter.iv)
+  return iv_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* AES256_Encryption_filter::release_salt() {
-  // @@protoc_insertion_point(field_release:proto.AES256_Encryption_filter.salt)
+inline ::std::string* Chapoly_Encryption_filter::release_iv() {
+  // @@protoc_insertion_point(field_release:proto.Chapoly_Encryption_filter.iv)
   
-  return salt_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return iv_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void AES256_Encryption_filter::set_allocated_salt(::std::string* salt) {
-  if (salt != NULL) {
+inline void Chapoly_Encryption_filter::set_allocated_iv(::std::string* iv) {
+  if (iv != NULL) {
     
   } else {
     
   }
-  salt_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), salt);
-  // @@protoc_insertion_point(field_set_allocated:proto.AES256_Encryption_filter.salt)
+  iv_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), iv);
+  // @@protoc_insertion_point(field_set_allocated:proto.Chapoly_Encryption_filter.iv)
 }
 
-// -------------------------------------------------------------------
-
-// Filter
-
-// .proto.ZSTD_Compression_filter zstd_compression = 1;
-inline bool Filter::has_zstd_compression() const {
-  return filter_case() == kZstdCompression;
+// bytes key = 2;
+inline void Chapoly_Encryption_filter::clear_key() {
+  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Filter::set_has_zstd_compression() {
-  _oneof_case_[0] = kZstdCompression;
+inline const ::std::string& Chapoly_Encryption_filter::key() const {
+  // @@protoc_insertion_point(field_get:proto.Chapoly_Encryption_filter.key)
+  return key_.GetNoArena();
 }
-inline void Filter::clear_zstd_compression() {
-  if (has_zstd_compression()) {
-    delete filter_.zstd_compression_;
-    clear_has_filter();
-  }
-}
-inline ::proto::ZSTD_Compression_filter* Filter::release_zstd_compression() {
-  // @@protoc_insertion_point(field_release:proto.Filter.zstd_compression)
-  if (has_zstd_compression()) {
-    clear_has_filter();
-      ::proto::ZSTD_Compression_filter* temp = filter_.zstd_compression_;
-    filter_.zstd_compression_ = NULL;
-    return temp;
-  } else {
-    return NULL;
-  }
-}
-inline const ::proto::ZSTD_Compression_filter& Filter::zstd_compression() const {
-  // @@protoc_insertion_point(field_get:proto.Filter.zstd_compression)
-  return has_zstd_compression()
-      ? *filter_.zstd_compression_
-      : *reinterpret_cast< ::proto::ZSTD_Compression_filter*>(&::proto::_ZSTD_Compression_filter_default_instance_);
-}
-inline ::proto::ZSTD_Compression_filter* Filter::mutable_zstd_compression() {
-  if (!has_zstd_compression()) {
-    clear_filter();
-    set_has_zstd_compression();
-    filter_.zstd_compression_ = new ::proto::ZSTD_Compression_filter;
-  }
-  // @@protoc_insertion_point(field_mutable:proto.Filter.zstd_compression)
-  return filter_.zstd_compression_;
-}
-
-// .proto.AES256_Encryption_filter aes_encryption = 2;
-inline bool Filter::has_aes_encryption() const {
-  return filter_case() == kAesEncryption;
-}
-inline void Filter::set_has_aes_encryption() {
-  _oneof_case_[0] = kAesEncryption;
-}
-inline void Filter::clear_aes_encryption() {
-  if (has_aes_encryption()) {
-    delete filter_.aes_encryption_;
-    clear_has_filter();
-  }
-}
-inline ::proto::AES256_Encryption_filter* Filter::release_aes_encryption() {
-  // @@protoc_insertion_point(field_release:proto.Filter.aes_encryption)
-  if (has_aes_encryption()) {
-    clear_has_filter();
-      ::proto::AES256_Encryption_filter* temp = filter_.aes_encryption_;
-    filter_.aes_encryption_ = NULL;
-    return temp;
-  } else {
-    return NULL;
-  }
-}
-inline const ::proto::AES256_Encryption_filter& Filter::aes_encryption() const {
-  // @@protoc_insertion_point(field_get:proto.Filter.aes_encryption)
-  return has_aes_encryption()
-      ? *filter_.aes_encryption_
-      : *reinterpret_cast< ::proto::AES256_Encryption_filter*>(&::proto::_AES256_Encryption_filter_default_instance_);
-}
-inline ::proto::AES256_Encryption_filter* Filter::mutable_aes_encryption() {
-  if (!has_aes_encryption()) {
-    clear_filter();
-    set_has_aes_encryption();
-    filter_.aes_encryption_ = new ::proto::AES256_Encryption_filter;
-  }
-  // @@protoc_insertion_point(field_mutable:proto.Filter.aes_encryption)
-  return filter_.aes_encryption_;
-}
-
-inline bool Filter::has_filter() const {
-  return filter_case() != FILTER_NOT_SET;
-}
-inline void Filter::clear_has_filter() {
-  _oneof_case_[0] = FILTER_NOT_SET;
-}
-inline Filter::FilterCase Filter::filter_case() const {
-  return Filter::FilterCase(_oneof_case_[0]);
-}
-// -------------------------------------------------------------------
-
-// Ref
-
-// string content_fname = 1;
-inline void Ref::clear_content_fname() {
-  content_fname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Ref::content_fname() const {
-  // @@protoc_insertion_point(field_get:proto.Ref.content_fname)
-  return content_fname_.GetNoArena();
-}
-inline void Ref::set_content_fname(const ::std::string& value) {
+inline void Chapoly_Encryption_filter::set_key(const ::std::string& value) {
   
-  content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:proto.Ref.content_fname)
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:proto.Chapoly_Encryption_filter.key)
 }
 #if LANG_CXX11
-inline void Ref::set_content_fname(::std::string&& value) {
+inline void Chapoly_Encryption_filter::set_key(::std::string&& value) {
+  
+  key_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:proto.Chapoly_Encryption_filter.key)
+}
+#endif
+inline void Chapoly_Encryption_filter::set_key(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:proto.Chapoly_Encryption_filter.key)
+}
+inline void Chapoly_Encryption_filter::set_key(const void* value, size_t size) {
+  
+  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:proto.Chapoly_Encryption_filter.key)
+}
+inline ::std::string* Chapoly_Encryption_filter::mutable_key() {
+  
+  // @@protoc_insertion_point(field_mutable:proto.Chapoly_Encryption_filter.key)
+  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Chapoly_Encryption_filter::release_key() {
+  // @@protoc_insertion_point(field_release:proto.Chapoly_Encryption_filter.key)
+  
+  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Chapoly_Encryption_filter::set_allocated_key(::std::string* key) {
+  if (key != NULL) {
+    
+  } else {
+    
+  }
+  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  // @@protoc_insertion_point(field_set_allocated:proto.Chapoly_Encryption_filter.key)
+}
+
+// -------------------------------------------------------------------
+
+// Filters
+
+// .proto.ZSTD_Compression_filter zstd_compression = 1;
+inline bool Filters::has_zstd_compression() const {
+  return this != internal_default_instance() && zstd_compression_ != NULL;
+}
+inline void Filters::clear_zstd_compression() {
+  if (GetArenaNoVirtual() == NULL && zstd_compression_ != NULL) {
+    delete zstd_compression_;
+  }
+  zstd_compression_ = NULL;
+}
+inline const ::proto::ZSTD_Compression_filter& Filters::zstd_compression() const {
+  const ::proto::ZSTD_Compression_filter* p = zstd_compression_;
+  // @@protoc_insertion_point(field_get:proto.Filters.zstd_compression)
+  return p != NULL ? *p : *reinterpret_cast<const ::proto::ZSTD_Compression_filter*>(
+      &::proto::_ZSTD_Compression_filter_default_instance_);
+}
+inline ::proto::ZSTD_Compression_filter* Filters::release_zstd_compression() {
+  // @@protoc_insertion_point(field_release:proto.Filters.zstd_compression)
+  
+  ::proto::ZSTD_Compression_filter* temp = zstd_compression_;
+  zstd_compression_ = NULL;
+  return temp;
+}
+inline ::proto::ZSTD_Compression_filter* Filters::mutable_zstd_compression() {
+  
+  if (zstd_compression_ == NULL) {
+    zstd_compression_ = new ::proto::ZSTD_Compression_filter;
+  }
+  // @@protoc_insertion_point(field_mutable:proto.Filters.zstd_compression)
+  return zstd_compression_;
+}
+inline void Filters::set_allocated_zstd_compression(::proto::ZSTD_Compression_filter* zstd_compression) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete zstd_compression_;
+  }
+  if (zstd_compression) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      zstd_compression = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, zstd_compression, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  zstd_compression_ = zstd_compression;
+  // @@protoc_insertion_point(field_set_allocated:proto.Filters.zstd_compression)
+}
+
+// .proto.Chapoly_Encryption_filter chapoly_encryption = 2;
+inline bool Filters::has_chapoly_encryption() const {
+  return this != internal_default_instance() && chapoly_encryption_ != NULL;
+}
+inline void Filters::clear_chapoly_encryption() {
+  if (GetArenaNoVirtual() == NULL && chapoly_encryption_ != NULL) {
+    delete chapoly_encryption_;
+  }
+  chapoly_encryption_ = NULL;
+}
+inline const ::proto::Chapoly_Encryption_filter& Filters::chapoly_encryption() const {
+  const ::proto::Chapoly_Encryption_filter* p = chapoly_encryption_;
+  // @@protoc_insertion_point(field_get:proto.Filters.chapoly_encryption)
+  return p != NULL ? *p : *reinterpret_cast<const ::proto::Chapoly_Encryption_filter*>(
+      &::proto::_Chapoly_Encryption_filter_default_instance_);
+}
+inline ::proto::Chapoly_Encryption_filter* Filters::release_chapoly_encryption() {
+  // @@protoc_insertion_point(field_release:proto.Filters.chapoly_encryption)
+  
+  ::proto::Chapoly_Encryption_filter* temp = chapoly_encryption_;
+  chapoly_encryption_ = NULL;
+  return temp;
+}
+inline ::proto::Chapoly_Encryption_filter* Filters::mutable_chapoly_encryption() {
+  
+  if (chapoly_encryption_ == NULL) {
+    chapoly_encryption_ = new ::proto::Chapoly_Encryption_filter;
+  }
+  // @@protoc_insertion_point(field_mutable:proto.Filters.chapoly_encryption)
+  return chapoly_encryption_;
+}
+inline void Filters::set_allocated_chapoly_encryption(::proto::Chapoly_Encryption_filter* chapoly_encryption) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete chapoly_encryption_;
+  }
+  if (chapoly_encryption) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      chapoly_encryption = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, chapoly_encryption, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  chapoly_encryption_ = chapoly_encryption;
+  // @@protoc_insertion_point(field_set_allocated:proto.Filters.chapoly_encryption)
+}
+
+// -------------------------------------------------------------------
+
+// Ref_to_refcount
+
+// string content_fname = 1;
+inline void Ref_to_refcount::clear_content_fname() {
+  content_fname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Ref_to_refcount::content_fname() const {
+  // @@protoc_insertion_point(field_get:proto.Ref_to_refcount.content_fname)
+  return content_fname_.GetNoArena();
+}
+inline void Ref_to_refcount::set_content_fname(const ::std::string& value) {
+  
+  content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:proto.Ref_to_refcount.content_fname)
+}
+#if LANG_CXX11
+inline void Ref_to_refcount::set_content_fname(::std::string&& value) {
   
   content_fname_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:proto.Ref.content_fname)
+  // @@protoc_insertion_point(field_set_rvalue:proto.Ref_to_refcount.content_fname)
 }
 #endif
-inline void Ref::set_content_fname(const char* value) {
+inline void Ref_to_refcount::set_content_fname(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
   content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:proto.Ref.content_fname)
+  // @@protoc_insertion_point(field_set_char:proto.Ref_to_refcount.content_fname)
 }
-inline void Ref::set_content_fname(const char* value, size_t size) {
+inline void Ref_to_refcount::set_content_fname(const char* value, size_t size) {
   
   content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:proto.Ref.content_fname)
+  // @@protoc_insertion_point(field_set_pointer:proto.Ref_to_refcount.content_fname)
 }
-inline ::std::string* Ref::mutable_content_fname() {
+inline ::std::string* Ref_to_refcount::mutable_content_fname() {
   
-  // @@protoc_insertion_point(field_mutable:proto.Ref.content_fname)
+  // @@protoc_insertion_point(field_mutable:proto.Ref_to_refcount.content_fname)
   return content_fname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Ref::release_content_fname() {
-  // @@protoc_insertion_point(field_release:proto.Ref.content_fname)
+inline ::std::string* Ref_to_refcount::release_content_fname() {
+  // @@protoc_insertion_point(field_release:proto.Ref_to_refcount.content_fname)
   
   return content_fname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Ref::set_allocated_content_fname(::std::string* content_fname) {
+inline void Ref_to_refcount::set_allocated_content_fname(::std::string* content_fname) {
   if (content_fname != NULL) {
     
   } else {
     
   }
   content_fname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content_fname);
-  // @@protoc_insertion_point(field_set_allocated:proto.Ref.content_fname)
+  // @@protoc_insertion_point(field_set_allocated:proto.Ref_to_refcount.content_fname)
 }
 
 // uint64 from = 2;
-inline void Ref::clear_from() {
+inline void Ref_to_refcount::clear_from() {
   from_ = GOOGLE_ULONGLONG(0);
 }
-inline ::google::protobuf::uint64 Ref::from() const {
-  // @@protoc_insertion_point(field_get:proto.Ref.from)
+inline ::google::protobuf::uint64 Ref_to_refcount::from() const {
+  // @@protoc_insertion_point(field_get:proto.Ref_to_refcount.from)
   return from_;
 }
-inline void Ref::set_from(::google::protobuf::uint64 value) {
+inline void Ref_to_refcount::set_from(::google::protobuf::uint64 value) {
   
   from_ = value;
-  // @@protoc_insertion_point(field_set:proto.Ref.from)
-}
-
-// uint64 to = 3;
-inline void Ref::clear_to() {
-  to_ = GOOGLE_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 Ref::to() const {
-  // @@protoc_insertion_point(field_get:proto.Ref.to)
-  return to_;
-}
-inline void Ref::set_to(::google::protobuf::uint64 value) {
-  
-  to_ = value;
-  // @@protoc_insertion_point(field_set:proto.Ref.to)
+  // @@protoc_insertion_point(field_set:proto.Ref_to_refcount.from)
 }
 
 // -------------------------------------------------------------------
@@ -1653,7 +1828,7 @@ inline void Fs_record::set_modified_seconds(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:proto.Fs_record.modified_seconds)
 }
 
-// .proto.Ref ref = 5;
+// .proto.Ref_to_refcount ref = 5;
 inline bool Fs_record::has_ref() const {
   return this != internal_default_instance() && ref_ != NULL;
 }
@@ -1663,28 +1838,28 @@ inline void Fs_record::clear_ref() {
   }
   ref_ = NULL;
 }
-inline const ::proto::Ref& Fs_record::ref() const {
-  const ::proto::Ref* p = ref_;
+inline const ::proto::Ref_to_refcount& Fs_record::ref() const {
+  const ::proto::Ref_to_refcount* p = ref_;
   // @@protoc_insertion_point(field_get:proto.Fs_record.ref)
-  return p != NULL ? *p : *reinterpret_cast<const ::proto::Ref*>(
-      &::proto::_Ref_default_instance_);
+  return p != NULL ? *p : *reinterpret_cast<const ::proto::Ref_to_refcount*>(
+      &::proto::_Ref_to_refcount_default_instance_);
 }
-inline ::proto::Ref* Fs_record::release_ref() {
+inline ::proto::Ref_to_refcount* Fs_record::release_ref() {
   // @@protoc_insertion_point(field_release:proto.Fs_record.ref)
   
-  ::proto::Ref* temp = ref_;
+  ::proto::Ref_to_refcount* temp = ref_;
   ref_ = NULL;
   return temp;
 }
-inline ::proto::Ref* Fs_record::mutable_ref() {
+inline ::proto::Ref_to_refcount* Fs_record::mutable_ref() {
   
   if (ref_ == NULL) {
-    ref_ = new ::proto::Ref;
+    ref_ = new ::proto::Ref_to_refcount;
   }
   // @@protoc_insertion_point(field_mutable:proto.Fs_record.ref)
   return ref_;
 }
-inline void Fs_record::set_allocated_ref(::proto::Ref* ref) {
+inline void Fs_record::set_allocated_ref(::proto::Ref_to_refcount* ref) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == NULL) {
     delete ref_;
@@ -1898,133 +2073,260 @@ Fs_state::rec() const {
 
 // -------------------------------------------------------------------
 
-// File_desc
+// State_file
 
-// string name = 1;
-inline void File_desc::clear_name() {
+// .proto.Filters filters = 1;
+inline bool State_file::has_filters() const {
+  return this != internal_default_instance() && filters_ != NULL;
+}
+inline void State_file::clear_filters() {
+  if (GetArenaNoVirtual() == NULL && filters_ != NULL) {
+    delete filters_;
+  }
+  filters_ = NULL;
+}
+inline const ::proto::Filters& State_file::filters() const {
+  const ::proto::Filters* p = filters_;
+  // @@protoc_insertion_point(field_get:proto.State_file.filters)
+  return p != NULL ? *p : *reinterpret_cast<const ::proto::Filters*>(
+      &::proto::_Filters_default_instance_);
+}
+inline ::proto::Filters* State_file::release_filters() {
+  // @@protoc_insertion_point(field_release:proto.State_file.filters)
+  
+  ::proto::Filters* temp = filters_;
+  filters_ = NULL;
+  return temp;
+}
+inline ::proto::Filters* State_file::mutable_filters() {
+  
+  if (filters_ == NULL) {
+    filters_ = new ::proto::Filters;
+  }
+  // @@protoc_insertion_point(field_mutable:proto.State_file.filters)
+  return filters_;
+}
+inline void State_file::set_allocated_filters(::proto::Filters* filters) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete filters_;
+  }
+  if (filters) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      filters = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, filters, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  filters_ = filters;
+  // @@protoc_insertion_point(field_set_allocated:proto.State_file.filters)
+}
+
+// string name = 2;
+inline void State_file::clear_name() {
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& File_desc::name() const {
-  // @@protoc_insertion_point(field_get:proto.File_desc.name)
+inline const ::std::string& State_file::name() const {
+  // @@protoc_insertion_point(field_get:proto.State_file.name)
   return name_.GetNoArena();
 }
-inline void File_desc::set_name(const ::std::string& value) {
+inline void State_file::set_name(const ::std::string& value) {
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:proto.File_desc.name)
+  // @@protoc_insertion_point(field_set:proto.State_file.name)
 }
 #if LANG_CXX11
-inline void File_desc::set_name(::std::string&& value) {
+inline void State_file::set_name(::std::string&& value) {
   
   name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:proto.File_desc.name)
+  // @@protoc_insertion_point(field_set_rvalue:proto.State_file.name)
 }
 #endif
-inline void File_desc::set_name(const char* value) {
+inline void State_file::set_name(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:proto.File_desc.name)
+  // @@protoc_insertion_point(field_set_char:proto.State_file.name)
 }
-inline void File_desc::set_name(const char* value, size_t size) {
+inline void State_file::set_name(const char* value, size_t size) {
   
   name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:proto.File_desc.name)
+  // @@protoc_insertion_point(field_set_pointer:proto.State_file.name)
 }
-inline ::std::string* File_desc::mutable_name() {
+inline ::std::string* State_file::mutable_name() {
   
-  // @@protoc_insertion_point(field_mutable:proto.File_desc.name)
+  // @@protoc_insertion_point(field_mutable:proto.State_file.name)
   return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* File_desc::release_name() {
-  // @@protoc_insertion_point(field_release:proto.File_desc.name)
+inline ::std::string* State_file::release_name() {
+  // @@protoc_insertion_point(field_release:proto.State_file.name)
   
   return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void File_desc::set_allocated_name(::std::string* name) {
+inline void State_file::set_allocated_name(::std::string* name) {
   if (name != NULL) {
     
   } else {
     
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
-  // @@protoc_insertion_point(field_set_allocated:proto.File_desc.name)
+  // @@protoc_insertion_point(field_set_allocated:proto.State_file.name)
 }
 
-// repeated .proto.Filter filters = 2;
-inline int File_desc::filters_size() const {
-  return filters_.size();
+// uint64 time_created = 3;
+inline void State_file::clear_time_created() {
+  time_created_ = GOOGLE_ULONGLONG(0);
 }
-inline void File_desc::clear_filters() {
-  filters_.Clear();
+inline ::google::protobuf::uint64 State_file::time_created() const {
+  // @@protoc_insertion_point(field_get:proto.State_file.time_created)
+  return time_created_;
 }
-inline const ::proto::Filter& File_desc::filters(int index) const {
-  // @@protoc_insertion_point(field_get:proto.File_desc.filters)
-  return filters_.Get(index);
+inline void State_file::set_time_created(::google::protobuf::uint64 value) {
+  
+  time_created_ = value;
+  // @@protoc_insertion_point(field_set:proto.State_file.time_created)
 }
-inline ::proto::Filter* File_desc::mutable_filters(int index) {
-  // @@protoc_insertion_point(field_mutable:proto.File_desc.filters)
-  return filters_.Mutable(index);
+
+// -------------------------------------------------------------------
+
+// Content_file
+
+// .proto.Filters filters = 1;
+inline bool Content_file::has_filters() const {
+  return this != internal_default_instance() && filters_ != NULL;
 }
-inline ::proto::Filter* File_desc::add_filters() {
-  // @@protoc_insertion_point(field_add:proto.File_desc.filters)
-  return filters_.Add();
+inline void Content_file::clear_filters() {
+  if (GetArenaNoVirtual() == NULL && filters_ != NULL) {
+    delete filters_;
+  }
+  filters_ = NULL;
 }
-inline ::google::protobuf::RepeatedPtrField< ::proto::Filter >*
-File_desc::mutable_filters() {
-  // @@protoc_insertion_point(field_mutable_list:proto.File_desc.filters)
-  return &filters_;
+inline const ::proto::Filters& Content_file::filters() const {
+  const ::proto::Filters* p = filters_;
+  // @@protoc_insertion_point(field_get:proto.Content_file.filters)
+  return p != NULL ? *p : *reinterpret_cast<const ::proto::Filters*>(
+      &::proto::_Filters_default_instance_);
 }
-inline const ::google::protobuf::RepeatedPtrField< ::proto::Filter >&
-File_desc::filters() const {
-  // @@protoc_insertion_point(field_list:proto.File_desc.filters)
+inline ::proto::Filters* Content_file::release_filters() {
+  // @@protoc_insertion_point(field_release:proto.Content_file.filters)
+  
+  ::proto::Filters* temp = filters_;
+  filters_ = NULL;
+  return temp;
+}
+inline ::proto::Filters* Content_file::mutable_filters() {
+  
+  if (filters_ == NULL) {
+    filters_ = new ::proto::Filters;
+  }
+  // @@protoc_insertion_point(field_mutable:proto.Content_file.filters)
   return filters_;
+}
+inline void Content_file::set_allocated_filters(::proto::Filters* filters) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete filters_;
+  }
+  if (filters) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      filters = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, filters, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  filters_ = filters;
+  // @@protoc_insertion_point(field_set_allocated:proto.Content_file.filters)
+}
+
+// string name = 2;
+inline void Content_file::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Content_file::name() const {
+  // @@protoc_insertion_point(field_get:proto.Content_file.name)
+  return name_.GetNoArena();
+}
+inline void Content_file::set_name(const ::std::string& value) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:proto.Content_file.name)
+}
+#if LANG_CXX11
+inline void Content_file::set_name(::std::string&& value) {
+  
+  name_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:proto.Content_file.name)
+}
+#endif
+inline void Content_file::set_name(const char* value) {
+  GOOGLE_DCHECK(value != NULL);
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:proto.Content_file.name)
+}
+inline void Content_file::set_name(const char* value, size_t size) {
+  
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:proto.Content_file.name)
+}
+inline ::std::string* Content_file::mutable_name() {
+  
+  // @@protoc_insertion_point(field_mutable:proto.Content_file.name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Content_file::release_name() {
+  // @@protoc_insertion_point(field_release:proto.Content_file.name)
+  
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Content_file::set_allocated_name(::std::string* name) {
+  if (name != NULL) {
+    
+  } else {
+    
+  }
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:proto.Content_file.name)
 }
 
 // repeated .proto.Ref_count refs = 3;
-inline int File_desc::refs_size() const {
+inline int Content_file::refs_size() const {
   return refs_.size();
 }
-inline void File_desc::clear_refs() {
+inline void Content_file::clear_refs() {
   refs_.Clear();
 }
-inline const ::proto::Ref_count& File_desc::refs(int index) const {
-  // @@protoc_insertion_point(field_get:proto.File_desc.refs)
+inline const ::proto::Ref_count& Content_file::refs(int index) const {
+  // @@protoc_insertion_point(field_get:proto.Content_file.refs)
   return refs_.Get(index);
 }
-inline ::proto::Ref_count* File_desc::mutable_refs(int index) {
-  // @@protoc_insertion_point(field_mutable:proto.File_desc.refs)
+inline ::proto::Ref_count* Content_file::mutable_refs(int index) {
+  // @@protoc_insertion_point(field_mutable:proto.Content_file.refs)
   return refs_.Mutable(index);
 }
-inline ::proto::Ref_count* File_desc::add_refs() {
-  // @@protoc_insertion_point(field_add:proto.File_desc.refs)
+inline ::proto::Ref_count* Content_file::add_refs() {
+  // @@protoc_insertion_point(field_add:proto.Content_file.refs)
   return refs_.Add();
 }
 inline ::google::protobuf::RepeatedPtrField< ::proto::Ref_count >*
-File_desc::mutable_refs() {
-  // @@protoc_insertion_point(field_mutable_list:proto.File_desc.refs)
+Content_file::mutable_refs() {
+  // @@protoc_insertion_point(field_mutable_list:proto.Content_file.refs)
   return &refs_;
 }
 inline const ::google::protobuf::RepeatedPtrField< ::proto::Ref_count >&
-File_desc::refs() const {
-  // @@protoc_insertion_point(field_list:proto.File_desc.refs)
+Content_file::refs() const {
+  // @@protoc_insertion_point(field_list:proto.Content_file.refs)
   return refs_;
-}
-
-// uint64 time_created = 4;
-inline void File_desc::clear_time_created() {
-  time_created_ = GOOGLE_ULONGLONG(0);
-}
-inline ::google::protobuf::uint64 File_desc::time_created() const {
-  // @@protoc_insertion_point(field_get:proto.File_desc.time_created)
-  return time_created_;
-}
-inline void File_desc::set_time_created(::google::protobuf::uint64 value) {
-  
-  time_created_ = value;
-  // @@protoc_insertion_point(field_set:proto.File_desc.time_created)
 }
 
 // -------------------------------------------------------------------
@@ -2087,77 +2389,143 @@ inline void Ref_count::set_space_taken(::google::protobuf::uint64 value) {
   // @@protoc_insertion_point(field_set:proto.Ref_count.space_taken)
 }
 
+// uint64 xxhash = 5;
+inline void Ref_count::clear_xxhash() {
+  xxhash_ = GOOGLE_ULONGLONG(0);
+}
+inline ::google::protobuf::uint64 Ref_count::xxhash() const {
+  // @@protoc_insertion_point(field_get:proto.Ref_count.xxhash)
+  return xxhash_;
+}
+inline void Ref_count::set_xxhash(::google::protobuf::uint64 value) {
+  
+  xxhash_ = value;
+  // @@protoc_insertion_point(field_set:proto.Ref_count.xxhash)
+}
+
 // -------------------------------------------------------------------
 
 // Catalogue
 
-// repeated .proto.File_desc used_files = 1;
-inline int Catalogue::used_files_size() const {
-  return used_files_.size();
+// repeated .proto.State_file state_files = 1;
+inline int Catalogue::state_files_size() const {
+  return state_files_.size();
 }
-inline void Catalogue::clear_used_files() {
-  used_files_.Clear();
+inline void Catalogue::clear_state_files() {
+  state_files_.Clear();
 }
-inline const ::proto::File_desc& Catalogue::used_files(int index) const {
-  // @@protoc_insertion_point(field_get:proto.Catalogue.used_files)
-  return used_files_.Get(index);
+inline const ::proto::State_file& Catalogue::state_files(int index) const {
+  // @@protoc_insertion_point(field_get:proto.Catalogue.state_files)
+  return state_files_.Get(index);
 }
-inline ::proto::File_desc* Catalogue::mutable_used_files(int index) {
-  // @@protoc_insertion_point(field_mutable:proto.Catalogue.used_files)
-  return used_files_.Mutable(index);
+inline ::proto::State_file* Catalogue::mutable_state_files(int index) {
+  // @@protoc_insertion_point(field_mutable:proto.Catalogue.state_files)
+  return state_files_.Mutable(index);
 }
-inline ::proto::File_desc* Catalogue::add_used_files() {
-  // @@protoc_insertion_point(field_add:proto.Catalogue.used_files)
-  return used_files_.Add();
+inline ::proto::State_file* Catalogue::add_state_files() {
+  // @@protoc_insertion_point(field_add:proto.Catalogue.state_files)
+  return state_files_.Add();
 }
-inline ::google::protobuf::RepeatedPtrField< ::proto::File_desc >*
-Catalogue::mutable_used_files() {
-  // @@protoc_insertion_point(field_mutable_list:proto.Catalogue.used_files)
-  return &used_files_;
+inline ::google::protobuf::RepeatedPtrField< ::proto::State_file >*
+Catalogue::mutable_state_files() {
+  // @@protoc_insertion_point(field_mutable_list:proto.Catalogue.state_files)
+  return &state_files_;
 }
-inline const ::google::protobuf::RepeatedPtrField< ::proto::File_desc >&
-Catalogue::used_files() const {
-  // @@protoc_insertion_point(field_list:proto.Catalogue.used_files)
-  return used_files_;
+inline const ::google::protobuf::RepeatedPtrField< ::proto::State_file >&
+Catalogue::state_files() const {
+  // @@protoc_insertion_point(field_list:proto.Catalogue.state_files)
+  return state_files_;
+}
+
+// repeated .proto.Content_file content_files = 2;
+inline int Catalogue::content_files_size() const {
+  return content_files_.size();
+}
+inline void Catalogue::clear_content_files() {
+  content_files_.Clear();
+}
+inline const ::proto::Content_file& Catalogue::content_files(int index) const {
+  // @@protoc_insertion_point(field_get:proto.Catalogue.content_files)
+  return content_files_.Get(index);
+}
+inline ::proto::Content_file* Catalogue::mutable_content_files(int index) {
+  // @@protoc_insertion_point(field_mutable:proto.Catalogue.content_files)
+  return content_files_.Mutable(index);
+}
+inline ::proto::Content_file* Catalogue::add_content_files() {
+  // @@protoc_insertion_point(field_add:proto.Catalogue.content_files)
+  return content_files_.Add();
+}
+inline ::google::protobuf::RepeatedPtrField< ::proto::Content_file >*
+Catalogue::mutable_content_files() {
+  // @@protoc_insertion_point(field_mutable_list:proto.Catalogue.content_files)
+  return &content_files_;
+}
+inline const ::google::protobuf::RepeatedPtrField< ::proto::Content_file >&
+Catalogue::content_files() const {
+  // @@protoc_insertion_point(field_list:proto.Catalogue.content_files)
+  return content_files_;
 }
 
 // -------------------------------------------------------------------
 
 // Catalog_header
 
-// repeated .proto.Filter filters = 2;
-inline int Catalog_header::filters_size() const {
-  return filters_.size();
+// .proto.Filters filters = 1;
+inline bool Catalog_header::has_filters() const {
+  return this != internal_default_instance() && filters_ != NULL;
 }
 inline void Catalog_header::clear_filters() {
-  filters_.Clear();
+  if (GetArenaNoVirtual() == NULL && filters_ != NULL) {
+    delete filters_;
+  }
+  filters_ = NULL;
 }
-inline const ::proto::Filter& Catalog_header::filters(int index) const {
+inline const ::proto::Filters& Catalog_header::filters() const {
+  const ::proto::Filters* p = filters_;
   // @@protoc_insertion_point(field_get:proto.Catalog_header.filters)
-  return filters_.Get(index);
+  return p != NULL ? *p : *reinterpret_cast<const ::proto::Filters*>(
+      &::proto::_Filters_default_instance_);
 }
-inline ::proto::Filter* Catalog_header::mutable_filters(int index) {
+inline ::proto::Filters* Catalog_header::release_filters() {
+  // @@protoc_insertion_point(field_release:proto.Catalog_header.filters)
+  
+  ::proto::Filters* temp = filters_;
+  filters_ = NULL;
+  return temp;
+}
+inline ::proto::Filters* Catalog_header::mutable_filters() {
+  
+  if (filters_ == NULL) {
+    filters_ = new ::proto::Filters;
+  }
   // @@protoc_insertion_point(field_mutable:proto.Catalog_header.filters)
-  return filters_.Mutable(index);
-}
-inline ::proto::Filter* Catalog_header::add_filters() {
-  // @@protoc_insertion_point(field_add:proto.Catalog_header.filters)
-  return filters_.Add();
-}
-inline ::google::protobuf::RepeatedPtrField< ::proto::Filter >*
-Catalog_header::mutable_filters() {
-  // @@protoc_insertion_point(field_mutable_list:proto.Catalog_header.filters)
-  return &filters_;
-}
-inline const ::google::protobuf::RepeatedPtrField< ::proto::Filter >&
-Catalog_header::filters() const {
-  // @@protoc_insertion_point(field_list:proto.Catalog_header.filters)
   return filters_;
+}
+inline void Catalog_header::set_allocated_filters(::proto::Filters* filters) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == NULL) {
+    delete filters_;
+  }
+  if (filters) {
+    ::google::protobuf::Arena* submessage_arena = NULL;
+    if (message_arena != submessage_arena) {
+      filters = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, filters, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  filters_ = filters;
+  // @@protoc_insertion_point(field_set_allocated:proto.Catalog_header.filters)
 }
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

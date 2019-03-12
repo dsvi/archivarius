@@ -3,10 +3,19 @@
 #include "buffer.h"
 #include <zstd.h>
 
+struct Zstd_in{
+
+};
+
+struct Zstd_out{
+	int compression_level;
+};
+
 class Pipe_zstd_out: public Pipe_out{
 public:
 	explicit
-	Pipe_zstd_out(int compression_level);
+	Pipe_zstd_out(Zstd_out zout);
+	void flush();
 private:
 	virtual
 	void pump(u8 *from, u64 size) override;

@@ -28,6 +28,7 @@ std::filesystem::file_time_type posix_epoch;
 
 void init_epoch()
 {
+	//TODO: switch to c++20
 	tm start;
 	start.tm_year=70;
 	start.tm_mon=0;

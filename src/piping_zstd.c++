@@ -9,12 +9,28 @@ void check_error(size_t code)
 }
 
 
-Pipe_zstd_out::Pipe_zstd_out(int compression_level) : zstream_(ZSTD_createCStream(), ZSTD_freeCStream)
+Pipe_zstd_out::Pipe_zstd_out(Zstd_out zout) : zstream_(ZSTD_createCStream(), ZSTD_freeCStream)
 {
 	if (!zstream_)
 		throw Exception("Can't initialize zstd compressor");
-	auto err = ZSTD_initCStream(zstream_.get(), compression_level);
+	auto err = ZSTD_initCStream(zstream_.get(), zout.compression_level);
 	check_error(err);
+}
+
+void Pipe_zstd_out::flush()
+{
+	ZSTD_outBuffer zout;
+	out_buffer_.resize(1024*1024);
+	while(true) {
+		zout.dst = out_buffer_.raw();
+		zout.pos = 0;
+		zout.size = out_buffer_.size();
+		auto err = ZSTD_flushStream(zstream_.get(), &zout);
+		check_error(err);
+		pump_next(out_buffer_.raw(), zout.pos);
+		if (err == 0)
+			break;
+	};
 }
 
 void Pipe_zstd_out::pump(u8 *from, u64 size)
@@ -53,6 +69,7 @@ void Pipe_zstd_out::finish()
 		check_error(err);
 		pump_next(out_buffer_.raw(), zout.pos);
 	} while(err != 0);
+	i_pumped_ = false;
 	finish_next();
 }
 

@@ -15,7 +15,35 @@ namespace fs = std::filesystem;
 
 const char * cat_filename = "catalog";
 
-Catalogue::Catalogue(std::filesystem::path &arc_path)
+void add_filters(proto::Filters *pf, Filters_in &f){
+	if (f.cmp_in)
+		pf->mutable_zstd_compression();
+	if (f.enc_in){
+		auto enc = pf->mutable_chapoly_encryption();
+		enc->set_iv(f.enc_in->iv(), f.enc_in->iv_size());
+		enc->set_key(f.enc_in->key(), f.enc_in->key_size());
+	}
+}
+
+
+Filters_in get_filters(const proto::Filters &pf){
+	Filters_in ret;
+	if (pf.has_zstd_compression())
+		ret.cmp_in.emplace();
+	if (pf.has_chapoly_encryption()){
+		auto &enc = ret.enc_in.emplace();
+		auto penc = pf.chapoly_encryption();
+		if (penc.key().size() != enc.key_size())
+			throw Exception("Wrong encryption key size. Likely corrupt file.");
+		if (penc.iv().size() != enc.iv_size())
+			throw Exception("Wrong encryption IV size. Likely corrupt file.");
+		enc.key(penc.key());
+		enc.iv(penc.iv());
+	}
+	return ret;
+}
+
+Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 {
 	fs::create_directories(arc_path);
 	cat_file_ = arc_path / cat_filename;
@@ -24,6 +52,16 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 	file_lock_ = lock(cat_file_);
 	if (fs::file_size(cat_file_) == 0){
 		clean_up();
+		if (!key.empty()){
+			enc_.emplace();
+			using namespace chrono;
+			//TODO: change to C++2a utc_clock
+			auto t = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+			std::vector<u8> iv(&t, &t + sizeof (t));
+			iv.resize(enc_->iv_size());
+			enc_->iv(iv);
+			enc_->set_key_word(key);
+		}
 		return;
 	}
 
@@ -31,7 +69,6 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 		File_source src(cat_file_);
 		Pipe_xxhash_in cs_pipe;
 		Stream_in in(cat_file_);
-		Pipe_zstd_in zin;
 
 		in << cs_pipe << src;
 
@@ -39,36 +76,52 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 			throw Exception("Unsupported file version {0}. Max supported is {1}")(version, current_version);
 		Buffer buf;
 		auto header = get_message<proto::Catalog_header>(buf, in, cs_pipe);
-		// TODO: setup piping
-	//	for (auto &f :header.filters()){
-	//	}
-		in << cs_pipe << zin << src;
+		Filters_in filters;
+		if (header.has_filters()){
+			auto &f = header.filters();
+			if (f.has_chapoly_encryption()){
+				Chapoly &ein = filters.enc_in.emplace();
+				auto &iv = f.chapoly_encryption().iv();
+				if (iv.size() != ein.iv_size())
+					throw Exception("Wrong encryption IV size. Likely corrupt file.");
+				ein.iv(iv);
+				ein.set_key_word(key);
+				enc_ = ein;
+				enc_->inc_iv();
+			}
+			if (f.has_zstd_compression())
+				filters.cmp_in.emplace();
+		}
+		if (!enc_ and !key.empty())
+			throw Exception("Archive was not encrypted before. You have to recreate it.");
+		Filtrator_in fltr(filters);
+		in << cs_pipe << fltr << src;
 
 		auto catalog = get_message<proto::Catalogue>(buf, in, cs_pipe);
-		for (auto &file: catalog.used_files()){
-			if (file.refs_size() == 0){
-				Fs_state_file state;
-				state.name = file.name();
-				state.time_created = file.time_created();
-				ASSERT(state.time_created);
-				for (auto &filter: file.filters()){
-					if (filter.has_aes_encryption())
-						state.aes_encripted = true;
-					if (filter.has_zstd_compression())
-						state.zstd_compressed = true;
-				}
-				fs_state_files_.push_back(move(state));
-			}
-			else{
-				File_content_ref ref;
-				ref.fname = file.name();
-				for (auto &r : file.refs()){
-					ref.from = r.from();
-					ref.to   = r.to();
-					ref.ref_count_ = r.ref_count();
-					ref.space_taken = r.space_taken();
-					content_refs_.insert(ref);
-				}
+		// TODO: add more checks?
+		for (auto &file: catalog.state_files()){
+			Fs_state_file state;
+			state.name = file.name();
+			state.time_created = file.time_created();
+			ASSERT(state.time_created);
+			if (file.has_filters())
+				state.filters = get_filters(file.filters());
+			fs_state_files_.push_back(move(state));
+		}
+
+		for (auto &file: catalog.content_files()){
+			File_content_ref ref;
+			if (file.has_filters())
+				ref.filters = get_filters(file.filters());
+			ref.fname = file.name();
+			for (auto &r : file.refs()){
+				ref.from = r.from();
+				ref.to   = r.to();
+				ref.ref_count_ = r.ref_count();
+				ref.space_taken = r.space_taken();
+				ASSERT(ref.space_taken);
+				ref.xxhash = r.xxhash();
+				content_refs_.insert(ref);
 			}
 		}
 		clean_up();
@@ -76,6 +129,13 @@ Catalogue::Catalogue(std::filesystem::path &arc_path)
 	catch (...){
 		throw_with_nested( Exception("Can't read {0}")(cat_file_) );
 	}
+}
+
+void Catalogue::key(string_view key)
+{
+	if (!enc_)
+		throw Exception("Archive was not encrypted before. You have to recreate it.");
+	enc_->set_key_word(key);
 }
 
 Filesystem_state Catalogue::fs_state(size_t ndx)
@@ -86,18 +146,32 @@ Filesystem_state Catalogue::fs_state(size_t ndx)
 	return Filesystem_state(
 	  cat_file_.parent_path(),
 	  state_desc.name,
-	  state_desc.time_created);
+	  state_desc.time_created,
+	  state_desc.filters,
+		[this](File_content_ref &r) -> File_content_ref { return map_ref(r); });
 }
 
 Filesystem_state Catalogue::latest_fs_state()
 {
-	if (fs_state_files_.empty())
-		return Filesystem_state(cat_file_.parent_path());
+	if (fs_state_files_.empty()){
+		return empty_fs_state();
+	}
 	auto &state_desc = fs_state_files_.back();
 	return Filesystem_state(
 	  cat_file_.parent_path(),
 	  state_desc.name,
-	  state_desc.time_created);
+	  state_desc.time_created,
+	  state_desc.filters,
+		[this](File_content_ref &r) -> File_content_ref { return map_ref(r); });
+}
+
+Filesystem_state Catalogue::empty_fs_state()
+{
+	Filters_out f;
+	f.cmp_out = {14};
+	if (enc_)
+		f.enc_out.emplace().randomize();
+	return Filesystem_state(cat_file_.parent_path(), f);
 }
 
 void Catalogue::add_fs_state(Filesystem_state &fs)
@@ -105,12 +179,14 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	Fs_state_file state_file;
 	state_file.name = fs.file_name();
 	state_file.time_created = fs.time_created();
+	state_file.filters = fs.filters();
 	fs_state_files_.push_back(state_file);
 
 	for (auto &file : fs.files()){
 		if (!file.content_ref.has_value())
 			continue;
 		auto [it, was_inserted] = content_refs_.insert(file.content_ref.value());
+		ASSERT( (was_inserted && it->ref_count_ == 0) || !was_inserted);
 		File_content_ref &ref = const_cast<File_content_ref&>(*it);
 		ref.ref_count_++;
 	}
@@ -122,7 +198,7 @@ void Catalogue::remove_fs_state(Filesystem_state &fs)
 		return a.name == fs.file_name();
 	});
 	if (end != --fs_state_files_.end())
-		throw_inconsistent();
+		throw_inconsistent(__LINE__);
 	fs_state_files_.pop_back();
 	for (auto &file : fs.files()){
 		if (!file.content_ref.has_value())
@@ -130,7 +206,7 @@ void Catalogue::remove_fs_state(Filesystem_state &fs)
 		auto it = content_refs_.find(file.content_ref.value());
 		ASSERT(it != content_refs_.end());
 		if (it == content_refs_.end())
-			throw_inconsistent();
+			throw_inconsistent(__LINE__);
 		auto &ref = const_cast<File_content_ref&>(*it);
 		if (--ref.ref_count_ == 0)
 			content_refs_.erase(file.content_ref.value());
@@ -148,38 +224,57 @@ void Catalogue::commit()
 		out >> cs_pipe >> dst;
 
 		out.put_uint(current_version);
-		proto::Catalog_header hdr;
-		//TODO: put right filters
 		Buffer buf;
-		put_message(hdr, buf, out, cs_pipe);
-
-		Pipe_zstd_out zout(20);
-		out >> cs_pipe >> zout >> dst;
+		{
+			proto::Catalog_header hdr;
+			auto f = hdr.mutable_filters();
+			f->mutable_zstd_compression();
+			if (enc_){
+				auto enc = f->mutable_chapoly_encryption();
+				enc->set_iv(enc_->iv(), enc_->iv_size());
+			}
+			put_message(hdr, buf, out, cs_pipe);
+		}
+		Pipe_chapoly_out eout;
+		Pipe_zstd_out zout({14});
+		if (enc_){
+			eout.set_params(*enc_);
+			out >> cs_pipe >> zout >> eout >> dst;
+		}
+		else
+			out >> cs_pipe >> zout >> dst;
 
 		proto::Catalogue cat_msg;
 		for (auto &fsf : fs_state_files_){
-			auto desc = cat_msg.add_used_files();
-			desc->set_name(fsf.name);
-			desc->set_time_created(fsf.time_created);
-			if (fsf.aes_encripted)
-				desc->add_filters()->mutable_aes_encryption()->set_salt(""); //TODO: posolit
-			if (fsf.zstd_compressed)
-				desc->add_filters()->mutable_zstd_compression();
+			auto sfile = cat_msg.add_state_files();
+			sfile->set_name(fsf.name);
+			sfile->set_time_created(fsf.time_created);
+			if (fsf.filters){
+				auto f = sfile->mutable_filters();
+				add_filters(f, fsf.filters);
+			}
 		}
 		string_view fn;
-		proto::File_desc *fd;
-		for (auto &r : content_refs_){
+		proto::Content_file *cfile;
+		for (auto &rc : content_refs_){
+			auto &r = const_cast<File_content_ref&>(rc);
 			if (fn != r.fname){
-				fd = cat_msg.add_used_files();
 				fn = r.fname;
-				fd->set_name(r.fname);
+				cfile = cat_msg.add_content_files();
+				cfile->set_name(r.fname);
+				if (r.filters){
+					auto f = cfile->mutable_filters();
+					add_filters(f, r.filters);
+				}
 			}
-			//TODO: filters
-			auto ref = fd->add_refs();
+			auto ref = cfile->add_refs();
 			ref->set_from(r.from);
 			ref->set_to(r.to);
+			ASSERT(r.space_taken);
 			ref->set_space_taken(r.space_taken);
+			ASSERT(r.ref_count_);
 			ref->set_ref_count(r.ref_count_);
+			ref->set_xxhash(r.xxhash);
 		}
 		put_message(cat_msg, buf, out, cs_pipe);
 		out.finish();
@@ -219,9 +314,18 @@ void Catalogue::clean_up()
 	}
 }
 
-void Catalogue::throw_inconsistent()
+void Catalogue::throw_inconsistent(uint line)
 {
-	throw Exception("Archive is in inconsistent state, better recreate: {0}")(cat_file_.parent_path());
+	throw Exception("Archive is in inconsistent state, better recreate: {0}\ncode: {1}")(cat_file_.parent_path(), line);
+}
+
+File_content_ref Catalogue::map_ref(File_content_ref &r)
+{
+	auto it = content_refs_.find(r);
+	ASSERT(it != content_refs_.end());
+	if (it == content_refs_.end())
+		throw_inconsistent(__LINE__);
+	return const_cast<File_content_ref&>(*it);
 }
 
 

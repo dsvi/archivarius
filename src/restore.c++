@@ -9,7 +9,7 @@ using namespace std;
 using namespace fmt;
 namespace fs = filesystem;
 
-void pump_to(Stream_in &in, u64 to, Stream_out *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
+void pump(Stream_in &in, u64 to, Stream_out *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
 {
 	while (num_pumped < to){
 		auto num_left = to - num_pumped;
@@ -38,8 +38,7 @@ void restore(Restore_settings &&cfg)
 	try{
 		Buffer tmp;
 		tmp.resize(10'000'000);
-		Catalogue catalog(cfg.from);
-		auto state = catalog.fs_state(cfg.from_ndx);
+		auto state = cfg.cat->fs_state(cfg.from_ndx);
 		auto files = state.files();
 		for (auto &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
@@ -62,7 +61,7 @@ void restore(Restore_settings &&cfg)
 			});
 			File_source in;
 			Stream_in sin;
-			sin.source(&in);
+			Filtrator_in filters;
 			decltype(File_content_ref::fname) fname;
 			decltype(File_content_ref::from)  num_pumped;
 			for (auto fr : sorted_by_refs){
@@ -71,23 +70,24 @@ void restore(Restore_settings &&cfg)
 				auto re_path = cfg.to / file.path;
 				try {
 					if (fname != ref.fname){
-						auto content_path = cfg.from / ref.fname;
+						auto content_path = cfg.cat->archive_path() / ref.fname;
 						in = content_path;
 						sin.name(content_path);
 						num_pumped = 0;
 						fname = ref.fname;
+						filters = Filtrator_in(ref.filters);
+						sin << filters << in;
 					}
-					pump_to(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
+					pump(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
 					File_sink out(re_path);
 					Pipe_xxhash_out cs;
-					cs.sink(&out);
 					Stream_out sout;
-					sout.sink(&cs);
-					pump_to(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
+					sout >> cs >> out;
+					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
 					u64 original_cs = sin.get_uint64();
 					num_pumped += sizeof(sin.get_uint64());
 					if (original_cs != cs.digest())
-						throw Exception( "Control sums do not match" );
+						cfg.warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path) );
 				}
 				catch(std::exception &e){
 					/* TRANSLATORS: This is about path from and to  */
@@ -138,7 +138,7 @@ void restore(Restore_settings &&cfg)
 		string msg;
 		if (cfg.name.empty())
 			/* TRANSLATORS: This is about path from and to  */
-			msg = format(tr_txt("Error while restoring from {0} to {1}:"), cfg.from, cfg.to);
+			msg = format(tr_txt("Error while restoring from {0} to {1}:"), cfg.cat->archive_path(), cfg.to);
 		else
 			/* TRANSLATORS: First argument is name, second - path*/
 			msg = format(tr_txt("Error while restoring {0} to {1}:"), cfg.name, cfg.to);

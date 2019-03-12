@@ -1,4 +1,4 @@
 syntax: glob
-archivarius.creator.user
-build/bin/*
-build/obj/*
+*.user.*
+bazel-*
+*.user
