@@ -50,6 +50,7 @@ private:
 	File_content_ref map_ref(File_content_ref &r);
 };
 
+static_assert (std::is_nothrow_move_constructible<Catalogue>::value);
 
 inline
 std::filesystem::path Catalogue::archive_path()

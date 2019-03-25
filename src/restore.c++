@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "platform.h"
 #include "piping.h"
+#include "checksumer.h"
 
 using namespace std;
 using namespace fmt;
@@ -64,6 +65,7 @@ void restore(Restore_settings &&cfg)
 			Filtrator_in filters;
 			decltype(File_content_ref::fname) fname;
 			decltype(File_content_ref::from)  num_pumped;
+			Checksumer cs;
 			for (auto fr : sorted_by_refs){
 				auto &file = fr.get();
 				auto &ref = file.content_ref.value();
@@ -77,16 +79,15 @@ void restore(Restore_settings &&cfg)
 						fname = ref.fname;
 						filters = Filtrator_in(ref.filters);
 						sin << filters << in;
+						cs.set_for(ref.csum);
 					}
 					pump(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
 					File_sink out(re_path);
-					Pipe_xxhash_out cs;
 					Stream_out sout;
-					sout >> cs >> out;
+					cs.reset();
+					sout >> cs.pipe() >> out;
 					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
-					u64 original_cs = sin.get_uint64();
-					num_pumped += sizeof(sin.get_uint64());
-					if (original_cs != cs.digest())
+					if (ref.csum != cs.checksum())
 						cfg.warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path) );
 				}
 				catch(std::exception &e){

@@ -60,6 +60,10 @@ void Archiver::archive()
 		auto fcc = File_content_creator(archive_path);
 		fcc.min_file_size(min_content_file_size);
 		creator_ = &fcc;
+		if (encryption)
+			creator_->enable_encryption();
+		if (zstd)
+			creator_->enable_compression(*zstd);
 		auto prev = catalog->latest_fs_state();
 		auto next = catalog->empty_fs_state();
 		prev_ = &prev;
@@ -86,6 +90,13 @@ void Archiver::archive()
 			}
 		}
 		creator_->finish();
+		if (zstd){
+			auto cs = creator_->compression_statistic();
+			if (cs.original){
+				auto percent = cs.compressed *100 / cs.original;
+				fmt::print("Archive compressed to {}% of original size\n", percent);
+			}
+		}
 		next_->commit();
 		catalog->add_fs_state(next);
 		catalog->commit();

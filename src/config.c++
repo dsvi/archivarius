@@ -65,26 +65,30 @@ void fill_compression(Config &to, Property &p){
 
 static const string conf_fn = "archivarius.conf"s;
 
-std::vector<Config> read_config()
+std::vector<Config> read_config(string_view filepath)
 {
-	forward_list<fs::path> folders{"/usr/local/etc", "/etc"};
-	auto hf = getenv("HOME");
-	if (hf)
-		folders.push_front(string(hf) + "/.config");
 	fs::path cfg_path;
-	for (auto &dir : folders){
-		cfg_path = dir / conf_fn;
-		if (exists(cfg_path))
-			break;
-		cfg_path = fs::path();
+	if (filepath.empty()){
+		forward_list<fs::path> folders{"/usr/local/etc", "/etc"};
+		auto hf = getenv("HOME");
+		if (hf)
+			folders.push_front(string(hf) + "/.config");
+		for (auto &dir : folders){
+			cfg_path = dir / conf_fn;
+			if (exists(cfg_path))
+				break;
+			cfg_path = fs::path();
+		}
+		if (cfg_path.empty()){
+			string paths;
+			for (auto &dir : folders)
+				paths += "\n" + dir.string();
+			/* TRANSLATORS: config file {1} was not found at the directories {0}*/
+			throw Exception("{1} was not found at: {0}\n")(paths, conf_fn);
+		}
 	}
-	if (cfg_path.empty()){
-		string paths;
-		for (auto &dir : folders)
-			paths += "\n" + dir.string();
-		/* TRANSLATORS: config file {1} was not found at the directories {0}*/
-		throw Exception("{1} was not found at: {0}\n")(paths, conf_fn);
-	}
+	else
+		cfg_path = filepath;
 	try{
 		Property root_pt = from_file(cfg_path);
 		unordered_set<std::string_view> names;
@@ -133,6 +137,9 @@ std::vector<Config> read_config()
 							if (pwd.empty())
 								throw Exception("line {0}: 'password' can not be empty")(taskp.orig_line());
 							cfg.enc.emplace().password = move(pwd);
+						}
+						else if (taskp.name() == "min-content-file-size"){
+							cfg.min_content_file_size = taskp.value_u64();
 						}
 						else
 							throw Exception("line {0}: unknown parameter {1}")(taskp.orig_line(), taskp.name());

@@ -61,7 +61,7 @@ Filesystem_state::Filesystem_state(
 			auto &ref = r.ref();
 			incomplete_ref.fname = ref.content_fname();
 			incomplete_ref.from = ref.from();
-			f.content_ref = ref_mapper(*f.content_ref);
+			f.content_ref = ref_mapper(incomplete_ref);
 		}
 		if (f.type == SYMLINK)
 			f.symlink_target = r.symlink_target();

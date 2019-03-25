@@ -87,6 +87,17 @@ std::string_view property_tree::Property::value_str()
 		throw Exception("Property {0} should have a value.\nProperty came from {1} line {2}")(key_, *origin_fn_, origin_ln_);
 	return val_;
 }
+
+u64 property_tree::Property::value_u64()
+{
+	try{
+		return stoull(val_);
+	}
+	catch(...){
+		throw_with_nested(Exception("Value for '{0}' must be unsigned integer.\nProperty came from {1} line {2}")(key_, *origin_fn_, origin_ln_));
+	}
+}
+
 void property_tree::Property::add_sub(property_tree::Property &&p)
 {
 	kids_.emplace_back(move(p));

@@ -18,27 +18,41 @@ const char * cat_filename = "catalog";
 void add_filters(proto::Filters *pf, Filters_in &f){
 	if (f.cmp_in)
 		pf->mutable_zstd_compression();
-	if (f.enc_in){
+	if (f.enc_chapo_in){
 		auto enc = pf->mutable_chapoly_encryption();
-		enc->set_iv(f.enc_in->iv(), f.enc_in->iv_size());
-		enc->set_key(f.enc_in->key(), f.enc_in->key_size());
+		enc->set_iv(f.enc_chapo_in->iv(), f.enc_chapo_in->iv_size());
+		enc->set_key(f.enc_chapo_in->key(), f.enc_chapo_in->key_size());
+	}
+	if (f.enc_chacha_in){
+		auto enc = pf->mutable_chacha_encryption();
+		enc->set_iv(f.enc_chacha_in->iv(), f.enc_chacha_in->iv_size());
+		enc->set_key(f.enc_chacha_in->key(), f.enc_chacha_in->key_size());
 	}
 }
 
+template<class PB_ENC_FILTER>
+void fill_enc_params(PB_ENC_FILTER &fm, Encryption_params &ep){
+	if (fm.key().size() != ep.key_size())
+		throw Exception("Wrong encryption key size. Likely corrupt file.");
+	if (fm.iv().size() != ep.iv_size())
+		throw Exception("Wrong encryption IV size. Likely corrupt file.");
+	ep.key(fm.key());
+	ep.iv(fm.iv());
+}
 
 Filters_in get_filters(const proto::Filters &pf){
 	Filters_in ret;
 	if (pf.has_zstd_compression())
 		ret.cmp_in.emplace();
 	if (pf.has_chapoly_encryption()){
-		auto &enc = ret.enc_in.emplace();
+		auto &enc = ret.enc_chapo_in.emplace();
 		auto penc = pf.chapoly_encryption();
-		if (penc.key().size() != enc.key_size())
-			throw Exception("Wrong encryption key size. Likely corrupt file.");
-		if (penc.iv().size() != enc.iv_size())
-			throw Exception("Wrong encryption IV size. Likely corrupt file.");
-		enc.key(penc.key());
-		enc.iv(penc.iv());
+		fill_enc_params(penc, enc);
+	}
+	if (pf.has_chacha_encryption()){
+		auto &enc = ret.enc_chacha_in.emplace();
+		auto penc = pf.chacha_encryption();
+		fill_enc_params(penc, enc);
 	}
 	return ret;
 }
@@ -60,7 +74,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 			std::vector<u8> iv(&t, &t + sizeof (t));
 			iv.resize(enc_->iv_size());
 			enc_->iv(iv);
-			enc_->set_key_word(key);
+			enc_->set_password(key);
 		}
 		return;
 	}
@@ -80,12 +94,12 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 		if (header.has_filters()){
 			auto &f = header.filters();
 			if (f.has_chapoly_encryption()){
-				Chapoly &ein = filters.enc_in.emplace();
+				Chapoly &ein = filters.enc_chapo_in.emplace();
 				auto &iv = f.chapoly_encryption().iv();
 				if (iv.size() != ein.iv_size())
 					throw Exception("Wrong encryption IV size. Likely corrupt file.");
 				ein.iv(iv);
-				ein.set_key_word(key);
+				ein.set_password(key);
 				enc_ = ein;
 				enc_->inc_iv();
 			}
@@ -120,7 +134,15 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 				ref.ref_count_ = r.ref_count();
 				ref.space_taken = r.space_taken();
 				ASSERT(ref.space_taken);
-				ref.xxhash = r.xxhash();
+				if (r.has_xxhash())
+					ref.csum.emplace<Xx_hash>(r.xxhash());
+				if (r.has_blake2b()){
+					auto &pb2b = r.blake2b();
+					Blake2b_hash &b2b = ref.csum.emplace<Blake2b_hash>();
+					if (pb2b.size() != sizeof(b2b))
+						throw Exception("Wrong blake2b size. Likely corrupt file.");
+					copy_n(pb2b.begin(), sizeof(b2b), b2b.begin());
+				}
 				content_refs_.insert(ref);
 			}
 		}
@@ -135,7 +157,9 @@ void Catalogue::key(string_view key)
 {
 	if (!enc_)
 		throw Exception("Archive was not encrypted before. You have to recreate it.");
-	enc_->set_key_word(key);
+	if (key.empty())
+		enc_.reset();
+	enc_->set_password(key);
 }
 
 Filesystem_state Catalogue::fs_state(size_t ndx)
@@ -170,7 +194,7 @@ Filesystem_state Catalogue::empty_fs_state()
 	Filters_out f;
 	f.cmp_out = {14};
 	if (enc_)
-		f.enc_out.emplace().randomize();
+		f.enc_chapo_out.emplace().randomize();
 	return Filesystem_state(cat_file_.parent_path(), f);
 }
 
@@ -180,6 +204,11 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	state_file.name = fs.file_name();
 	state_file.time_created = fs.time_created();
 	state_file.filters = fs.filters();
+//	fmt::print("Fs_state added\ncompression :{}\nchapo :{}\nchacha :{} \n",
+//	           state_file.filters.cmp_in.has_value(),
+//	           state_file.filters.enc_chapo_in.has_value(),
+//	           state_file.filters.enc_chacha_in.has_value() );
+	cout.flush();
 	fs_state_files_.push_back(state_file);
 
 	for (auto &file : fs.files()){
@@ -235,14 +264,11 @@ void Catalogue::commit()
 			}
 			put_message(hdr, buf, out, cs_pipe);
 		}
-		Pipe_chapoly_out eout;
-		Pipe_zstd_out zout({14});
-		if (enc_){
-			eout.set_params(*enc_);
-			out >> cs_pipe >> zout >> eout >> dst;
-		}
-		else
-			out >> cs_pipe >> zout >> dst;
+		Filtrator_out filtr;
+		filtr.compression({22});
+		if (enc_)
+			filtr.encryption(*enc_);
+		out >> cs_pipe >> filtr >> dst;
 
 		proto::Catalogue cat_msg;
 		for (auto &fsf : fs_state_files_){
@@ -274,7 +300,10 @@ void Catalogue::commit()
 			ref->set_space_taken(r.space_taken);
 			ASSERT(r.ref_count_);
 			ref->set_ref_count(r.ref_count_);
-			ref->set_xxhash(r.xxhash);
+			if (auto h = get_if<Xx_hash>(&r.csum))
+				ref->set_xxhash(*h);
+			if (auto h = get_if<Blake2b_hash>(&r.csum))
+				ref->set_blake2b(h, sizeof(*h));
 		}
 		put_message(cat_msg, buf, out, cs_pipe);
 		out.finish();

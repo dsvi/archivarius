@@ -65,6 +65,8 @@ private:
 	    std::function<File_content_ref(File_content_ref&)> ref_mapper);
 };
 
+static_assert (std::is_nothrow_move_constructible<Filesystem_state>::value);
+
 inline
 std::string_view Filesystem_state::file_name()
 {

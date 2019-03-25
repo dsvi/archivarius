@@ -24,6 +24,7 @@
 #include <time.h>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
 #include <botan_all.h>

@@ -10,7 +10,7 @@ std::string File_content_creator::prefix = "c";
 File_content_creator::File_content_creator(const std::filesystem::path &arc_path)
 {
 	arc_path_ = arc_path;
-	buff_.resize(50'000'000);
+	buff_.resize(10'000'000);
 }
 
 void File_content_creator::enable_compression(Zstd_out &p)
@@ -22,7 +22,8 @@ void File_content_creator::enable_compression(Zstd_out &p)
 void File_content_creator::enable_encryption()
 {
 	ASSERT(!file_);
-	enc_params_.emplace();
+	enc_.emplace();
+	cs_.set_for(Blake2b_hash());
 }
 
 File_content_ref File_content_creator::add(const std::filesystem::path &file_name)
@@ -47,17 +48,16 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 		bytes_pumped_ += res.pumped_size;
 	}while (!res.eof);
 	ref.to = bytes_pumped_;
-	ref.xxhash = cs_.digest();
-	bytes_pumped_ += sizeof(cs_.digest());
-	if (file_.bytes_written() > min_file_size_)
-		out_.finish();
+	ref.csum = cs_.checksum();
 	// TODO: check if this shit actually works well
 	filters_.flush_der_kompressor();
 	ref.space_taken = file_.bytes_written() - bytes_actually_wirtten;
-	if (ref.space_taken == 0)
-		ref.space_taken = 1;
 	comp_ratio_.original += ref.to - ref.from;
 	comp_ratio_.compressed += ref.space_taken;
+	if (ref.space_taken == 0)
+		ref.space_taken = 1;
+	if (file_.bytes_written() > min_file_size_)
+		out_.finish();
 	return ref;
 }
 
@@ -79,10 +79,10 @@ void File_content_creator::create_file()
 		file /= fname_;
 	}while (fs::exists(file));
 	file_ = file;
-	if (enc_params_){
-		enc_params_->randomize();
-		filters_.encryption(*enc_params_);
+	if (enc_){
+		enc_->randomize();
+		filters_.encryption(*enc_);
 	}
-	out_ >> cs_ >> filters_ >> file_;
+	out_ >> cs_.pipe() >> filters_ >> file_;
 	out_.name(file);
 }

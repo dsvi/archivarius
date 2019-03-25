@@ -23,7 +23,8 @@ struct Config{
 	bool                 process_acl = false;
 	std::optional<Config_zstd> zstd;
 	std::optional<Config_enc>  enc;
+	u64 min_content_file_size = 0;
 };
 
 
-std::vector<Config> read_config();
+std::vector<Config> read_config(std::string_view filepath = "");

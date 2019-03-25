@@ -11,6 +11,7 @@ public:
 	std::string_view value_str();
 	/// doesn't throw
 	std::string_view opt_value_str();
+	u64 value_u64();
 	/// raw text, not divided to name and value. gets trimmed inside. might be empty()
 	std::string_view text();
 	/// will be divide to name and value. can be empty()

@@ -22,9 +22,9 @@ u64 Stream_in::get_uint()
 	do{
 		Source::Pump_result read = pump(&sv, 1);
 		if (read.pumped_size != 1)
-			throw Exception( "Malformed file or wrong password: {0}" )(name_);
+			throw Exception( "Malformed file: {0}" )(name_);
 		if (shift > sizeof(v) * 8 - 7)
-			throw Exception( "Too big varint. Malformed file or wrong password? {0}" )(name_);
+			throw Exception( "Too big varint. Malformed file {0}" )(name_);
 		v |= (sv &127) << shift;
 		shift += 7;
 	}while(sv &128);
@@ -36,7 +36,7 @@ u64 Stream_in::get_uint64()
 	u64 v;
 	auto res = pump((u8*) &v, sizeof(v));
 	if (res.pumped_size != sizeof(v))
-		throw Exception( "Malformed file or wrong password: {0}" )(name_);
+		throw Exception( "Malformed file: {0}" )(name_);
 	return v;
 }
 
@@ -101,11 +101,11 @@ void read_message(Buffer &message, Stream_in &in, Pipe_xxhash_in &cs_pipe)
 	cs_pipe.reset();
 	auto res = in.pump(message.raw(), msize);
 	if (res.pumped_size != msize)
-		throw Exception("Malformed file or wrong password: {0}")(in.name());
+		throw Exception("Malformed file: {0}")(in.name());
 	auto cs_now = cs_pipe.digest();
 	auto cs_was = in.get_uint64();
 	if (cs_now != cs_was)
-		throw Exception("Control sums don't match. Corrupted file or wrong password.");
+		throw Exception("Control sums don't match. Corrupted file.");
 }
 
 void put_message(google::protobuf::MessageLite &msg, Buffer &buff, Stream_out &out, Pipe_xxhash_out &cs_pipe)
@@ -117,5 +117,5 @@ void put_message(google::protobuf::MessageLite &msg, Buffer &buff, Stream_out &o
 	cs_pipe.reset();
 	out.pump(buff.raw(), msize);
 	auto cs = cs_pipe.digest();
-	out.put_uint64(cs);
+	out.put_uint64(get<Xx_hash>(cs));
 }

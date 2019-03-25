@@ -1,17 +1,16 @@
 #pragma once
-#include "piping.h"
 #include "checksum.h"
+#include "piping.h"
 
-
-class Xxhash_csumer : public Checksumer_base{
+class Blake2b_csumer : public Checksumer_base{
 public:
 	Checksum digest() override;
 	void reset() override;
 protected:
-	xxh::hash_state64_t state_{0};
+	Botan::Blake2b state_{512};
 };
 
-class Pipe_xxhash_in : public Pipe_in, public Xxhash_csumer
+class Pipe_blake2b_in : public Pipe_in, public Blake2b_csumer
 {
 private:
 	virtual
@@ -19,7 +18,7 @@ private:
 };
 
 
-class Pipe_xxhash_out : public Pipe_out, public Xxhash_csumer
+class Pipe_blake2b_out : public Pipe_out, public Blake2b_csumer
 {
 private:
 	virtual

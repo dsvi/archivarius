@@ -20,9 +20,10 @@ int main(int argc, char *argv[]){
 			return 0;
 		}
 		auto cmd_line = parse_command_line(argc, argv);
+		auto cfg_path = cmd_line.param_str_opt("cfg-file");
 		if (cmd_line.command() == "archive"){
 			cmd_line.check_unused_arguments();
-			auto cfgs = read_config();
+			auto cfgs = read_config(cfg_path.value_or(""));
 			Archiver arc;
 			for (auto &c : cfgs){
 				try {
@@ -32,11 +33,10 @@ int main(int argc, char *argv[]){
 						cerr << w << endl;
 					};
 					Catalogue cat(c.archive, c.enc ? c.enc->password : "");
-#ifdef DEBUG
-					arc.min_content_file_size = 10*1024*1024;
-#else
-					arc.min_content_file_size = 2*1024*1024*1024;
-#endif
+					if (c.min_content_file_size)
+						arc.min_content_file_size = c.min_content_file_size;
+					else
+						arc.min_content_file_size = 2*1024*1024*1024ul;
 					arc.catalog = &cat;
 					// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 					auto max_ref = cat.max_ref_count();
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
 							if (content_file_size.find(*f.content_fn) != content_file_size.end())
 								continue;
 							auto size = file_size(c.archive / *f.content_fn);
-							if (size < arc.min_content_file_size) // intentionally used here before recalculation later
+							if (size < arc.min_content_file_size)
 								content_file_size[*f.content_fn] = arc.min_content_file_size;
 							else
 								content_file_size[*f.content_fn] = size;
@@ -86,6 +86,7 @@ int main(int argc, char *argv[]){
 					}
 					// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 					arc.name = c.name;
+					arc.encryption = c.enc.has_value();
 					arc.archive_path = c.archive;
 					arc.files_to_archive = c.files_to_archive;
 					arc.files_to_exclude = c.files_to_ignore;

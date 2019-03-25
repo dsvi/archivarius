@@ -1,3 +1,6 @@
+src/checksum.h
+src/checksumer.c++
+src/checksumer.h
 src/cmd_line_parser.c++
 src/cmd_line_parser.h
 src/archive.c++
@@ -8,6 +11,8 @@ src/catalogue.c++
 src/catalogue.h
 src/config.c++
 src/config.h
+src/encryption_params.c++
+src/encryption_params.h
 src/exception.c++
 src/exception.h
 src/file_content_creator.c++
@@ -19,14 +24,20 @@ src/filters.c++
 src/filters.h
 src/piping.c++
 src/piping.h
+src/piping_blake2b.c++
+src/piping_blake2b.h
 src/piping_chapoly.c++
 src/piping_chapoly.h
+src/piping_chacha.c++
+src/piping_chacha.h
 src/piping_xxhash.c++
 src/piping_xxhash.h
 src/piping_zstd.c++
 src/piping_zstd.h
 src/platform.c++
 src/platform.h
+src/property_tree.h
+src/property_tree.c++
 src/restore.c++
 src/restore.h
 src/stream.c++

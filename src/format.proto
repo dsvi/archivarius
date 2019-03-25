@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 // refresh me by
 // protoc -I=. --cpp_out=. format.proto
@@ -13,18 +13,26 @@ message ZSTD_Compression_filter{
 }
 
 message Chapoly_Encryption_filter{
-  bytes iv = 1;
-  bytes key  = 2;
+  required bytes iv = 1;
+  optional bytes key  = 2;
+}
+
+message Chacha_Encryption_filter{
+  required bytes iv = 1;
+  optional bytes key  = 2;
 }
 
 message Filters{
-  ZSTD_Compression_filter   zstd_compression = 1;
-  Chapoly_Encryption_filter chapoly_encryption  = 2;
+  optional ZSTD_Compression_filter   zstd_compression = 1;
+  oneof encryption{
+    Chapoly_Encryption_filter chapoly_encryption  = 2;  //Catalogue can only be encryped with this
+    Chacha_Encryption_filter chacha_encryption = 3;
+  }
 }
 
 message Ref_to_refcount{
-  string content_fname = 1;
-  uint64 from = 2;
+  required string content_fname = 1;
+  required uint64 from = 2;
 }
 
 enum File_type{
@@ -34,14 +42,14 @@ enum File_type{
 }
 
 message Fs_record{
-  string pathname = 1;
-  uint32 unix_permissions = 2; // equal to std::filesystem::perms
-  File_type type = 3;
-  uint64 modified_seconds = 4; // POSIX time
-  Ref_to_refcount ref = 5;                // only exists for regular files of sizes more than 0
-  string symlink_target = 6;
-  string posix_acl = 7;
-  string posix_default_acl = 8;
+  required string pathname = 1;
+  required File_type type = 2;
+  required uint64 modified_seconds = 3; // POSIX time
+  optional Ref_to_refcount ref = 4;     // only exists for regular files of sizes more than 0
+  optional string symlink_target = 5;
+  required uint32 unix_permissions = 6; // equal to std::filesystem::perms
+  optional string posix_acl = 7;
+  optional string posix_default_acl = 8;
 }
 
 message Fs_state{
@@ -49,24 +57,27 @@ message Fs_state{
 }
 
 message State_file{
-  Filters filters = 1;
-  string name = 2;
-  uint64  time_created = 3;
+  optional Filters filters = 1;
+  required string name = 2;
+  required uint64 time_created = 3;
 }
 
 message Content_file{
-  Filters filters = 1;
-  string name = 2;
+  optional Filters filters = 1;
+  required string name = 2;
   repeated Ref_count refs = 3;
 }
 
 
 message Ref_count{
-  uint64 from = 1;
-  uint64 to = 2;
-  uint64 ref_count = 3;
-  uint64 space_taken = 4;   // space in file taken by the refd data. never 0
-  uint64 xxhash = 5;
+  required uint64 from = 1;
+  required uint64 to = 2;
+  required uint64 ref_count = 3;
+  required uint64 space_taken = 4;   // space in file taken by the refd data. never 0
+  oneof csum{
+    uint64 xxhash = 5;
+    bytes  blake2b = 6;
+  }
 }
 
 message Catalogue{
@@ -75,5 +86,5 @@ message Catalogue{
 }
 
 message Catalog_header{
-  Filters filters = 1;
+  optional Filters filters = 1;
 }

@@ -1,67 +1,37 @@
 #pragma once
 #include "piping.h"
+#include "buffer.h"
+#include "encryption_params.h"
 
-class Chapoly{
-public:
-	u8* key(){
-		return key_;
-	};
-	u8* iv(){
-		return iv_;
-	}
+class Chapoly: public Encryption_params{};
 
-	template<class T>
-	void key(T &v){
-		ASSERT( (uint) distance(begin(v), end(v)) <= sizeof(key_) );
-		auto i = begin(v);
-		for (auto &a: key_){
-			a = *i++;
-		}
-	}
-
-	template<class T>
-	void iv(T &v){
-		ASSERT( (uint) distance(begin(v), end(v)) <= sizeof(iv_) );
-		auto i = begin(v);
-		for (auto &a: iv_){
-			a = *i++;
-		}
-	}
-
-	/// set random key and iv
-	void randomize();
-	/// increment iv by 1
-	void inc_iv();
-	/// set key from arbitrary string
-	void set_key_word(std::string_view kw);
-	static constexpr
-	size_t key_size(){return sizeof(key_);}
-	static constexpr
-	size_t iv_size(){ return sizeof(iv_); }
-private:
-	u8 iv_[24];
-	u8 key_[32];
-};
-
+/// reads all the input till eof at the first pump, and checks authenticity
+/// then feeds input from internal buffer
+/// so not suitable for files which can't possibly fit in memory
 class Pipe_chapoly_in: public Pipe_in{
 public:
+	Pipe_chapoly_in(Chapoly &p);
+private:
 	virtual
 	Pump_result pump(u8 *to, u64 size) override;
-private:
-	//std::vector<ui64> buffer_;
+	Botan::ChaCha20Poly1305_Decryption decryptor_;
+	Botan::secure_vector<uint8_t> buf_;
+	size_t offset_ = 0;
 };
 
 
-
+/// accumulates all the output into internal buffer, ecrypts, signs and flushes it further only on finish()
+/// so not suitable for files which can't possibly fit in memory
 class Pipe_chapoly_out: public Pipe_out{
 public:
-	Pipe_chapoly_out();
 	Pipe_chapoly_out(Chapoly &p);
-	void set_params(Chapoly &p);
+private:
 	virtual
 	void pump(u8 *to, u64 size) override;
-private:
-	//std::vector<ui64> buffer_;
+	virtual
+	void finish() override;
+	Botan::ChaCha20Poly1305_Encryption encryptor_;
+	Botan::secure_vector<uint8_t> buf_;
 };
 
 

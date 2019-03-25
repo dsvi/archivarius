@@ -13,6 +13,7 @@ public:
 	std::unordered_set<std::filesystem::path> force_to_archive;// relative to archive_path. list of files to 'compact'
 	u64 min_content_file_size;
 	std::optional<Zstd_out> zstd;
+	bool encryption;
 	std::function<void(std::string&&)> warning;
 	Catalogue *catalog;
 	void archive();
