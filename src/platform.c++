@@ -47,15 +47,28 @@ string get_default_acl(const std::filesystem::path &path)
 	return get_acl_internal(path, ACL_TYPE_DEFAULT);
 }
 
-
-void set_acl(std::filesystem::path &path, string acl_txt)
+void set_acl_internal(std::filesystem::path &path, const char* acl_txt, acl_type_t type)
 {
-	//TODO:
+	try{
+		errno = 0;
+		acl_ptr acl( acl_from_text(acl_txt), acl_free );
+		check_error();
+		acl_set_file(path.c_str(), type, acl.get());
+		check_error();
+	}
+	catch(...){
+		throw_with_nested( Exception("Can't set ACL for {0}")(path) );
+	}
 }
 
-void set_default_acl(std::filesystem::path &path, string acl_txt)
+void set_acl(std::filesystem::path &path, string &acl_txt)
 {
-	//TODO:
+	set_acl_internal(path, acl_txt.c_str(), ACL_TYPE_ACCESS);
+}
+
+void set_default_acl(std::filesystem::path &path, string &acl_txt)
+{
+	set_acl_internal(path, acl_txt.c_str(), ACL_TYPE_DEFAULT);
 }
 
 class File_lock_int : public File_lock{

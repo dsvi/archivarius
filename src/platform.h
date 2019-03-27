@@ -3,8 +3,8 @@
 
 std::string get_acl(const std::filesystem::path &path);
 std::string get_default_acl(const std::filesystem::path &path);
-void set_acl(std::filesystem::path &path, std::string acl_txt);
-void set_default_acl(std::filesystem::path &path, std::string acl_txt);
+void set_acl(std::filesystem::path &path, std::string &acl_txt);
+void set_default_acl(std::filesystem::path &path, std::string &acl_txt);
 
 class File_lock{
 public:
