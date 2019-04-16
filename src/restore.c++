@@ -34,7 +34,7 @@ void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 	fs::permissions(target, static_cast<fs::perms>(attr.unix_permissions));
 }
 
-void restore(Restore_settings &&cfg)
+void restore(Restore_settings &cfg)
 {
 	try{
 		Buffer tmp;

@@ -26,13 +26,12 @@ public:
 		u64 compressed; // can be 0
 	};
 	Compression_ratio compression_statistic();
-	static std::string prefix;
 private:
 	std::filesystem::path arc_path_;
 	std::string   fname_;
 	Stream_in     in_;
 	Stream_out    out_;
-	File_sink     file_;
+	File_sink     file_sink_;
 	Checksumer    cs_;
 	u64 bytes_pumped_;
 	u64 min_file_size_;

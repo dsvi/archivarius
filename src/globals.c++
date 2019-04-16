@@ -40,26 +40,36 @@ void init_epoch()
 	posix_epoch = std::filesystem::file_time_type::clock::from_time_t(t);
 }
 
-
-u64 to_posix_time(std::filesystem::file_time_type time)
+Time to_posix_time(std::filesystem::file_time_type time)
 {
-	return chrono::duration_cast<chrono::seconds>(time - posix_epoch).count();
+	return chrono::duration_cast<chrono::nanoseconds>(time - posix_epoch).count();
 }
 
-std::filesystem::file_time_type from_posix_time(u64 posix_seconds)
+std::filesystem::file_time_type from_posix_time(Time t)
 {
-	return posix_epoch + std::chrono::seconds(posix_seconds);
+	return posix_epoch + std::chrono::nanoseconds(t);
 }
 
-string current_time_to_filename()
+fs::path make_unique_filename(const filesystem::path &dir, string_view prefix)
 {
 	time_t t = time(nullptr);
 	if (t == -1)
 		throw Exception("Can't get current time");
-	auto st = gmtime(&t);
+	auto st = localtime(&t);
 	ostringstream name;
 	name << put_time(st, "%Y-%m-%d %H:%M:%S");
-	return name.str();
+	fs::path file;
+	fs::path fname;
+	size_t count = 0;
+	do {
+		fname = prefix;
+		fname += name.str();
+		if (count++)
+			fname += string("#") + to_string(count -2);
+		file = dir;
+		file /= fname;
+	}while (fs::exists(file));
+	return fname;
 }
 
 std::tuple<Filesystem_state::File, bool> make_file(const std::filesystem::path &file_path, std::filesystem::path &&archive_path)
@@ -113,3 +123,5 @@ void trim(string &s)
 		  return !std::isspace(ch);
 	}).base(), s.end());
 }
+
+

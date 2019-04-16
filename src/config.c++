@@ -13,6 +13,9 @@ void fill_max_storage_time(Config &to, Property &p){
 		auto str_time = p.value_str();
 		u64 mult;
 		switch (str_time.back()){
+		case 's':
+			mult = 1;
+			break;
 		case 'd':
 			mult = 24*3600;
 			break;
@@ -28,8 +31,9 @@ void fill_max_storage_time(Config &to, Property &p){
 		default:
 			throw Exception("'max-storage-time' value must end on 'd', 'w', 'm' or 'y'");
 		}
-		from_chars(str_time.begin(), str_time.end(), *to.max_storage_time);
-		*to.max_storage_time *= mult;
+		to.max_storage_time_seconds.emplace();
+		from_chars(str_time.begin(), str_time.end(), *to.max_storage_time_seconds);
+		*to.max_storage_time_seconds *= mult;
 	} catch (...) {
 		throw_with_nested(Exception("line {0}: Wrong 'max-storage-time' value")(p.orig_line()));
 	}

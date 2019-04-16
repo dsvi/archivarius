@@ -10,4 +10,4 @@ struct Restore_settings{
 	std::function<void(std::string&&)> warning;
 };
 
-void restore(Restore_settings &&cfg);
+void restore(Restore_settings &cfg);

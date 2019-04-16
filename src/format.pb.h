@@ -931,12 +931,12 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::proto::Ref_to_refcount* mutable_ref();
   void set_allocated_ref(::proto::Ref_to_refcount* ref);
 
-  // required uint64 modified_seconds = 3;
-  bool has_modified_seconds() const;
-  void clear_modified_seconds();
-  static const int kModifiedSecondsFieldNumber = 3;
-  ::google::protobuf::uint64 modified_seconds() const;
-  void set_modified_seconds(::google::protobuf::uint64 value);
+  // required uint64 modified_nanoseconds = 3;
+  bool has_modified_nanoseconds() const;
+  void clear_modified_nanoseconds();
+  static const int kModifiedNanosecondsFieldNumber = 3;
+  ::google::protobuf::uint64 modified_nanoseconds() const;
+  void set_modified_nanoseconds(::google::protobuf::uint64 value);
 
   // required .proto.File_type type = 2;
   bool has_type() const;
@@ -958,8 +958,8 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   void clear_has_pathname();
   void set_has_type();
   void clear_has_type();
-  void set_has_modified_seconds();
-  void clear_has_modified_seconds();
+  void set_has_modified_nanoseconds();
+  void clear_has_modified_nanoseconds();
   void set_has_ref();
   void clear_has_ref();
   void set_has_symlink_target();
@@ -982,7 +982,7 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::google::protobuf::internal::ArenaStringPtr posix_acl_;
   ::google::protobuf::internal::ArenaStringPtr posix_default_acl_;
   ::proto::Ref_to_refcount* ref_;
-  ::google::protobuf::uint64 modified_seconds_;
+  ::google::protobuf::uint64 modified_nanoseconds_;
   int type_;
   ::google::protobuf::uint32 unix_permissions_;
   friend struct ::protobuf_format_2eproto::TableStruct;
@@ -2399,28 +2399,28 @@ inline void Fs_record::set_type(::proto::File_type value) {
   // @@protoc_insertion_point(field_set:proto.Fs_record.type)
 }
 
-// required uint64 modified_seconds = 3;
-inline bool Fs_record::has_modified_seconds() const {
+// required uint64 modified_nanoseconds = 3;
+inline bool Fs_record::has_modified_nanoseconds() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void Fs_record::set_has_modified_seconds() {
+inline void Fs_record::set_has_modified_nanoseconds() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void Fs_record::clear_has_modified_seconds() {
+inline void Fs_record::clear_has_modified_nanoseconds() {
   _has_bits_[0] &= ~0x00000020u;
 }
-inline void Fs_record::clear_modified_seconds() {
-  modified_seconds_ = GOOGLE_ULONGLONG(0);
-  clear_has_modified_seconds();
+inline void Fs_record::clear_modified_nanoseconds() {
+  modified_nanoseconds_ = GOOGLE_ULONGLONG(0);
+  clear_has_modified_nanoseconds();
 }
-inline ::google::protobuf::uint64 Fs_record::modified_seconds() const {
-  // @@protoc_insertion_point(field_get:proto.Fs_record.modified_seconds)
-  return modified_seconds_;
+inline ::google::protobuf::uint64 Fs_record::modified_nanoseconds() const {
+  // @@protoc_insertion_point(field_get:proto.Fs_record.modified_nanoseconds)
+  return modified_nanoseconds_;
 }
-inline void Fs_record::set_modified_seconds(::google::protobuf::uint64 value) {
-  set_has_modified_seconds();
-  modified_seconds_ = value;
-  // @@protoc_insertion_point(field_set:proto.Fs_record.modified_seconds)
+inline void Fs_record::set_modified_nanoseconds(::google::protobuf::uint64 value) {
+  set_has_modified_nanoseconds();
+  modified_nanoseconds_ = value;
+  // @@protoc_insertion_point(field_set:proto.Fs_record.modified_nanoseconds)
 }
 
 // optional .proto.Ref_to_refcount ref = 4;

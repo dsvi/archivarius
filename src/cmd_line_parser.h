@@ -14,10 +14,10 @@ public:
 private:
 	std::string cmd_;
 	std::unordered_map<std::string, std::string> params_;
-	friend Cmd_line parse_command_line(int argc, char *argv[]);
+	friend Cmd_line parse_command_line(int argc, const char *argv[]);
 };
 
-Cmd_line parse_command_line(int argc, char *argv[]);
+Cmd_line parse_command_line(int argc, const char *argv[]);
 
 inline
 std::string_view Cmd_line::command()

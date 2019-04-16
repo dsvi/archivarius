@@ -24,9 +24,7 @@ try {
 		recursive_add_from_dir(dir);
 }
 catch(std::exception &exp){
-	string msg = fmt::format(tr_txt("Can't get directory contents for {0}:\n"), dir_path);
-	msg += message(exp);
-	warning(move(msg));
+	warning(fmt::format(tr_txt("Can't get directory contents for {0}:\n"), dir_path), message(exp));
 }
 
 void Archiver::add(const fs::path &file_path)
@@ -48,9 +46,7 @@ void Archiver::add(const fs::path &file_path)
 		next_->add(move(file));
 	}
 	catch(std::exception &exp){
-		string msg = fmt::format(tr_txt("Skipping {0}:\n"), file_path);
-		msg += message(exp);
-		warning(move(msg));
+		warning(fmt::format(tr_txt("Skipping {0}:\n"), file_path), message(exp));
 	}
 }
 
@@ -80,7 +76,7 @@ void Archiver::archive()
 		else{
 			for (auto &file : files_to_archive){
 				if (!exists(file)){
-					warning(fmt::format(tr_txt("Path {0} does not exist at {1}\n"), file, root));
+					warning(fmt::format(tr_txt("Path {0} does not exist at {1}\n"), file, root), "");
 					continue;
 				}
 				if (fs::is_directory(file))
@@ -99,12 +95,9 @@ void Archiver::archive()
 		}
 		next_->commit();
 		catalog->add_fs_state(next);
-		catalog->commit();
 	}
 	catch(std::exception &e){
-		string msg = fmt::format(tr_txt("Error while archiving {0}:\n"), name);
-		msg += message(e);
-		warning(move(msg));
+		warning(fmt::format(tr_txt("Error while archiving {0}:\n"), name), message(e));
 	}
 }
 

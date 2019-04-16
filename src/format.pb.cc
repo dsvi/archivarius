@@ -1668,7 +1668,7 @@ void Fs_record::InitAsDefaultInstance() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Fs_record::kPathnameFieldNumber;
 const int Fs_record::kTypeFieldNumber;
-const int Fs_record::kModifiedSecondsFieldNumber;
+const int Fs_record::kModifiedNanosecondsFieldNumber;
 const int Fs_record::kRefFieldNumber;
 const int Fs_record::kSymlinkTargetFieldNumber;
 const int Fs_record::kUnixPermissionsFieldNumber;
@@ -1711,9 +1711,9 @@ Fs_record::Fs_record(const Fs_record& from)
   } else {
     ref_ = NULL;
   }
-  ::memcpy(&modified_seconds_, &from.modified_seconds_,
+  ::memcpy(&modified_nanoseconds_, &from.modified_nanoseconds_,
     static_cast<size_t>(reinterpret_cast<char*>(&unix_permissions_) -
-    reinterpret_cast<char*>(&modified_seconds_)) + sizeof(unix_permissions_));
+    reinterpret_cast<char*>(&modified_nanoseconds_)) + sizeof(unix_permissions_));
   // @@protoc_insertion_point(copy_constructor:proto.Fs_record)
 }
 
@@ -1789,9 +1789,9 @@ void Fs_record::Clear() {
     }
   }
   if (cached_has_bits & 224u) {
-    ::memset(&modified_seconds_, 0, static_cast<size_t>(
+    ::memset(&modified_nanoseconds_, 0, static_cast<size_t>(
         reinterpret_cast<char*>(&unix_permissions_) -
-        reinterpret_cast<char*>(&modified_seconds_)) + sizeof(unix_permissions_));
+        reinterpret_cast<char*>(&modified_nanoseconds_)) + sizeof(unix_permissions_));
   }
   _has_bits_.Clear();
   _internal_metadata_.Clear();
@@ -1846,14 +1846,14 @@ bool Fs_record::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint64 modified_seconds = 3;
+      // required uint64 modified_nanoseconds = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
-          set_has_modified_seconds();
+          set_has_modified_nanoseconds();
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint64, ::google::protobuf::internal::WireFormatLite::TYPE_UINT64>(
-                 input, &modified_seconds_)));
+                 input, &modified_nanoseconds_)));
         } else {
           goto handle_unusual;
         }
@@ -1961,9 +1961,9 @@ void Fs_record::SerializeWithCachedSizes(
       2, this->type(), output);
   }
 
-  // required uint64 modified_seconds = 3;
+  // required uint64 modified_nanoseconds = 3;
   if (cached_has_bits & 0x00000020u) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->modified_seconds(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->modified_nanoseconds(), output);
   }
 
   // optional .proto.Ref_to_refcount ref = 4;
@@ -2011,11 +2011,11 @@ size_t Fs_record::RequiredFieldsByteSizeFallback() const {
         this->pathname());
   }
 
-  if (has_modified_seconds()) {
-    // required uint64 modified_seconds = 3;
+  if (has_modified_nanoseconds()) {
+    // required uint64 modified_nanoseconds = 3;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->modified_seconds());
+        this->modified_nanoseconds());
   }
 
   if (has_type()) {
@@ -2045,10 +2045,10 @@ size_t Fs_record::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->pathname());
 
-    // required uint64 modified_seconds = 3;
+    // required uint64 modified_nanoseconds = 3;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->modified_seconds());
+        this->modified_nanoseconds());
 
     // required .proto.File_type type = 2;
     total_size += 1 +
@@ -2133,7 +2133,7 @@ void Fs_record::MergeFrom(const Fs_record& from) {
       mutable_ref()->::proto::Ref_to_refcount::MergeFrom(from.ref());
     }
     if (cached_has_bits & 0x00000020u) {
-      modified_seconds_ = from.modified_seconds_;
+      modified_nanoseconds_ = from.modified_nanoseconds_;
     }
     if (cached_has_bits & 0x00000040u) {
       type_ = from.type_;
@@ -2171,7 +2171,7 @@ void Fs_record::InternalSwap(Fs_record* other) {
   posix_acl_.Swap(&other->posix_acl_);
   posix_default_acl_.Swap(&other->posix_default_acl_);
   swap(ref_, other->ref_);
-  swap(modified_seconds_, other->modified_seconds_);
+  swap(modified_nanoseconds_, other->modified_nanoseconds_);
   swap(type_, other->type_);
   swap(unix_permissions_, other->unix_permissions_);
   swap(_has_bits_[0], other->_has_bits_[0]);

@@ -16,9 +16,7 @@
 #include <iterator>
 #include <list>
 #include <memory>
-#include <numeric>
 #include <optional>
-#include <queue>
 #include <regex>
 #include <string_view>
 #include <time.h>
@@ -30,6 +28,9 @@
 #include <botan_all.h>
 
 #include <fmt/format.h>
+#include <fmt/color.h>
+#include <fmt/chrono.h>
+using namespace fmt::literals;
 
 template <>
 struct fmt::formatter<std::filesystem::path> {
@@ -99,3 +100,6 @@ typedef uint32_t                 u32;
 typedef uint64_t                 u64;
 
 typedef unsigned int             uint;
+
+// posix time in nanoseconds
+using Time = u64;

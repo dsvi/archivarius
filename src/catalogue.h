@@ -14,7 +14,7 @@ public:
 	void key(std::string_view key);
 	//std::vector<std::filesystem::file_time_type> state_times();
 	auto  state_times(){
-		return fs_state_files_ | ranges::view::transform([](auto &fs){return from_posix_time(fs.time_created);});
+		return fs_state_files_ | ranges::view::transform([](auto &fs){return fs.time_created;});
 	}
 	// ndx from array returned by state_times()
 	Filesystem_state fs_state(size_t ndx);
@@ -33,7 +33,7 @@ private:
 	std::set<File_content_ref> content_refs_;
 	struct Fs_state_file{
 		std::string name;
-		u64         time_created;
+		Time        time_created;
 		Filters_in  filters;
 	};
 	std::vector<Fs_state_file> fs_state_files_;

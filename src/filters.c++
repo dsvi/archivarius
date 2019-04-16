@@ -7,7 +7,14 @@ Filtrator_in::Filtrator_in()
 
 Filtrator_in::Filtrator_in(Filters_in &f)
 {
-	set_filters(f);
+	if (f.cmp_in)
+		compression(f.cmp_in.value());
+	ASSERT(!(f.enc_chapo_in and f.enc_chacha_in));
+
+	if (f.enc_chapo_in)
+		encryption(f.enc_chapo_in.value());
+	if (f.enc_chacha_in)
+		encryption(f.enc_chacha_in.value());
 }
 
 Pipe_in &Filtrator_in::apply(Pipe_in &p)
@@ -17,22 +24,15 @@ Pipe_in &Filtrator_in::apply(Pipe_in &p)
 		*prev << *cmp_pipe_in_;
 		prev = &*cmp_pipe_in_;
 	}
-	if (enc_){
-		*prev << *enc_;
-		prev = enc_;
+	if (enc_pipe_chapo_in_){
+		*prev << *enc_pipe_chapo_in_;
+		prev = &*enc_pipe_chapo_in_;
+	}
+	if (enc_pipe_chacha_in_){
+		*prev << *enc_pipe_chacha_in_;
+		prev = &*enc_pipe_chacha_in_;
 	}
 	return *prev;
-}
-
-void Filtrator_in::set_filters(Filters_in &f)
-{
-	if (f.cmp_in)
-		compression(f.cmp_in.value());
-	ASSERT(!(f.enc_chapo_in and f.enc_chacha_in));
-	if (f.enc_chapo_in)
-		encryption(f.enc_chapo_in.value());
-	if (f.enc_chacha_in)
-		encryption(f.enc_chacha_in.value());
 }
 
 void Filtrator_in::compression(Zstd_in &zin)
@@ -42,14 +42,14 @@ void Filtrator_in::compression(Zstd_in &zin)
 
 void Filtrator_in::encryption(Chapoly &ein)
 {
-	ASSERT(!enc_chacha_in_);
-	enc_ = &enc_chapo_in_.emplace(ein);
+	ASSERT(!enc_pipe_chacha_in_);
+	enc_pipe_chapo_in_.emplace(ein);
 }
 
 void Filtrator_in::encryption(Chacha &ein)
 {
-	ASSERT(!enc_chapo_in_);
-	enc_ = &enc_chacha_in_.emplace(ein);
+	ASSERT(!enc_pipe_chapo_in_);
+	enc_pipe_chacha_in_.emplace(ein);
 }
 
 Pipe_out &Filtrator_out::apply(Pipe_out &p)
@@ -59,9 +59,13 @@ Pipe_out &Filtrator_out::apply(Pipe_out &p)
 		*prev >> *cmp_pipe_out_;
 		prev = &*cmp_pipe_out_;
 	}
-	if (enc_){
-		*prev >> *enc_;
-		prev = enc_;
+	if (enc_pipe_chacha_out_){
+		*prev >> *enc_pipe_chacha_out_;
+		prev = &*enc_pipe_chacha_out_;
+	}
+	if (enc_pipe_chapo_out_){
+		*prev >> *enc_pipe_chapo_out_;
+		prev = &*enc_pipe_chapo_out_;
 	}
 	return *prev;
 }
@@ -75,19 +79,21 @@ void Filtrator_out::compression(Zstd_out zout)
 void Filtrator_out::encryption(Chapoly &eout)
 {
 	ASSERT(!enc_pipe_chacha_out_);
-	enc_ = &enc_pipe_chapo_out_.emplace(eout);
+	enc_pipe_chapo_out_.emplace(eout);
 	enc_chapo_out_.emplace(eout);
 }
 
 void Filtrator_out::encryption(Chacha &eout)
 {
 	ASSERT(!enc_pipe_chapo_out_);
-	enc_ = &enc_pipe_chacha_out_.emplace(eout);
+	enc_pipe_chacha_out_.emplace(eout);
 	enc_chacha_out_.emplace(eout);
 }
 
 void Filtrator_out::set_filters(Filters_out &f)
 {
+	// do not set twice
+	ASSERT(!enc_pipe_chacha_out_ and !enc_pipe_chapo_out_ and !cmp_pipe_out_);
 	if (f.cmp_out)
 		compression(f.cmp_out.value());
 	ASSERT(!(f.enc_chapo_out and f.enc_chacha_out));

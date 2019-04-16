@@ -70,7 +70,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 			enc_.emplace();
 			using namespace chrono;
 			//TODO: change to C++2a utc_clock
-			auto t = duration_cast<seconds>(system_clock::now().time_since_epoch()).count();
+			auto t = duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count();
 			std::vector<u8> iv(&t, &t + sizeof (t));
 			iv.resize(enc_->iv_size());
 			enc_->iv(iv);
@@ -204,11 +204,12 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	state_file.name = fs.file_name();
 	state_file.time_created = fs.time_created();
 	state_file.filters = fs.filters();
+	//TODO: remove
 //	fmt::print("Fs_state added\ncompression :{}\nchapo :{}\nchacha :{} \n",
 //	           state_file.filters.cmp_in.has_value(),
 //	           state_file.filters.enc_chapo_in.has_value(),
 //	           state_file.filters.enc_chacha_in.has_value() );
-	cout.flush();
+//	cout.flush();
 	fs_state_files_.push_back(state_file);
 
 	for (auto &file : fs.files()){
@@ -308,7 +309,8 @@ void Catalogue::commit()
 		put_message(cat_msg, buf, out, cs_pipe);
 		out.finish();
 		#ifdef COMPRESS_STAT
-		fmt::print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg.ByteSizeLong());
+		if (cat_msg.ByteSizeLong())
+			fmt::print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg.ByteSizeLong());
 		#endif
 		fs_sync();
 		fs::rename(new_file, cat_file_);

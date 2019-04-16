@@ -14,7 +14,7 @@ public:
 	u64 min_content_file_size;
 	std::optional<Zstd_out> zstd;
 	bool encryption;
-	std::function<void(std::string&&)> warning;
+	std::function<void(std::string &&header, std::string &&warning_message)> warning;
 	Catalogue *catalog;
 	void archive();
 private:

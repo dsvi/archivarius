@@ -5,7 +5,7 @@
 using namespace std;
 using namespace fmt;
 
-Cmd_line parse_command_line(int argc, char *argv[])
+Cmd_line parse_command_line(int argc, const char *argv[])
 {
 	try {
 		Cmd_line ret;

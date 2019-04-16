@@ -20,7 +20,7 @@ public:
 		std::filesystem::path path;
 		u16        unix_permissions;
 		File_type  type;
-		u64        mod_time; // in posix seconds
+		Time       mod_time;
 		std::optional<File_content_ref> content_ref; // only for regular files with sizes > 0
 		std::filesystem::path	symlink_target;
 		std::string acl; // posix long format
@@ -30,7 +30,7 @@ public:
 	void add(File &&f);
 
 	std::string_view file_name();
-	u64 time_created();
+	Time time_created();
 
 	std::optional<File_content_ref> get_ref_if_exist(
 	                                                std::filesystem::path &archive_path,
@@ -49,7 +49,7 @@ private:
 	std::unordered_map<std::filesystem::path, File> files_;
 	std::string filename_;
 	std::filesystem::path arc_path_;
-	u64 time_created_;
+	Time time_created_;
 	Filtrator_out filtrator_;
 
 	// Only Catalogue allaws to create fstates
@@ -60,7 +60,7 @@ private:
 	Filesystem_state(
 	    const std::filesystem::path &arc_path,
 	    std::string_view name,
-	    u64 time_created_posix,
+	    Time time_created,
 	    Filters_in &f,
 	    std::function<File_content_ref(File_content_ref&)> ref_mapper);
 };
@@ -74,7 +74,7 @@ std::string_view Filesystem_state::file_name()
 }
 
 inline
-u64 Filesystem_state::time_created()
+Time Filesystem_state::time_created()
 {
 	return time_created_;
 }

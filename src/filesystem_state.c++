@@ -10,7 +10,7 @@ namespace fs = filesystem;
 
 Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, Filters_out &f)
 {
-	filename_ = std::string("s") + current_time_to_filename();
+	filename_ = make_unique_filename(arc_path, "s");
 	time_created_ = to_posix_time(fs::file_time_type::clock::now());
 	arc_path_ = arc_path;
 	filtrator_.set_filters(f);
@@ -33,13 +33,13 @@ static Filesystem_state::File_type from_proto(proto::File_type ft){
 Filesystem_state::Filesystem_state(
 	const std::filesystem::path &arc_path,
 	std::string_view name,
-	u64 time_created_posix,
+	Time time_created,
 	Filters_in &f,
 	std::function<File_content_ref(File_content_ref&)> ref_mapper)
 {
 	filename_ = name;
 	arc_path_ = arc_path;
-	time_created_ = time_created_posix;
+	time_created_ = time_created;
 
 	auto fn = arc_path_ / file_name();
 	Filtrator_in filtr(f);
@@ -55,7 +55,7 @@ Filesystem_state::Filesystem_state(
 		f.path = r.pathname();
 		f.unix_permissions = r.unix_permissions();
 		f.type = from_proto(r.type());
-		f.mod_time = r.modified_seconds();
+		f.mod_time = r.modified_nanoseconds();
 		if (r.has_ref()){
 			File_content_ref incomplete_ref;
 			auto &ref = r.ref();
@@ -117,7 +117,7 @@ void Filesystem_state::commit()
 		rec->set_pathname(f.path);
 		rec->set_unix_permissions(f.unix_permissions);
 		rec->set_type(to_proto(f.type));
-		rec->set_modified_seconds(f.mod_time);
+		rec->set_modified_nanoseconds(f.mod_time);
 		if (f.content_ref){
 			auto ref = rec->mutable_ref();
 			auto &fref = f.content_ref.value();
@@ -135,7 +135,8 @@ void Filesystem_state::commit()
 	put_message(state, buf, out, cs);
 	out.finish();
   #ifdef COMPRESS_STAT
-	fmt::print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state.ByteSizeLong());
+	if (state.ByteSizeLong())
+		fmt::print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state.ByteSizeLong());
   #endif
 }
 

@@ -26,7 +26,7 @@ Source::Pump_result Pipe_chapoly_in::pump(u8 *to, u64 size)
 			decryptor_.finish(buf_);
 			buf_.shrink_to_fit();
 		} catch(Botan::Integrity_Failure &ef){
-			throw Exception("ChaCha20Poly1305 integrity check failed. The file was altered or damaged.");
+			throw Exception("ChaCha20Poly1305 integrity check failed. Either wrong password, or the file was altered or damaged.");
 		}
 	}
 	auto reminder = buf_.size() - offset_;

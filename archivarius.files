@@ -42,18 +42,17 @@ src/restore.c++
 src/restore.h
 src/stream.c++
 src/stream.h
+src/test.c++
+src/test.h
 src/zstd_filter.c++
 src/zstd_filter.h
-src/format.proto
 src/main.c++
 src/precomp.h
 src/precomp.c++
-premake5.lua
 src/globals.h
 src/globals.c++
+src/format.proto
 src/format.pb.h
 src/format.pb.cc
-libs/protobuf/lib.lua
-libs/protobuf/exports.lua
-libs/protobuf/links.lua
+
 

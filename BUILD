@@ -11,6 +11,7 @@ cc_binary(
     linkopts = ["-lstdc++fs -lacl"],
     defines = select({
         ":debug": ["DEBUG"],
+        "//conditions:default": []
     }),
 )
 
@@ -18,3 +19,4 @@ config_setting(
     name = "debug",
     values = { "compilation_mode": "dbg" }
 )
+

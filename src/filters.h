@@ -25,13 +25,10 @@ public:
 	void compression(Zstd_in &zin);
 	void encryption(Chapoly &ein);
 	void encryption(Chacha &ein);
-
-	void set_filters(Filters_in &f);
 private:
 	std::optional<Pipe_zstd_in> cmp_pipe_in_;
-	std::optional<Pipe_chapoly_in> enc_chapo_in_;
-	std::optional<Pipe_chacha_in> enc_chacha_in_;
-	Pipe_in *enc_ = nullptr;
+	std::optional<Pipe_chapoly_in> enc_pipe_chapo_in_;
+	std::optional<Pipe_chacha_in> enc_pipe_chacha_in_;
 };
 
 inline
@@ -63,7 +60,6 @@ private:
 	std::optional<Pipe_zstd_out> cmp_pipe_out_;
 	std::optional<Pipe_chapoly_out> enc_pipe_chapo_out_;
 	std::optional<Pipe_chacha_out>  enc_pipe_chacha_out_;
-	Pipe_out *enc_ = nullptr;
 	std::optional<Zstd_out> cmp_out_;
 	std::optional<Chapoly> enc_chapo_out_;
 	std::optional<Chacha>  enc_chacha_out_;
