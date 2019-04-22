@@ -1,6 +1,7 @@
 #include <thread>
-#include "test.h"
 #include "catalogue.h"
+#include "test.h"
+#include "platform.h"
 
 /*
 Directory structure:
