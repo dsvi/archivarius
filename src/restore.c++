@@ -30,15 +30,17 @@ void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 		set_acl(target, attr.acl);
 	if (!attr.default_acl.empty())
 		set_default_acl(target, attr.default_acl);
-	fs::last_write_time(target, from_posix_time(attr.mod_time));
-	fs::permissions(target, static_cast<fs::perms>(attr.unix_permissions));
+	if (attr.mod_time)
+		fs::last_write_time(target, from_posix_time(*attr.mod_time));
+	if (attr.unix_permissions)
+		fs::permissions(target, static_cast<fs::perms>(*attr.unix_permissions));
 }
 
 void restore(Restore_settings &cfg)
 {
 	try{
 		Buffer tmp;
-		tmp.resize(10'000'000);
+		tmp.resize(128*1024);
 		auto state = cfg.cat->fs_state(cfg.from_ndx);
 		auto files = state.files();
 		for (auto &file : files){ // restore dirs

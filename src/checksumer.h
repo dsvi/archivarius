@@ -6,6 +6,8 @@ class Checksumer
 {
 public:
 	Checksumer();
+	Checksumer(Checksumer &) = delete;
+	Checksumer& operator= (Checksumer &) = delete;
 	/// sets up piping to produce the same checksum type as \p csum
 	void set_for(const Checksum &csum);
 	Pipe_out &pipe();

@@ -51,6 +51,10 @@ struct fmt::formatter<std::filesystem::path> {
 
 #include <google/protobuf/message_lite.h>
 
+#ifndef NDEBUG
+#define DEBUG
+#endif
+
 #ifdef DEBUG
 #define ASSERTS_ENABLED
 #define ASSERT(x) assert(x)
@@ -103,3 +107,4 @@ typedef unsigned int             uint;
 
 // posix time in nanoseconds
 using Time = u64;
+static const u64 Time_ticks_in_second = 1'000'000'000;

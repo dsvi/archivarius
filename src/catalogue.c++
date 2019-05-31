@@ -204,12 +204,6 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	state_file.name = fs.file_name();
 	state_file.time_created = fs.time_created();
 	state_file.filters = fs.filters();
-	//TODO: remove
-//	fmt::print("Fs_state added\ncompression :{}\nchapo :{}\nchacha :{} \n",
-//	           state_file.filters.cmp_in.has_value(),
-//	           state_file.filters.enc_chapo_in.has_value(),
-//	           state_file.filters.enc_chacha_in.has_value() );
-//	cout.flush();
 	fs_state_files_.push_back(state_file);
 
 	for (auto &file : fs.files()){
@@ -315,11 +309,11 @@ void Catalogue::commit()
 		fs_sync();
 		fs::rename(new_file, cat_file_);
 		fs_sync();
-		clean_up();
 	}
 	catch (...){
 		throw_with_nested( Exception( "Can't save {0}" )(cat_file_) );
 	}
+	clean_up();
 }
 
 std::unordered_set<string> Catalogue::used_files()
@@ -340,8 +334,11 @@ void Catalogue::clean_up()
 	for (auto &f : fs::directory_iterator(dir)){
 		auto path_name = f.path();
 		auto file_name = path_name.filename();
-		if (used.find(file_name) == used.end())
-			fs::remove(path_name);
+		if (used.find(file_name) == used.end()){
+			error_code ec;
+			fs::remove(path_name, ec);
+			ASSERT(!ec or file_name.c_str()[0] == '.'); // for files like .nfs-blahlah
+		}
 	}
 }
 

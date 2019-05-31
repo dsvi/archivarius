@@ -931,7 +931,7 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::proto::Ref_to_refcount* mutable_ref();
   void set_allocated_ref(::proto::Ref_to_refcount* ref);
 
-  // required uint64 modified_nanoseconds = 3;
+  // optional uint64 modified_nanoseconds = 3;
   bool has_modified_nanoseconds() const;
   void clear_modified_nanoseconds();
   static const int kModifiedNanosecondsFieldNumber = 3;
@@ -945,7 +945,7 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::proto::File_type type() const;
   void set_type(::proto::File_type value);
 
-  // required uint32 unix_permissions = 6;
+  // optional uint32 unix_permissions = 6;
   bool has_unix_permissions() const;
   void clear_unix_permissions();
   static const int kUnixPermissionsFieldNumber = 6;
@@ -2399,7 +2399,7 @@ inline void Fs_record::set_type(::proto::File_type value) {
   // @@protoc_insertion_point(field_set:proto.Fs_record.type)
 }
 
-// required uint64 modified_nanoseconds = 3;
+// optional uint64 modified_nanoseconds = 3;
 inline bool Fs_record::has_modified_nanoseconds() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
@@ -2540,7 +2540,7 @@ inline void Fs_record::set_allocated_symlink_target(::std::string* symlink_targe
   // @@protoc_insertion_point(field_set_allocated:proto.Fs_record.symlink_target)
 }
 
-// required uint32 unix_permissions = 6;
+// optional uint32 unix_permissions = 6;
 inline bool Fs_record::has_unix_permissions() const {
   return (_has_bits_[0] & 0x00000080u) != 0;
 }
