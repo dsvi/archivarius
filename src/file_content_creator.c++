@@ -8,7 +8,7 @@ namespace fs = std::filesystem;
 File_content_creator::File_content_creator(const std::filesystem::path &arc_path)
 {
 	arc_path_ = arc_path;
-	buff_.resize(10'000'000);
+	buff_.resize(128*1024);
 }
 
 void File_content_creator::enable_compression(Zstd_out &p)

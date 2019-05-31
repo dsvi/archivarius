@@ -7,24 +7,30 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build mode")
 endif ()
 
-
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS NO)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+    message("Using libc++")
+    string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -stdlib=libc++ -lc++abi")
+endif()
+
+
+#string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address -fsanitize-recover=address")
+
 project(archivarius  
     VERSION 0.0 
     DESCRIPTION "Archivarius CLI tool")
-    
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    message("Using libc++")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++")
-endif()
-    
 
 add_subdirectory("libs/botan")
 add_subdirectory("libs/zstd")
+set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 add_subdirectory("libs/range-v3")
 add_subdirectory("libs/protobuf/cmake")
 add_subdirectory("libs/fmt")

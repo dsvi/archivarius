@@ -131,6 +131,8 @@ void extract(size_t i, path arc, path to){
 	run({"restore", a.c_str(), t.c_str(), id.c_str(), "password=qwerty"});
 }
 
+#pragma GCC diagnostic ignored "-Wunused-result"
+
 void test()
 {
 	path hf = getenv("HOME");

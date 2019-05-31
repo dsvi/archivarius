@@ -14,9 +14,32 @@ namespace fs = std::filesystem;
 int run(int argc, const char *argv[]){
 	if (argc < 2){
 		cout << tr_txt(
-			"usage:\n"
-			" blah blah blah\n"
-			" blah\n"
+			"usage: archivarius <cmd> [params]\n\n"
+		  "cmd is one of:\n"
+			"	restore - restore the archive to some path\n"
+		  "	archive - read config file and execute archiving tasks\n"
+		  "	          looks for file archivarius.conf in path:\n"
+		  "	          ~/.config\n"
+		  "	          /usr/local/etc\n"
+		  "	          /etc\n"
+		  "	          and follows instructions in it\n"
+		  "	list    - list versions in archive\n\n"
+		  "Acceptable parameters for commads:\n"
+		  "	restore:\n"
+		  "		archive\n"
+		  "		id\n"
+		  "		target-dir - where to restore\n"
+		  "		password\n"
+		  "	archive:\n"
+		  "		\n"
+		  "	list:\n"
+		  "		archive\n"
+		  "		password\n\n"
+		  "[params] are in form param1=value param2=value\n"
+		  "params can be:\n"
+		  "	archive  - path to archive\n"
+		  "	id       - id of the state in archive\n"
+		  "	password - password to archive\n"
 			) << endl;
 		return 0;
 	}
@@ -33,8 +56,10 @@ int run(int argc, const char *argv[]){
 				fmt::print("▕╾╼╾╼╾╼╾╼╾╼╾\n");
 				fflush(stdout);
 				auto report_warning = [](std::string &&h, std::string &&w){
-					print(stderr, fg(fmt::terminal_color::red), "Warning! {}\n", h);
+					print(stderr, fg(fmt::terminal_color::red), "Warning! {}", h);
+					w.insert(0, "\n");
 					find_and_replace(w, "\n", "\n  ");
+					w += '\n';
 					fmt::print(stderr, w);
 					fflush(stderr);
 				};
@@ -45,6 +70,7 @@ int run(int argc, const char *argv[]){
 					arc.min_content_file_size = 2*1024*1024*1024ul;
 				arc.catalog = &cat;
 				// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+				//TODO: move to archive
 				if (c.max_storage_time_seconds){
 					auto max_ref = cat.max_ref_count();
 					if (max_ref != 0){
@@ -94,9 +120,11 @@ int run(int argc, const char *argv[]){
 				}
 				arc.name = c.name;
 				arc.encryption = c.enc.has_value();
+				arc.process_acls = c.process_acl;
 				arc.archive_path = c.archive;
 				arc.files_to_archive = c.files_to_archive;
-				arc.files_to_exclude = c.files_to_ignore;
+				for (auto &f: c.files_to_ignore)
+					arc.files_to_exclude.insert(move(f));
 				arc.root = c.root;
 				if (c.zstd){
 					arc.zstd.emplace();
@@ -106,7 +134,7 @@ int run(int argc, const char *argv[]){
 				arc.archive();
 				if (c.max_storage_time_seconds){
 					try{
-						auto t = to_posix_time(fs::file_time_type::clock::now()) - *c.max_storage_time_seconds * 1'000'000;
+						auto t = to_posix_time(fs::file_time_type::clock::now()) - *c.max_storage_time_seconds * Time_ticks_in_second;
 						vector<Filesystem_state> states_to_remove;
 						size_t ndx = 0;
 						for (auto state_time : cat.state_times()){
@@ -143,12 +171,12 @@ int run(int argc, const char *argv[]){
 		Catalogue cat(archive_path, password.value_or(""));
 		auto times = cat.state_times();
 		for (size_t i = 0; i < times.size(); i++){
-			time_t t = times[i]/ 1'000'000;
+			time_t t = times[i]/ 1e9;
 			auto tm = localtime(&t);
 			char str[200];
 			if (!strftime(str, sizeof(str), "%Y %B %d %H:%M:%S", tm))
 				throw Exception("Can't format time string for current locale");
-			fmt::print(" {:-<5}-{}\n", i, str);
+			fmt::print("{:-<5}-{}\n", i, str);
 		}
 	}
 	else

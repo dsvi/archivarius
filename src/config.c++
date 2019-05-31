@@ -111,12 +111,16 @@ std::vector<Config> read_config(string_view filepath)
 				try {
 					for (auto &taskp : pt.subs()){
 						if (taskp.name() == "archive"){
+							if (!cfg.archive.empty())
+								throw Exception("line {0}: 'archive' is already defined")(taskp.orig_line());
 							cfg.archive = taskp.value_str();
 							if (arc_paths.find(cfg.archive) != arc_paths.end())
 								throw Exception("'task' with such 'archive' attribute already exist. {0}")(cfg.archive);
 							arc_paths.insert(cfg.archive);
 						}
 						else if (taskp.name() == "root"){
+							if (!cfg.root.empty())
+								throw Exception("line {0}: 'root' is already defined")(taskp.orig_line());
 							cfg.root = taskp.value_str();
 						}
 						else if (taskp.name() == "include"){
@@ -128,6 +132,8 @@ std::vector<Config> read_config(string_view filepath)
 								cfg.files_to_ignore.push_back(ex.text());
 						}
 						else if (taskp.name() == "max-storage-time"){
+							if (cfg.max_storage_time_seconds)
+								throw Exception("line {0}: 'max-storage-time' is already set")(taskp.orig_line());
 							fill_max_storage_time(cfg, taskp);
 						}
 						else if (taskp.name() == "acl"){
@@ -140,6 +146,8 @@ std::vector<Config> read_config(string_view filepath)
 							auto pwd = taskp.value_str();
 							if (pwd.empty())
 								throw Exception("line {0}: 'password' can not be empty")(taskp.orig_line());
+							if (cfg.enc)
+								throw Exception("line {0}: 'password' is already set")(taskp.orig_line());
 							cfg.enc.emplace().password = move(pwd);
 						}
 						else if (taskp.name() == "min-content-file-size"){
@@ -148,8 +156,10 @@ std::vector<Config> read_config(string_view filepath)
 						else
 							throw Exception("line {0}: unknown parameter {1}")(taskp.orig_line(), taskp.name());
 					}
-					//TODO: check if required stuff is set
-					// note that "root" is not one of them, either it or "include" must be set
+					if (cfg.root.empty() && cfg.files_to_archive.empty())
+						throw Exception("either 'root' or 'include' must be set");
+					if (cfg.archive.empty())
+						throw Exception("'archive' path must be set");
 					cfgs.push_back(move(cfg));
 				} catch (...) {
 					throw_with_nested(Exception("In task {0}:")(cfg.name));

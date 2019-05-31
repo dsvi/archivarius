@@ -18,13 +18,13 @@ public:
 
 	struct File {
 		std::filesystem::path path;
-		u16        unix_permissions;
 		File_type  type;
-		Time       mod_time;
+		std::optional<Time>   mod_time;
 		std::optional<File_content_ref> content_ref; // only for regular files with sizes > 0
 		std::filesystem::path	symlink_target;
 		std::string acl; // posix long format
 		std::string default_acl; // posix long format
+		std::optional<u16>    unix_permissions;
 	};
 
 	void add(File &&f);

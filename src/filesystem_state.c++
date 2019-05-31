@@ -53,9 +53,7 @@ Filesystem_state::Filesystem_state(
 	for (auto &r : state.rec()){
 		File f;
 		f.path = r.pathname();
-		f.unix_permissions = r.unix_permissions();
 		f.type = from_proto(r.type());
-		f.mod_time = r.modified_nanoseconds();
 		if (r.has_ref()){
 			File_content_ref incomplete_ref;
 			auto &ref = r.ref();
@@ -65,9 +63,16 @@ Filesystem_state::Filesystem_state(
 		}
 		if (f.type == SYMLINK)
 			f.symlink_target = r.symlink_target();
-		f.acl = r.posix_acl();
-		if (f.type == DIR)
-			f.default_acl = r.posix_default_acl();
+		else{
+			if (r.has_modified_nanoseconds())
+				f.mod_time = r.modified_nanoseconds();
+			if (r.has_unix_permissions())
+				f.unix_permissions = r.unix_permissions();
+			if (r.has_posix_acl())
+				f.acl = r.posix_acl();
+			if (f.type == DIR and r.has_posix_default_acl())
+				f.default_acl = r.posix_default_acl();
+		}
 		add(move(f));
 	}
 }
@@ -75,6 +80,7 @@ Filesystem_state::Filesystem_state(
 void Filesystem_state::add(Filesystem_state::File &&f)
 {
 	ASSERT(!f.path.empty());
+	ASSERT(files_.find(f.path) == files_.end());
 	files_[f.path] = move(f);
 }
 
@@ -115,9 +121,7 @@ void Filesystem_state::commit()
 	for (auto &f : files()){
 		auto rec = state.add_rec();
 		rec->set_pathname(f.path);
-		rec->set_unix_permissions(f.unix_permissions);
 		rec->set_type(to_proto(f.type));
-		rec->set_modified_nanoseconds(f.mod_time);
 		if (f.content_ref){
 			auto ref = rec->mutable_ref();
 			auto &fref = f.content_ref.value();
@@ -126,9 +130,13 @@ void Filesystem_state::commit()
 		}
 		if (SYMLINK == f.type)
 			rec->set_symlink_target(f.symlink_target);
+		if (f.mod_time)
+			rec->set_modified_nanoseconds(*f.mod_time);
+		if (f.unix_permissions)
+			rec->set_unix_permissions(*f.unix_permissions);
 		if (!f.acl.empty())
 			rec->set_posix_acl(f.acl);
-		if (DIR == f.type && !f.default_acl.empty())
+		if (!f.default_acl.empty())
 			rec->set_posix_default_acl(f.default_acl);
 	}
 	Buffer buf;

@@ -28,7 +28,7 @@ std::filesystem::file_time_type posix_epoch;
 
 void init_epoch()
 {
-	//TODO: switch to c++20
+	//TODO: switch to c++20 ?
 	tm start;
 	start.tm_year=70;
 	start.tm_mon=0;
@@ -70,30 +70,6 @@ fs::path make_unique_filename(const filesystem::path &dir, string_view prefix)
 		file /= fname;
 	}while (fs::exists(file));
 	return fname;
-}
-
-std::tuple<Filesystem_state::File, bool> make_file(const std::filesystem::path &file_path, std::filesystem::path &&archive_path)
-{
-	auto sts = symlink_status(file_path);
-	Filesystem_state::File f;
-	f.path = move(archive_path);
-	f.unix_permissions = to_int(sts.permissions());
-	auto type = sts.type();
-	if (type == fs::file_type::regular)
-		f.type = Filesystem_state::FILE;
-	else if (type == fs::file_type::directory)
-		f.type = Filesystem_state::DIR;
-	else if (type == fs::file_type::symlink)
-		f.type = Filesystem_state::SYMLINK;
-	else
-		return {f, false};
-	f.mod_time = to_posix_time(last_write_time(file_path));
-	if (f.type == Filesystem_state::SYMLINK)
-		f.symlink_target = fs::read_symlink(file_path);
-	f.acl = get_acl(file_path);
-	if (f.type == Filesystem_state::DIR)
-		f.default_acl = get_default_acl(file_path);
-	return {f, true};
 }
 
 

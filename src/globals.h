@@ -19,11 +19,4 @@ std::filesystem::path make_unique_filename(const std::filesystem::path &dir, std
 Time to_posix_time(std::filesystem::file_time_type);
 std::filesystem::file_time_type from_posix_time(Time t);
 
-
-
-// just add content_ref to it
-std::tuple<Filesystem_state::File, bool> make_file(
-    const std::filesystem::path &entry,
-          std::filesystem::path &&archive_path);
-
 std::filesystem::path home_dir(); // might be empty

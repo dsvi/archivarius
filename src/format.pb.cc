@@ -1846,7 +1846,7 @@ bool Fs_record::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint64 modified_nanoseconds = 3;
+      // optional uint64 modified_nanoseconds = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(24u /* 24 & 0xFF */)) {
@@ -1884,7 +1884,7 @@ bool Fs_record::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint32 unix_permissions = 6;
+      // optional uint32 unix_permissions = 6;
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
@@ -1961,7 +1961,7 @@ void Fs_record::SerializeWithCachedSizes(
       2, this->type(), output);
   }
 
-  // required uint64 modified_nanoseconds = 3;
+  // optional uint64 modified_nanoseconds = 3;
   if (cached_has_bits & 0x00000020u) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt64(3, this->modified_nanoseconds(), output);
   }
@@ -1978,7 +1978,7 @@ void Fs_record::SerializeWithCachedSizes(
       5, this->symlink_target(), output);
   }
 
-  // required uint32 unix_permissions = 6;
+  // optional uint32 unix_permissions = 6;
   if (cached_has_bits & 0x00000080u) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(6, this->unix_permissions(), output);
   }
@@ -2011,24 +2011,10 @@ size_t Fs_record::RequiredFieldsByteSizeFallback() const {
         this->pathname());
   }
 
-  if (has_modified_nanoseconds()) {
-    // required uint64 modified_nanoseconds = 3;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->modified_nanoseconds());
-  }
-
   if (has_type()) {
     // required .proto.File_type type = 2;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
-  }
-
-  if (has_unix_permissions()) {
-    // required uint32 unix_permissions = 6;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->unix_permissions());
   }
 
   return total_size;
@@ -2039,30 +2025,20 @@ size_t Fs_record::ByteSizeLong() const {
 
   total_size += _internal_metadata_.unknown_fields().size();
 
-  if (((_has_bits_[0] & 0x000000e1) ^ 0x000000e1) == 0) {  // All required fields are present.
+  if (((_has_bits_[0] & 0x00000041) ^ 0x00000041) == 0) {  // All required fields are present.
     // required string pathname = 1;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->pathname());
 
-    // required uint64 modified_nanoseconds = 3;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt64Size(
-        this->modified_nanoseconds());
-
     // required .proto.File_type type = 2;
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
 
-    // required uint32 unix_permissions = 6;
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::UInt32Size(
-        this->unix_permissions());
-
   } else {
     total_size += RequiredFieldsByteSizeFallback();
   }
-  if (_has_bits_[0 / 32] & 30u) {
+  if (_has_bits_[0 / 32] & 62u) {
     // optional string symlink_target = 5;
     if (has_symlink_target()) {
       total_size += 1 +
@@ -2091,7 +2067,21 @@ size_t Fs_record::ByteSizeLong() const {
           *this->ref_);
     }
 
+    // optional uint64 modified_nanoseconds = 3;
+    if (has_modified_nanoseconds()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt64Size(
+          this->modified_nanoseconds());
+    }
+
   }
+  // optional uint32 unix_permissions = 6;
+  if (has_unix_permissions()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::UInt32Size(
+        this->unix_permissions());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = cached_size;
@@ -2153,7 +2143,7 @@ void Fs_record::CopyFrom(const Fs_record& from) {
 }
 
 bool Fs_record::IsInitialized() const {
-  if ((_has_bits_[0] & 0x000000e1) != 0x000000e1) return false;
+  if ((_has_bits_[0] & 0x00000041) != 0x00000041) return false;
   if (has_ref()) {
     if (!this->ref_->IsInitialized()) return false;
   }

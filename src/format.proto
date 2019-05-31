@@ -44,10 +44,10 @@ enum File_type{
 message Fs_record{
   required string pathname = 1;
   required File_type type = 2;
-  required uint64 modified_nanoseconds = 3; // POSIX time
+  optional uint64 modified_nanoseconds = 3; // POSIX time. Is not set for symlinks
   optional Ref_to_refcount ref = 4;     // only exists for regular files of sizes more than 0
   optional string symlink_target = 5;
-  required uint32 unix_permissions = 6; // equal to std::filesystem::perms
+  optional uint32 unix_permissions = 6; // equal to std::filesystem::perms
   optional string posix_acl = 7;
   optional string posix_default_acl = 8;
 }
