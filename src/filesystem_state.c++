@@ -84,12 +84,12 @@ void Filesystem_state::add(Filesystem_state::File &&f)
 	files_[f.path] = move(f);
 }
 
-std::optional<File_content_ref> Filesystem_state::get_ref_if_exist(std::filesystem::path &archive_path, u64 modified_seconds)
+std::optional<File_content_ref> Filesystem_state::get_ref_if_exist(std::filesystem::path &archive_path, Time modified_time)
 {
 	auto it = files_.find(archive_path);
 	if (it == files_.end())
 		return optional<File_content_ref>();
-	if (it->second.mod_time != modified_seconds)
+	if (it->second.mod_time.value() != modified_time)
 		return optional<File_content_ref>();
 	return it->second.content_ref;
 }

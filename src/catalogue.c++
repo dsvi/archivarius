@@ -204,7 +204,7 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	state_file.name = fs.file_name();
 	state_file.time_created = fs.time_created();
 	state_file.filters = fs.filters();
-	fs_state_files_.push_back(state_file);
+	fs_state_files_.insert(fs_state_files_.begin(), state_file);
 
 	for (auto &file : fs.files()){
 		if (!file.content_ref.has_value())
@@ -334,10 +334,12 @@ void Catalogue::clean_up()
 	for (auto &f : fs::directory_iterator(dir)){
 		auto path_name = f.path();
 		auto file_name = path_name.filename();
+		if (file_name.c_str()[0] == '.')
+			continue;
 		if (used.find(file_name) == used.end()){
 			error_code ec;
 			fs::remove(path_name, ec);
-			ASSERT(!ec or file_name.c_str()[0] == '.'); // for files like .nfs-blahlah
+			ASSERT(!ec);
 		}
 	}
 }

@@ -39,6 +39,8 @@ using Fs_state = map<fs::path, File>;
 
 void recursive_walk(fs::path p, const function<void(fs::path)> &visitor){
 	for(auto& di: fs::directory_iterator(p)){
+		if (di.path().filename().string() == "ignore")
+			continue;
 		visitor(di.path());
 		if (di.is_directory())
 			recursive_walk(di.path(), visitor);
@@ -85,6 +87,7 @@ void compare(Fs_state &a, Fs_state &b){
 			if (da.time != db.time){
 				auto tma = chrono::system_clock::to_time_t(da.time);
 				auto tmb = chrono::system_clock::to_time_t(db.time);
+				fmt::print("for: ", pa.first.string());
 				cout << std::ctime(&tma) << endl;
 				cout << std::ctime(&tmb) << endl;
 				ASSERT(0);
@@ -183,7 +186,8 @@ void test()
 	for (size_t i = 0; i < states.size(); i++){
 		fmt::print("{}%\r", i * 100 /states.size());
 		fflush(stdout);
-		extract(i, atest_arc, atest_tmp);
+		auto j = states.size() - 1 - i;
+		extract(j, atest_arc, atest_tmp);
 		auto fs = state_for(atest_tmp);
 		compare(fs, states[i]);
 	}
@@ -198,5 +202,5 @@ void test()
 	extract(0, atest_arc, atest_tmp);
 	auto fs = state_for(atest_tmp);
 	compare(fs, last_state);
-	print(fg(fmt::terminal_color::bright_green), "All green! All shiny!");
+	print(fg(fmt::terminal_color::bright_green), "All green! All shiny!\n");
 }

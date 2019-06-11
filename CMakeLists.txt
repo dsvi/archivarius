@@ -18,11 +18,8 @@ set(CMAKE_CXX_EXTENSIONS NO)
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     message("Using libc++")
     string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
-    string(APPEND CMAKE_EXE_LINKER_FLAGS " -stdlib=libc++ -lc++abi")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,-Bstatic -lc++ -lc++fs -Wl,-Bdynamic")
 endif()
-
-
-#string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address -fsanitize-recover=address")
 
 project(archivarius  
     VERSION 0.0 

@@ -34,7 +34,7 @@ public:
 
 	std::optional<File_content_ref> get_ref_if_exist(
 	                                                std::filesystem::path &archive_path,
-	                                                u64 modified_seconds );
+	                                                Time modified_time );
 
 	// for (File &file: fss.files())...
 	auto files(){
