@@ -48,9 +48,9 @@ int run(int argc, const char *argv[]){
 	if (cmd_line.command() == "archive"){
 		cmd_line.check_unused_arguments();
 		auto cfgs = read_config(cfg_path.value_or(""));
-		Archiver arc;
 		for (auto &c : cfgs){
 			try {
+				Archiver arc;
 				fmt::print("╼╾╼╾╼▏");
 				print(fg(fmt::terminal_color::yellow), " {} ",c.name);
 				fmt::print("▕╾╼╾╼╾╼╾╼╾╼╾\n");
@@ -63,96 +63,27 @@ int run(int argc, const char *argv[]){
 					fmt::print(stderr, w);
 					fflush(stderr);
 				};
-				Catalogue cat(c.archive, c.enc ? c.enc->password : "");
+
+				arc.name = c.name;
+				arc.archive_path = c.archive;
+				arc.root = c.root;
+				arc.files_to_archive = c.files_to_archive;
+				for (auto &f: c.files_to_ignore)
+					arc.files_to_exclude.insert(move(f));
 				if (c.min_content_file_size)
 					arc.min_content_file_size = c.min_content_file_size;
 				else
 					arc.min_content_file_size = 2*1024*1024*1024ul;
-				arc.catalog = &cat;
-				// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-				//TODO: move to archive
-				if (c.max_storage_time_seconds){
-					auto max_ref = cat.max_ref_count();
-					if (max_ref != 0){
-						auto fs_state = cat.latest_fs_state();
-						struct Old_files{
-							fs::path *path;
-							string_view content_fn;
-							u64      size;
-						};
-						vector<Old_files> old_enough_to_compact;
-						for (Filesystem_state::File &file: fs_state.files()){
-							if ( file.content_ref.has_value() && file.content_ref.value().ref_count_ == cat.max_ref_count()){
-								auto &a = old_enough_to_compact.emplace_back();
-								a.path = &file.path;
-								a.content_fn = file.content_ref->fname;
-								a.size = file.content_ref->space_taken;
-							}
-						}
-						unordered_map<string_view, u64> content_file_sizes;
-						for (auto &f : old_enough_to_compact){
-							if (content_file_sizes.find(f.content_fn) != content_file_sizes.end())
-								continue;
-							auto size = file_size(c.archive / f.content_fn);
-							content_file_sizes[f.content_fn] = max(size, arc.min_content_file_size);
-						}
-						for (auto &f :old_enough_to_compact){
-							auto &size = content_file_sizes[f.content_fn];
-							size -= min(f.size, size); // underflow protection
-						}
-						// now content_file_sizes contains wasted space for each file
-						unordered_set<string_view> content_files_to_compact;
-						for (auto &cz: content_file_sizes){
-							if (cz.second < arc.min_content_file_size / 16)
-								continue;   // too little is wasted
-							content_files_to_compact.insert(cz.first);
-						}
-						u64 total_size = 0;
-						for (auto &f : old_enough_to_compact ){
-							if (content_files_to_compact.find(f.content_fn) != content_files_to_compact.end()){
-								arc.force_to_archive.insert(*f.path);
-								total_size += f.size;
-							}
-						}
-						if (total_size < arc.min_content_file_size) //not enough even for one new content file
-							arc.force_to_archive.clear();
-					}
-				}
-				arc.name = c.name;
-				arc.encryption = c.enc.has_value();
-				arc.process_acls = c.process_acl;
-				arc.archive_path = c.archive;
-				arc.files_to_archive = c.files_to_archive;
-				for (auto &f: c.files_to_ignore)
-					arc.files_to_exclude.insert(move(f));
-				arc.root = c.root;
+				if (c.max_storage_time_seconds)
+					arc.max_storage_time = *c.max_storage_time_seconds * Time_ticks_in_second;
+				arc.password = c.enc.has_value() ? c.enc->password : "";
 				if (c.zstd){
 					arc.zstd.emplace();
 					arc.zstd->compression_level = 11;
 				}
 				arc.warning = move(report_warning);
+				arc.process_acls = c.process_acl;
 				arc.archive();
-				if (c.max_storage_time_seconds){
-					try{
-						auto t = to_posix_time(fs::file_time_type::clock::now()) - *c.max_storage_time_seconds * Time_ticks_in_second;
-						vector<Filesystem_state> states_to_remove;
-						size_t ndx = 0;
-						for (auto state_time : cat.state_times()){
-							if (state_time < t)
-								states_to_remove.push_back(cat.fs_state(ndx));
-							ndx++;
-						}
-						// leave at least one state
-						if (cat.max_ref_count() == states_to_remove.size())
-							states_to_remove.pop_back();
-						for (auto &fs_state : states_to_remove)
-							cat.remove_fs_state(fs_state);
-					}
-					catch(std::exception &exp){
-						arc.warning( tr_txt("Error while remoing old state"), message(exp) );
-					}
-				}
-				cat.commit();
 			} catch (std::exception &e) {
 				print(stderr, fg(fmt::terminal_color::red), "Stopped processing the task.\n");
 				auto msg = message(e);
@@ -193,7 +124,7 @@ int run(int argc, const char *argv[]){
 			cout << tr_txt("Archive is empty.") << endl;
 			return 0;
 		}
-		size_t id = id_opt.value_or(state_times.size() - 1);
+		size_t id = id_opt.value_or(0);
 		auto report_warning = [](std::string &&w){
 			cerr << w << endl;
 		};

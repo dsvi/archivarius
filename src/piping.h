@@ -77,7 +77,8 @@ private:
 	void finish() override;
 };
 
-
+void checked_fclose(FILE *f);
+typedef std::unique_ptr<std::FILE, decltype(&checked_fclose)> File_ptr;
 
 class File_source : public Source{
 public:
@@ -87,7 +88,6 @@ private:
 	virtual
 	Pump_result pump(u8 *to, u64 size) override;
 
-	typedef std::unique_ptr<std::FILE, decltype(&fclose)> File_ptr;
 	File_ptr file_;
 };
 
@@ -98,19 +98,24 @@ public:
 	File_sink(const std::filesystem::path &path);
 
 	u64 bytes_written();
+	/// true if sink is associated with an open file and rdy to accept data
 	operator bool(){
 		return static_cast<bool>(file_);
 	}
+	/// closes the file if open, and resetes bytes_written(). basically object returns into default constructed state
+	/// exception safe. throws only if no current exception is pending
+	void reset();
 private:
 	virtual
 	void pump(u8 *from, u64 size) override;
 	virtual
 	void finish() override;
 
-	typedef std::unique_ptr<std::FILE, decltype(&fclose)> File_ptr;
 	File_ptr file_;
 	u64 bytes_written_ = 0;
 };
+
+static_assert (std::is_nothrow_move_constructible<File_sink>::value);
 
 inline
 u64 File_sink::bytes_written()

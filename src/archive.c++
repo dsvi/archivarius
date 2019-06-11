@@ -82,17 +82,68 @@ void Archiver::add(const fs::path &file_path)
 void Archiver::archive()
 {
 	try{
-		auto fcc = File_content_creator(archive_path);
-		fcc.min_file_size(min_content_file_size);
-		creator_ = &fcc;
-		if (encryption)
-			creator_->enable_encryption();
-		if (zstd)
-			creator_->enable_compression(*zstd);
+		Catalogue cat(archive_path, password);
+		catalog = &cat;
 		auto prev = catalog->latest_fs_state();
 		auto next = catalog->empty_fs_state();
 		prev_ = &prev;
 		next_ = &next;
+		// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+		force_to_archive.clear();
+		if (max_storage_time){
+			auto max_ref = cat.max_ref_count();
+			if (max_ref != 0){
+				struct Old_files{
+					fs::path *path;
+					string_view content_fn;
+					u64      size;
+				};
+				vector<Old_files> old_enough_to_compact;
+				for (Filesystem_state::File &file: prev.files()){
+					if ( file.content_ref.has_value() && file.content_ref.value().ref_count_ == cat.max_ref_count()){
+						auto &a = old_enough_to_compact.emplace_back();
+						a.path = &file.path;
+						a.content_fn = file.content_ref->fname;
+						a.size = file.content_ref->space_taken;
+					}
+				}
+				unordered_map<string_view, u64> content_file_waste;
+				for (auto &f : old_enough_to_compact){
+					if (content_file_waste.find(f.content_fn) != content_file_waste.end())
+						continue;
+					auto size = file_size(archive_path / f.content_fn);
+					content_file_waste[f.content_fn] = max(size, min_content_file_size);
+				}
+				for (auto &f :old_enough_to_compact){
+					auto &size = content_file_waste[f.content_fn];
+					size -= min(f.size, size); // underflow protection
+				}
+				// now content_file_sizes contains wasted space for each file
+				unordered_set<string_view> content_files_to_compact;
+				for (auto &cz: content_file_waste){
+					if (cz.second < min_content_file_size / 16)
+						continue;   // too little is wasted
+					content_files_to_compact.insert(cz.first);
+				}
+				u64 total_size = 0;
+				for (auto &f : old_enough_to_compact ){
+					if (content_files_to_compact.find(f.content_fn) == content_files_to_compact.end())
+						continue;
+					force_to_archive.insert(*f.path);
+					total_size += f.size;
+				}
+				if (total_size < min_content_file_size) //not enough even for one new content file
+					force_to_archive.clear();
+			}
+		}
+
+		auto fcc = File_content_creator(archive_path);
+		fcc.min_file_size(min_content_file_size);
+		creator_ = &fcc;
+		if (!password.empty())
+			creator_->enable_encryption();
+		if (zstd)
+			creator_->enable_compression(*zstd);
 		if (!root.empty()){
 			for (auto &file : files_to_archive)
 				file = root / file;
@@ -110,10 +161,9 @@ void Archiver::archive()
 					warning(fmt::format(tr_txt("Path {0} does not exist"), file), "");
 					continue;
 				}
+				add(file);
 				if (fs::is_directory(file))
 					recursive_add_from_dir(file);
-				else
-					add(file);
 			}
 		}
 		creator_->finish();
@@ -126,6 +176,27 @@ void Archiver::archive()
 		}
 		next_->commit();
 		catalog->add_fs_state(next);
+		if (max_storage_time){
+			try{
+				auto t = to_posix_time(fs::file_time_type::clock::now()) - *max_storage_time;
+				vector<Filesystem_state> states_to_remove;
+				size_t ndx = 0;
+				for (auto state_time : cat.state_times()){
+					if (state_time < t)
+						states_to_remove.push_back(cat.fs_state(ndx));
+					ndx++;
+				}
+				// leave at least one state
+				if (cat.max_ref_count() == states_to_remove.size())
+					states_to_remove.erase(states_to_remove.begin());
+				for (auto &fs_state : states_to_remove)
+					cat.remove_fs_state(fs_state);
+			}
+			catch(std::exception &exp){
+				warning( tr_txt("Error while remoing old state"), message(exp) );
+			}
+		}
+		catalog->commit();
 	}
 	catch(std::exception &e){
 		warning(fmt::format(tr_txt("Error while archiving {0}:"), name), message(e));

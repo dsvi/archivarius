@@ -15,12 +15,12 @@ void check_error(){
 }
 
 
-File_source::File_source() :  file_(nullptr, fclose)
+File_source::File_source() :  file_(nullptr, checked_fclose)
 {
 
 }
 
-File_source::File_source(const std::filesystem::path &path) : file_(fopen(path.c_str(),"rb"),fclose)
+File_source::File_source(const std::filesystem::path &path) : file_(fopen(path.c_str(),"rb"), checked_fclose)
 {
 	try{
 		if (!file_)
@@ -41,12 +41,12 @@ Source::Pump_result File_source::pump(u8 *to, u64 size)
 	return res;
 }
 
-File_sink::File_sink() : file_(nullptr, fclose)
+File_sink::File_sink() : file_(nullptr, checked_fclose)
 {
 
 }
 
-File_sink::File_sink(const std::filesystem::path &path): file_(fopen(path.c_str(),"wb"), fclose)
+File_sink::File_sink(const std::filesystem::path &path): file_(fopen(path.c_str(),"wb"), checked_fclose)
 {
 	try{
 		if (!file_)
@@ -57,10 +57,15 @@ File_sink::File_sink(const std::filesystem::path &path): file_(fopen(path.c_str(
 	}
 }
 
+void File_sink::reset()
+{
+	bytes_written_ = 0;
+	file_.reset(nullptr);
+}
+
 void File_sink::pump(u8 *to, u64 size)
 {
-	fwrite(to, 1, size , file_.get());
-	bytes_written_ += size;
+	bytes_written_ += fwrite(to, 1, size , file_.get());
 	if (ferror(file_.get()))
 		check_error();
 }
@@ -100,4 +105,13 @@ Sink::~Sink()
 Source::Pump_result Pipe_in::pump_next(u8 *to, u64 size)
 {
 	return next_->pump(to, size);
+}
+
+void checked_fclose(FILE *f)
+{
+	auto err = fclose(f);
+	if (uncaught_exceptions())
+		return;
+	if (err)
+		check_error();
 }
