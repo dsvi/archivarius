@@ -9,7 +9,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-#define TEST
+//#define TEST
 
 int run(int argc, const char *argv[]){
 	if (argc < 2){
