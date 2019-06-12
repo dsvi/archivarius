@@ -9,7 +9,7 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-//#define TEST
+#define TEST
 
 int run(int argc, const char *argv[]){
 	if (argc < 2){
@@ -50,7 +50,7 @@ int run(int argc, const char *argv[]){
 		auto cfgs = read_config(cfg_path.value_or(""));
 		for (auto &c : cfgs){
 			try {
-				Archiver arc;
+				Archive_settings arc;
 				fmt::print("╼╾╼╾╼▏");
 				print(fg(fmt::terminal_color::yellow), " {} ",c.name);
 				fmt::print("▕╾╼╾╼╾╼╾╼╾╼╾\n");
@@ -83,7 +83,7 @@ int run(int argc, const char *argv[]){
 				}
 				arc.warning = move(report_warning);
 				arc.process_acls = c.process_acl;
-				arc.archive();
+				archive(move(arc));
 			} catch (std::exception &e) {
 				print(stderr, fg(fmt::terminal_color::red), "Stopped processing the task.\n");
 				auto msg = message(e);
@@ -112,27 +112,15 @@ int run(int argc, const char *argv[]){
 	}
 	else
 	if (cmd_line.command() == "restore"){
-		fs::path archive_path{cmd_line.param_str("archive")};
-		fs::path restore_path{cmd_line.param_str("target-dir")};
-		auto id_opt = cmd_line.param_uint_opt("id");
-		auto password = cmd_line.param_str_opt("password");
+		Restore_settings rs;
+		rs.archive_path = cmd_line.param_str("archive");
+		rs.to = cmd_line.param_str("target-dir");
+		rs.from_ndx = cmd_line.param_uint_opt("id").value_or(0);
+		rs.password = cmd_line.param_str_opt("password").value_or("");
 		cmd_line.check_unused_arguments();
-		Catalogue cat(archive_path, password.value_or(""));
-		auto state_times = cat.state_times();
-		auto num_ids = state_times.size();
-		if (num_ids == 0){
-			cout << tr_txt("Archive is empty.") << endl;
-			return 0;
-		}
-		size_t id = id_opt.value_or(0);
-		auto report_warning = [](std::string &&w){
+		rs.warning = [](std::string &&w){
 			cerr << w << endl;
 		};
-		Restore_settings rs;
-		rs.cat = &cat;
-		rs.from_ndx = id;
-		rs.to = restore_path;
-		rs.warning = move(report_warning);
 		restore(rs);
 	}
 	else{

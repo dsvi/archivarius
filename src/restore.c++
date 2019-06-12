@@ -41,7 +41,12 @@ void restore(Restore_settings &cfg)
 	try{
 		Buffer tmp;
 		tmp.resize(128*1024);
-		auto state = cfg.cat->fs_state(cfg.from_ndx);
+		Catalogue cat(cfg.archive_path, cfg.password);
+		auto state_times = cat.state_times();
+		auto num_ids = state_times.size();
+		if (num_ids == 0)
+			throw Exception("the archive is empty.");
+		auto state = cat.fs_state(cfg.from_ndx);
 		auto files = state.files();
 		for (auto &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
@@ -74,7 +79,7 @@ void restore(Restore_settings &cfg)
 				auto re_path = cfg.to / file.path;
 				try {
 					if (fname != ref.fname){
-						auto content_path = cfg.cat->archive_path() / ref.fname;
+						auto content_path = cat.archive_path() / ref.fname;
 						in = content_path;
 						sin.name(content_path);
 						num_pumped = 0;
@@ -141,7 +146,7 @@ void restore(Restore_settings &cfg)
 		string msg;
 		if (cfg.name.empty())
 			/* TRANSLATORS: This is about path from and to  */
-			msg = format(tr_txt("Error while restoring from {0} to {1}:"), cfg.cat->archive_path(), cfg.to);
+			msg = format(tr_txt("Error while restoring from {0} to {1}:"), cfg.archive_path, cfg.to);
 		else
 			/* TRANSLATORS: First argument is name, second - path*/
 			msg = format(tr_txt("Error while restoring {0} to {1}:"), cfg.name, cfg.to);

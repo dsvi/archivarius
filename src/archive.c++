@@ -8,7 +8,7 @@ using namespace std;
 namespace fs = std::filesystem;
 
 
-std::tuple<Filesystem_state::File, bool> Archiver::make_file(const std::filesystem::path &file_path, std::filesystem::path &&archive_path)
+std::tuple<Filesystem_state::File, bool> Archive_settings::make_file(const std::filesystem::path &file_path, std::filesystem::path &&archive_path)
 {
 	auto sts = symlink_status(file_path);
 	Filesystem_state::File f;
@@ -37,7 +37,7 @@ std::tuple<Filesystem_state::File, bool> Archiver::make_file(const std::filesyst
 }
 
 
-void Archiver::recursive_add_from_dir(const fs::path &dir_path)
+void Archive_settings::recursive_add_from_dir(const fs::path &dir_path)
 try {
 	std::vector<fs::path> dirs;
 	for (auto &e : fs::directory_iterator(dir_path)){
@@ -55,7 +55,7 @@ catch(std::exception &exp){
 	warning(fmt::format(tr_txt("Can't get directory contents for {0}:"), dir_path), message(exp));
 }
 
-void Archiver::add(const fs::path &file_path)
+void Archive_settings::add(const fs::path &file_path)
 {
 	try{
 		auto rel_path = root.empty() ? file_path : file_path.lexically_relative(root);
@@ -79,7 +79,7 @@ void Archiver::add(const fs::path &file_path)
 	}
 }
 
-void Archiver::archive()
+void Archive_settings::archive()
 {
 	try{
 		Catalogue cat(archive_path, password);

@@ -203,4 +203,6 @@ void test()
 	auto fs = state_for(atest_tmp);
 	compare(fs, last_state);
 	print(fg(fmt::terminal_color::bright_green), "All green! All shiny!\n");
+	fs::remove_all(atest_tmp);
+	fs::remove_all(atest_arc);
 }

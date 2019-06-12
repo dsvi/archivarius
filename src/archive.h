@@ -3,7 +3,7 @@
 #include "file_content_creator.h"
 #include "catalogue.h"
 
-class Archiver{
+class Archive_settings{
 public:
 	std::string name;
 	std::filesystem::path archive_path;
@@ -16,8 +16,8 @@ public:
 	std::optional<Zstd_out> zstd;
 	std::function<void(std::string &&header, std::string &&warning_message)> warning;
 	bool process_acls;
-	void archive();
 private:
+	void archive();
 	void add(const std::filesystem::path &file_path);
 	void recursive_add_from_dir(const std::filesystem::path &dir_path);
 	// just add content_ref to it
@@ -30,7 +30,11 @@ private:
 	File_content_creator *creator_;
 	Filesystem_state *prev_;
 	Filesystem_state *next_;
+	friend void archive(Archive_settings a);
 };
 
-
+inline
+void archive(Archive_settings a){
+	a.archive();
+}
 
