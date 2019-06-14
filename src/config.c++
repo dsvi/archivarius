@@ -56,15 +56,16 @@ void fill_acl(Config &to, Property &p){
 
 static
 void fill_compression(Config &to, Property &p){
-	//auto val = p.value_str();
-	to.zstd.emplace();
-//	if (val == "on"){
-//		to.zstd.emplace();
-//		return;
-//	}
-//	if (val == "off")
-//		return;
-//	throw Exception("'compression' can only be 'on' or 'off'");
+	auto val = p.value_str();
+	if (val == "on"){
+		to.zstd.emplace();
+		return;
+	}
+	if (val == "off"){
+		to.zstd.reset();
+		return;
+	}
+	throw Exception("'compression' can only be 'on' or 'off'");
 }
 
 static const string conf_fn = "archivarius.conf"s;

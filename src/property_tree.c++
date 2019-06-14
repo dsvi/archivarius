@@ -84,7 +84,7 @@ property_tree::Property::Property()
 std::string_view property_tree::Property::value_str()
 {
 	if (val_.empty())
-		throw Exception("Property {0} should have a value.\nProperty came from {1} line {2}")(key_, *origin_fn_, origin_ln_);
+		throw Exception("Property '{0}' should have a value.\nProperty came from {1} line {2}")(key_, *origin_fn_, origin_ln_);
 	return val_;
 }
 
