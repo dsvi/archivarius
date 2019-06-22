@@ -1,0 +1,90 @@
+syntax = "proto2";
+
+// refresh me by
+// protoc -I=. --cpp_out=. format.proto
+
+
+option optimize_for = LITE_RUNTIME;
+
+package proto;
+
+message ZSTD_Compression_filter{
+
+}
+
+message Chapoly_Encryption_filter{
+  required bytes iv = 1;
+  optional bytes key  = 2;
+}
+
+message Chacha_Encryption_filter{
+  required bytes iv = 1;
+  optional bytes key  = 2;
+}
+
+message Filters{
+  optional ZSTD_Compression_filter   zstd_compression = 1;
+  oneof encryption{
+    Chapoly_Encryption_filter chapoly_encryption  = 2;  //Catalogue can only be encryped with this
+    Chacha_Encryption_filter chacha_encryption = 3;
+  }
+}
+
+message Ref_to_refcount{
+  required string content_fname = 1;
+  required uint64 from = 2;
+}
+
+enum File_type{
+  FILE = 0;
+  DIR = 1;
+  SYMLINK = 2;
+}
+
+message Fs_record{
+  required string pathname = 1;
+  required File_type type = 2;
+  optional uint64 modified_nanoseconds = 3; // POSIX time. Is not set for symlinks
+  optional Ref_to_refcount ref = 4;     // only exists for regular files of sizes more than 0
+  optional string symlink_target = 5;
+  optional uint32 unix_permissions = 6; // equal to std::filesystem::perms
+  optional string posix_acl = 7;
+  optional string posix_default_acl = 8;
+}
+
+message Fs_state{
+  repeated Fs_record rec = 1;
+}
+
+message State_file{
+  optional Filters filters = 1;
+  required string name = 2;
+  required uint64 time_created = 3; // POSIX time in nanoseconds
+}
+
+message Content_file{
+  optional Filters filters = 1;
+  required string name = 2;
+  repeated Ref_count refs = 3;
+}
+
+
+message Ref_count{
+  required uint64 from = 1;
+  required uint64 to = 2;
+  required uint64 ref_count = 3;
+  required uint64 space_taken = 4;   // space in file taken by the refd data. never 0
+  oneof csum{
+    uint64 xxhash = 5; // little endian
+    bytes  blake2b = 6;
+  }
+}
+
+message Catalogue{
+  repeated State_file state_files = 1;
+  repeated Content_file content_files = 2;
+}
+
+message Catalog_header{
+  optional Filters filters = 1;
+}
