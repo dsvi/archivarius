@@ -10,11 +10,11 @@ namespace archi{
 class Catalogue
 {
 public:
-	Catalogue(std::filesystem::path &arc_path, std::string_view key);
+	Catalogue(std::filesystem::path &arc_path, std::string_view password);
 
 	std::filesystem::path archive_path();
 
-	void key(std::string_view key);
+	void password(std::string_view password);
 	//std::vector<std::filesystem::file_time_type> state_times();
 	auto  state_times(){
 		return fs_state_files_ | ranges::view::transform([](auto &fs){return fs.time_created;});

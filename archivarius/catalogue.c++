@@ -156,7 +156,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 	}
 }
 
-void Catalogue::key(string_view key)
+void Catalogue::password(string_view key)
 {
 	if (!enc_)
 		throw Exception("Archive was not encrypted before. You have to recreate it.");
