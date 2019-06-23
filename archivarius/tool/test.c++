@@ -19,6 +19,8 @@ using namespace std;
 using namespace archi;
 namespace fs = std::filesystem;
 
+static const char * password = "qwerty";
+//static const string password = "";
 
 struct File {
 	enum Type{
@@ -133,7 +135,11 @@ void extract(size_t i, fs::path arc, fs::path to){
 	auto a = "archive={}"_format(arc);
 	auto t = "target-dir={}"_format(to);
 	auto id = "id={}"_format(i);
-	run({"restore", a.c_str(), t.c_str(), id.c_str(), "password=qwerty"});
+	auto pwrd = "password={}"_format(password);
+	vector<const char *> params{"restore", a.c_str(), t.c_str(), id.c_str()};
+	if (!password.empty())
+		params.push_back(pwrd.c_str());
+	run(params);
 }
 
 #pragma GCC diagnostic ignored "-Wunused-result"
@@ -195,11 +201,7 @@ void test()
 	}
 	this_thread::sleep_for(2s);
 	run({"archive", "cfg-file=test-1s.conf"});
-	run({"archive", "cfg-file=test-1s.conf"});
-	run({"archive", "cfg-file=test-1s.conf"});
-	run({"archive", "cfg-file=test-1s.conf"});
-	run({"archive", "cfg-file=test-1s.conf"});
-	Catalogue cat(atest_arc, "qwerty");
+	Catalogue cat(atest_arc, password);
 	ASSERT(cat.max_ref_count() == 1);
 	extract(0, atest_arc, atest_tmp);
 	auto fs = state_for(atest_tmp);
