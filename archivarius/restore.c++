@@ -58,9 +58,7 @@ void restore(Restore_settings &cfg)
 				fs::create_directories(re_path);
 			}
 			catch(std::exception &e){
-				string msg = format(tr_txt("Can't restore directory {0} to {1}:\n"), file.path, re_path);
-				msg += message(e);
-				cfg.warning(move(msg));
+				cfg.warning(format(tr_txt("Can't restore directory {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
 		{ // restore non empty files
@@ -97,13 +95,11 @@ void restore(Restore_settings &cfg)
 					sout >> cs.pipe() >> out;
 					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
 					if (ref.csum != cs.checksum())
-						cfg.warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path) );
+						cfg.warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path), "" );
 				}
 				catch(std::exception &e){
 					/* TRANSLATORS: This is about path from and to  */
-					string msg = format(tr_txt("Can't restore {0} to {1}:\n"), file.path, re_path);
-					msg += message(e);
-					cfg.warning(move(msg));
+					cfg.warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 				}
 			}
 		}
@@ -123,9 +119,7 @@ void restore(Restore_settings &cfg)
 			}
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
-				string msg = format(tr_txt("Can't restore {0} to {1}:\n"), file.path, re_path);
-				msg += message(e);
-				cfg.warning(move(msg));
+				cfg.warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
 		vector<reference_wrapper<Filesystem_state::File>> sorted_files( files.begin(), files.end() );
@@ -138,9 +132,7 @@ void restore(Restore_settings &cfg)
 				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
-				string msg = format(tr_txt("Can't restore attributes for {0}:\n"), re_path);
-				msg += message(e);
-				cfg.warning(move(msg));
+				cfg.warning(format(tr_txt("Can't restore attributes for {0}: "), re_path), message(e));
 			}
 		}
 	}
@@ -148,12 +140,10 @@ void restore(Restore_settings &cfg)
 		string msg;
 		if (cfg.name.empty())
 			/* TRANSLATORS: This is about path from and to  */
-			msg = format(tr_txt("Error while restoring from {0} to {1}: "), cfg.archive_path, cfg.to);
+			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}: "), cfg.archive_path, cfg.to), message(e));
 		else
 			/* TRANSLATORS: First argument is name, second - path*/
-			msg = format(tr_txt("Error while restoring {0} to {1}: "), cfg.name, cfg.to);
-		msg += message(e);
-		cfg.warning(move(msg));
+			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}: "), cfg.name, cfg.to), message(e));
 	}
 }
 

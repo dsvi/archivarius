@@ -19,7 +19,7 @@ using namespace std;
 using namespace archi;
 namespace fs = std::filesystem;
 
-static const char * password = "qwerty";
+static const string password = "qwerty";
 //static const string password = "";
 
 struct File {

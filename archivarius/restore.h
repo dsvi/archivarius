@@ -10,7 +10,7 @@ struct Restore_settings{
 	size_t from_ndx;
 	std::filesystem::path to;
 	std::string password;
-	std::function<void(std::string&&)> warning;
+	std::function<void(std::string &&header, std::string &&warning_message)> warning;
 };
 
 void restore(Restore_settings &cfg);

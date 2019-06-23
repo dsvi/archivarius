@@ -54,15 +54,6 @@ int run(int argc, const char *argv[]){
 				print(fg(fmt::terminal_color::yellow), " {} ",c.name);
 				fmt::print("▕╾╼╾╼╾╼╾╼╾╼╾\n");
 				fflush(stdout);
-				auto report_warning = [](std::string &&h, std::string &&w){
-					print(stderr, fg(fmt::terminal_color::red), "Warning! {}", h);
-					w.insert(0, "\n");
-					find_and_replace(w, "\n", "\n  ");
-					w += '\n';
-					fmt::print(stderr, w);
-					fflush(stderr);
-				};
-
 				arc.name = c.name;
 				arc.archive_path = c.archive;
 				arc.root = c.root;
@@ -80,7 +71,14 @@ int run(int argc, const char *argv[]){
 					arc.zstd.emplace();
 					arc.zstd->compression_level = 11;
 				}
-				arc.warning = move(report_warning);
+				arc.warning = [](std::string &&h, std::string &&w){
+					print(stderr, fg(fmt::terminal_color::red), "Warning! {}", h);
+					w.insert(0, "\n");
+					find_and_replace(w, "\n", "\n  ");
+					w += '\n';
+					fmt::print(stderr, w);
+					fflush(stderr);
+				};
 				arc.process_acls = c.process_acl;
 				archive(move(arc));
 			} catch (std::exception &e) {
@@ -117,8 +115,13 @@ int run(int argc, const char *argv[]){
 		rs.from_ndx = cmd_line.param_uint_opt("id").value_or(0);
 		rs.password = cmd_line.param_str_opt("password").value_or("");
 		cmd_line.check_unused_arguments();
-		rs.warning = [](std::string &&w){
-			cerr << w << endl;
+		rs.warning = [](std::string &&h, std::string &&w){
+			fmt::print(stderr, h);
+			w.insert(0, "\n");
+			find_and_replace(w, "\n", "\n  ");
+			w += '\n';
+			fmt::print(stderr, w);
+			fflush(stderr);
 		};
 		restore(rs);
 	}
