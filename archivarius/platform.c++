@@ -97,7 +97,7 @@ public:
 			check_error();
 		}
 		catch(...){
-			throw_with_nested( Exception("Can't acquire file lock for {0}")(path) );
+			throw_with_nested( Exception("Can't acquire file lock for {0}\nIs another instance accessing the file?")(path) );
 		}
 	}
 

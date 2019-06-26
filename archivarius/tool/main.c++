@@ -3,6 +3,7 @@
 #include "cmd_line_parser.h"
 #include "config.h"
 #include "test.h"
+#include <ctime>
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -10,45 +11,103 @@ using namespace archi;
 
 //#define TEST
 
+void report_warning(std::string &&h, std::string &&w){
+	print(stderr, fg(fmt::terminal_color::red), "Warning! {}", h);
+	w.insert(0, "\n");
+	find_and_replace(w, "\n", "\n  ");
+	w += '\n';
+	fmt::print(stderr, w);
+	fflush(stderr);
+}
+
+struct Archive_params{
+	fs::path archive_path;
+	string name;
+	string password;
+};
+
+Archive_params get_archive_params(Cmd_line &cmd_line, string &cfg_path){
+	auto name = cmd_line.param_str_opt("name");
+	auto arch = cmd_line.param_str_opt("archive");
+	if ((name and arch) or (!name and !arch))
+			throw Exception("Either 'name' or 'archive' should be set in command line, but not both.");
+	Archive_params ret;
+	if (arch){
+		ret.archive_path = *arch;
+		ret.password = cmd_line.param_str_opt("password").value_or("");
+	}
+	else {
+		auto cfgs = read_config(cfg_path);
+		for (auto &c : cfgs){
+			if (name and c.name != *name)
+				continue;
+			ret.name = c.name;
+			ret.archive_path = c.archive;
+			if (c.enc)
+				ret.password = c.enc->password;
+			break;
+		}
+		if (ret.archive_path.empty())
+			throw Exception(tr_txt("Task \'{}\' not found in the config file."))(*name);
+	}
+	return ret;
+}
+
+
 int run(int argc, const char *argv[]){
 	if (argc < 2){
 		cout << tr_txt(
-			"usage: archivarius <cmd> [params]\n\n"
-		  "cmd is one of:\n"
-			"	restore - restore the archive to some path\n"
+			"usage: archivarius <command> [params]\n\n"
+		  "command is one of:\n"
+			"	restore - restore an archive to some path\n"
 		  "	archive - read config file and execute archiving tasks\n"
 		  "	          looks for file archivarius.conf in path:\n"
 		  "	          ~/.config\n"
 		  "	          /usr/local/etc\n"
 		  "	          /etc\n"
 		  "	          and follows instructions in it\n"
-		  "	list    - list versions in archive\n\n"
+		  "	list    - list versions in an archive\n"
+		  "	test    - check checksums in an archive, and report errors if they dont match.\n\n"
+		  "params are in the form param1=value param2=value2\n"
+		  "params can be:\n"
+		  "	archive  - path to the archive. normally either this or 'name' should be set.\n"
+		  "	name     - name of a task in the config file\n"
+		  "	id       - id of the version in the archive\n"
+		  "	password - password to the archive\n\n"
 		  "Acceptable parameters for commads:\n"
 		  "	restore:\n"
 		  "		archive\n"
+		  "		name\n"
 		  "		id\n"
 		  "		target-dir - where to restore\n"
 		  "		password\n"
 		  "	archive:\n"
-		  "		\n"
+		  "		name\n"
 		  "	list:\n"
 		  "		archive\n"
-		  "		password\n\n"
-		  "[params] are in form param1=value param2=value\n"
-		  "params can be:\n"
-		  "	archive  - path to archive\n"
-		  "	id       - id of the state in archive\n"
-		  "	password - password to archive\n"
+		  "		name\n"
+		  "		password\n"
+		  "	test:\n"
+		  "		archive\n"
+		  "		name\n\n"
+
+		  "example:\n"
+		  "	archivarius restore archive=/nfs/backup target-dir=. password=\"qwerty asdfg\"\n"
 			) << endl;
 		return 0;
 	}
 	auto cmd_line = parse_command_line(argc, argv);
-	auto cfg_path = cmd_line.param_str_opt("cfg-file");
+	auto cfg_path = cmd_line.param_str_opt("cfg-file").value_or("");
 	if (cmd_line.command() == "archive"){
+		auto name = cmd_line.param_str_opt("name");
 		cmd_line.check_unused_arguments();
-		auto cfgs = read_config(cfg_path.value_or(""));
+		auto cfgs = read_config(cfg_path);
+		bool task_found = false;
 		for (auto &c : cfgs){
 			try {
+				if (name and c.name != *name)
+					continue;
+				task_found = true;
 				Archive_settings arc;
 				fmt::print("╼╾╼╾╼▏");
 				print(fg(fmt::terminal_color::yellow), " {} ",c.name);
@@ -71,14 +130,7 @@ int run(int argc, const char *argv[]){
 					arc.zstd.emplace();
 					arc.zstd->compression_level = 11;
 				}
-				arc.warning = [](std::string &&h, std::string &&w){
-					print(stderr, fg(fmt::terminal_color::red), "Warning! {}", h);
-					w.insert(0, "\n");
-					find_and_replace(w, "\n", "\n  ");
-					w += '\n';
-					fmt::print(stderr, w);
-					fflush(stderr);
-				};
+				arc.warning = report_warning;
 				arc.process_acls = c.process_acl;
 				archive(move(arc));
 			} catch (std::exception &e) {
@@ -89,18 +141,18 @@ int run(int argc, const char *argv[]){
 				fflush(stderr);
 			}
 		}
-
+		if (name and !task_found)
+			throw Exception(tr_txt("Task \'{}\' not found in the config file."))(*name);
 	}
 	else
 	if (cmd_line.command() == "list"){
-		fs::path archive_path{cmd_line.param_str("archive")};
-		auto password = cmd_line.param_str_opt("password");
+		auto tp = get_archive_params(cmd_line, cfg_path);
 		cmd_line.check_unused_arguments();
-		Catalogue cat(archive_path, password.value_or(""));
+		Catalogue cat(tp.archive_path, tp.password);
 		auto times = cat.state_times();
 		for (size_t i = 0; i < times.size(); i++){
-			time_t t = times[i]/ 1e9;
-			auto tm = localtime(&t);
+			time_t t = times[i]/ Time_ticks_in_second;
+			auto tm = std::gmtime(&t);
 			char str[200];
 			if (!strftime(str, sizeof(str), "%Y %B %d %H:%M:%S", tm))
 				throw Exception("Can't format time string for current locale");
@@ -110,20 +162,28 @@ int run(int argc, const char *argv[]){
 	else
 	if (cmd_line.command() == "restore"){
 		Restore_settings rs;
-		rs.archive_path = cmd_line.param_str("archive");
+		auto tp = get_archive_params(cmd_line, cfg_path);
+		rs.archive_path = move(tp.archive_path);
+		rs.name = move(tp.name);
+		rs.password = move(tp.password);
 		rs.to = cmd_line.param_str("target-dir");
 		rs.from_ndx = cmd_line.param_uint_opt("id").value_or(0);
-		rs.password = cmd_line.param_str_opt("password").value_or("");
 		cmd_line.check_unused_arguments();
-		rs.warning = [](std::string &&h, std::string &&w){
-			fmt::print(stderr, h);
-			w.insert(0, "\n");
-			find_and_replace(w, "\n", "\n  ");
-			w += '\n';
-			fmt::print(stderr, w);
-			fflush(stderr);
-		};
+		rs.warning = report_warning;
 		restore(rs);
+	}
+	else
+	if (cmd_line.command() == "test"){
+		Test_settings ts;
+		ts.warning = report_warning;
+		auto tp = get_archive_params(cmd_line, cfg_path);
+		ts.archive_path = move(tp.archive_path);
+		ts.name = move(tp.name);
+		ts.password = move(tp.password);
+		cmd_line.check_unused_arguments();
+		test(ts);
+		fmt::print(tr_txt("Test finished.\n"));
+		return 0;
 	}
 	else{
 		print(stderr, fg(fmt::terminal_color::red), tr_txt("unknown command {}\n"), cmd_line.command());

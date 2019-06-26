@@ -5,6 +5,7 @@
 #include "platform.h"
 #include "piping.h"
 #include "checksumer.h"
+#include "pump.h"
 
 using namespace std;
 using namespace fmt;
@@ -12,20 +13,6 @@ namespace fs = filesystem;
 
 namespace archi{
 
-void pump(Stream_in &in, u64 to, Stream_out *out, std::string_view fname, Buffer &tmp, u64 &num_pumped )
-{
-	while (num_pumped < to){
-		auto num_left = to - num_pumped;
-		auto to_pump = num_left > tmp.size() ? tmp.size() : num_left;
-		auto ret = in.pump(tmp.raw(), to_pump);
-		if (ret.eof && ret.pumped_size != to_pump)
-			throw Exception( "Truncated content file {0}" )(fname);
-		if (out)
-			out->pump(tmp.raw(), to_pump);
-		num_pumped += to_pump;
-	}
-	ASSERT(num_pumped == to);
-}
 
 void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 	if (!attr.acl.empty())
@@ -44,8 +31,7 @@ void restore(Restore_settings &cfg)
 		Buffer tmp;
 		tmp.resize(128*1024);
 		Catalogue cat(cfg.archive_path, cfg.password);
-		auto state_times = cat.state_times();
-		auto num_ids = state_times.size();
+		auto num_ids = cat.num_states();
 		if (num_ids == 0)
 			throw Exception("the archive is empty.");
 		auto state = cat.fs_state(cfg.from_ndx);
@@ -140,10 +126,10 @@ void restore(Restore_settings &cfg)
 		string msg;
 		if (cfg.name.empty())
 			/* TRANSLATORS: This is about path from and to  */
-			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}: "), cfg.archive_path, cfg.to), message(e));
+			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}"), cfg.archive_path, cfg.to), message(e));
 		else
 			/* TRANSLATORS: First argument is name, second - path*/
-			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}: "), cfg.name, cfg.to), message(e));
+			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}"), cfg.name, cfg.to), message(e));
 	}
 }
 

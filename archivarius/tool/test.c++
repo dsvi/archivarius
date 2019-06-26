@@ -202,7 +202,7 @@ void test()
 	this_thread::sleep_for(2s);
 	run({"archive", "cfg-file=test-1s.conf"});
 	Catalogue cat(atest_arc, password);
-	ASSERT(cat.max_ref_count() == 1);
+	ASSERT(cat.num_states() == 1);
 	extract(0, atest_arc, atest_tmp);
 	auto fs = state_for(atest_tmp);
 	compare(fs, last_state);

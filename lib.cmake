@@ -60,10 +60,14 @@ set(archivarius-lib-srcs
 ./archivarius/platform.h
 ./archivarius/precomp.c++
 ./archivarius/precomp.h
+./archivarius/pump.c++
+./archivarius/pump.h
 ./archivarius/restore.c++
 ./archivarius/restore.h
 ./archivarius/stream.c++
 ./archivarius/stream.h
+./archivarius/test.c++
+./archivarius/test.h
 ./archivarius/xxhash.h
 )
 

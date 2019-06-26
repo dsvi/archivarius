@@ -19,7 +19,8 @@ public:
 	auto  state_times(){
 		return fs_state_files_ | ranges::view::transform([](auto &fs){return fs.time_created;});
 	}
-	// ndx from array returned by state_times()
+	size_t num_states();
+	// 0 is the latest state. up to num_states()
 	Filesystem_state fs_state(size_t ndx);
 	Filesystem_state latest_fs_state(); //or empty fs_state if no states available
 	Filesystem_state empty_fs_state();
@@ -27,8 +28,11 @@ public:
 	void add_fs_state(Filesystem_state &fs);
 	void remove_fs_state(Filesystem_state &fs);
 
-	// == number of state files
-	u64 max_ref_count();
+	// returns sorted
+	auto content_refs(){
+		return content_refs_ | ranges::view::all;
+	}
+
 
 	void commit();
 private:
@@ -62,7 +66,7 @@ std::filesystem::path Catalogue::archive_path()
 }
 
 inline
-u64 Catalogue::max_ref_count()
+size_t Catalogue::num_states()
 {
 	return fs_state_files_.size();
 }

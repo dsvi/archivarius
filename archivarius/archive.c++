@@ -93,7 +93,7 @@ void Archive_settings::archive()
 		// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 		force_to_archive.clear();
 		if (max_storage_time){
-			auto max_ref = cat.max_ref_count();
+			auto max_ref = cat.num_states();
 			if (max_ref != 0){
 				struct Old_files{
 					fs::path *path;
@@ -102,7 +102,7 @@ void Archive_settings::archive()
 				};
 				vector<Old_files> old_enough_to_compact;
 				for (Filesystem_state::File &file: prev.files()){
-					if ( file.content_ref.has_value() && file.content_ref.value().ref_count_ == cat.max_ref_count()){
+					if ( file.content_ref.has_value() && file.content_ref.value().ref_count_ == max_ref){
 						auto &a = old_enough_to_compact.emplace_back();
 						a.path = &file.path;
 						a.content_fn = file.content_ref->fname;
@@ -189,7 +189,7 @@ void Archive_settings::archive()
 					ndx++;
 				}
 				// leave at least one state
-				if (cat.max_ref_count() == states_to_remove.size())
+				if (cat.num_states() == states_to_remove.size())
 					states_to_remove.erase(states_to_remove.begin());
 				for (auto &fs_state : states_to_remove)
 					cat.remove_fs_state(fs_state);
