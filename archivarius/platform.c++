@@ -78,9 +78,9 @@ class File_lock_int : public File_lock{
 public:
 	File_lock_int(std::filesystem::path &path){
 		try{
-			errno = 0;
 			file_ = open(path.c_str(), O_RDWR);
-			check_error();
+			if (file_ == -1)
+				check_error();
 			struct flock fl;
 			memset(&fl, 0, sizeof(fl));
 
@@ -92,9 +92,9 @@ public:
 			fl.l_len = 0;           // len is zero, which is a special value representing end
 			                        // of file (no matter how large the file grows in future)
 
-			// F_SETLKW specifies blocking mode
-			fcntl(file_, F_SETLK, &fl);
-			check_error();
+			auto rc = fcntl(file_, F_SETLK, &fl);
+			if (rc == -1)
+				check_error();
 		}
 		catch(...){
 			throw_with_nested( Exception("Can't acquire file lock for {0}\nIs another instance accessing the file?")(path) );
