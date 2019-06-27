@@ -92,7 +92,7 @@ public:
 			fl.l_len = 0;           // len is zero, which is a special value representing end
 			                        // of file (no matter how large the file grows in future)
 
-			auto rc = fcntl(file_, F_SETLK, &fl);
+			auto rc = fcntl(file_, F_OFD_SETLK, &fl);
 			if (rc == -1)
 				check_error();
 		}
