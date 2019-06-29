@@ -17,7 +17,6 @@ public:
 		return *this;
 	}
 	const char *what() const noexcept override;
-	std::string_view message();
 private:
 	std::string fmt_;
 };
