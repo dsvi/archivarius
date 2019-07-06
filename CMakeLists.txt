@@ -11,15 +11,15 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    message("Using libc++")
-    string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
-    string(APPEND CMAKE_EXE_LINKER_FLAGS " -Wl,-Bstatic -lc++ -Wl,-Bdynamic")
-endif()
-
 project(archivarius  
     VERSION 0.0 
     DESCRIPTION "Archivarius lib and CLI tool")
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message("Using libc++")
+    string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
+    # use static build for clang
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -static -lc++abi -fuse-ld=lld")
+endif()
 
 include(console-tool.cmake)

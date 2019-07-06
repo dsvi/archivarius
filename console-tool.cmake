@@ -16,7 +16,7 @@ set(archivarius-tool-srcs
 add_executable(archivarius ${archivarius-tool-srcs})
 target_include_directories(archivarius PRIVATE src)
 set_target_properties(archivarius PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )

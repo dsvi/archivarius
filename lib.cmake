@@ -6,13 +6,13 @@ add_subdirectory("libs/protobuf/cmake")
 add_subdirectory("libs/fmt")
 
 set_target_properties(libprotobuf-lite PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
 
 set_target_properties(fmt PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
@@ -74,9 +74,17 @@ set(archivarius-lib-srcs
 add_library(archivarius-lib ${archivarius-lib-srcs})
 target_include_directories(archivarius-lib PUBLIC .)
 set_target_properties(archivarius-lib PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
 )
-target_link_libraries(archivarius-lib PUBLIC botan fmt zstd range-v3 libprotobuf-lite acl stdc++fs)
+target_link_libraries(archivarius-lib PUBLIC botan fmt zstd range-v3 libprotobuf-lite acl)
 
+# TODO: remove this, since new compilers dot require it
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_link_libraries(archivarius-lib PUBLIC c++fs)
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  target_link_libraries(archivarius-lib PUBLIC stdc++fs)
+endif()

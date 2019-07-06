@@ -19,6 +19,18 @@ using namespace std;
 using namespace archi;
 namespace fs = std::filesystem;
 
+template <>
+struct fmt::formatter<fs::file_time_type> {
+	template <typename ParseContext>
+	constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
+
+	template <typename FormatContext>
+	auto format(const fs::file_time_type &p, FormatContext &ctx) {
+		auto cftime = fs::file_time_type::clock::to_time_t(p);
+		return format_to(ctx.begin(), "{}", std::asctime(std::localtime(&cftime)));
+	}
+};
+
 static const string password = "qwerty";
 //static const string password = "";
 
@@ -89,13 +101,8 @@ void compare(Fs_state &a, Fs_state &b){
 				throw runtime_error(fmt::format("type dont match\n{0}\n{1}", da.type, db.type));
 			}
 			if (da.time != db.time){
-				auto tma = chrono::system_clock::to_time_t(da.time);
-				auto tmb = chrono::system_clock::to_time_t(db.time);
-				fmt::print("for: ", pa.first.string());
-				cout << std::ctime(&tma) << endl;
-				cout << std::ctime(&tmb) << endl;
 				ASSERT(0);
-				throw runtime_error(fmt::format("times dont match\n{0}\n{1}", da.time.time_since_epoch(), db.time.time_since_epoch()));
+				throw runtime_error(fmt::format("times dont match\n{0}\n{1}", da.time, db.time));
 			}
 			if (da.type == File::FILE && da.size != db.size){
 				ASSERT(0);
@@ -201,8 +208,23 @@ void test()
 	}
 	this_thread::sleep_for(2s);
 	run({"archive", "cfg-file=test-1s.conf"});
-	Catalogue cat(atest_arc, password);
-	ASSERT(cat.num_states() == 1);
+	{
+		Catalogue cat(atest_arc, password);
+		ASSERT(cat.num_states() == 1);
+		if (cat.num_states() != 1)
+			throw runtime_error("GC test failed");
+		// lock test
+		bool failed = false;
+		try{
+			Catalogue cat1(atest_arc, password);
+		}
+		catch(...){
+			failed = true;
+		}
+		ASSERT(failed);
+		if (!failed)
+			throw runtime_error("lock test failed");
+	}
 	extract(0, atest_arc, atest_tmp);
 	auto fs = state_for(atest_tmp);
 	compare(fs, last_state);
