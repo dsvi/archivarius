@@ -36,13 +36,14 @@ Or you can build it yourself:
     hg up latest
 	mkdir build
 	cd build
-	ccmake .. 
-	make
 
-After that, create [archivarius.conf](./docs/config file format.md) file at one of those paths:
+For <font color=#E95420>Ubuntu</font> you'll need `libacl1-dev` installed.
 
-	~/.config
-	/usr/local/etc
-	/etc
+Now you need a good C++17 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this:
 
-And launch the tool `archivarius archive`
+    CXX=clang++-8 CC=clang-8 cmake ..
+    make archivarius
+
+After that, create [archivarius.conf](./docs/config file format.md), and run the built tool:
+
+    archivarius archive

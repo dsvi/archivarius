@@ -1,4 +1,16 @@
-# Config file format
+# Config file
+
+## Location
+
+Archivarius looks for the archivarius.conf file at the locations:
+
+	~/.config
+	/usr/local/etc
+	/etc
+
+In the mentioned order.
+
+## Format
 
 Example:
  
