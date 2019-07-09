@@ -82,7 +82,7 @@ int run(int argc, const char *argv[]){
 		  "		target-dir - where to restore\n"
 		  "		password\n"
 		  "	archive:\n"
-		  "		name\n"
+		  "		name - if not set, all tasks will be processed\n"
 		  "	list:\n"
 		  "		archive\n"
 		  "		name\n"
