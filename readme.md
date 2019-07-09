@@ -39,8 +39,10 @@ Or you can build it yourself:
 	ccmake .. 
 	make
 
-After that, create a [config file](./docs/config file format.md)
+After that, create [archivarius.conf](./docs/config file format.md) file at one of those paths:
 
+	~/.config
+	/usr/local/etc
+	/etc
 
-
-
+And launch the tool `archivarius archive`
