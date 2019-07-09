@@ -37,9 +37,9 @@ Or you can build it yourself:
 	mkdir build
 	cd build
 
-For <font color=#E95420>Ubuntu</font> you'll need `libacl1-dev` installed.
+For Ubuntu you'll need `libacl1-dev` installed.
 
-Now you need a good C++17 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this:
+Now you need a good C++17 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system):
 
     CXX=clang++-8 CC=clang-8 cmake ..
     make archivarius
