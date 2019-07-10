@@ -39,11 +39,32 @@ Or you can build it yourself:
 
 For Ubuntu you'll need `libacl1-dev` installed.
 
-Now you need a good C++17 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system):
+Now you need a good C++17 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-8 libc++-8-dev lld-8`):
 
     CXX=clang++-8 CC=clang-8 cmake ..
     make archivarius
 
-After that, create [archivarius.conf](./docs/config file format.md), and run the built tool:
+## Using it
+
+Create [archivarius.conf](./docs/config file format.md), and run the tool:
 
     archivarius archive
+
+The command `archive` tells archivarius to execute all the tasks in the config. You might want to add it to cron, to do it daily.
+To restore an archive run:
+
+	archivarius restore archive=path/to/archive target-dir=/home/me/
+
+## Licence 
+
+The software is provided under [Zlib licence](https://en.wikipedia.org/wiki/Zlib_License):
+
+This software is provided 'as-is', without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
+
+2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
+
+3. This notice may not be removed or altered from any source distribution.
