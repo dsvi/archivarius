@@ -7,7 +7,7 @@ It's fast:
 
 - To restore the latest saved version, it does not have to first restore the oldest one, and then incrementally refine it. It goes right to the latest, despite being incremental. So depth of your archive does not affect restoration performance.
 - Uses modern encryption (ChaCha20+Poly1305) and compression (zstd).
-- Unlike [some other incremental backup tools][1], it does not require a few gigs of local cache to work efficiently over network.
+- Unlike [some other incremental backup tools][1], it does not require a few gigs of local cache to work efficiently over network. Neither does it require periodic full-backups. So it's much easier on network bandwidth.
 
 It's reliable:
 
