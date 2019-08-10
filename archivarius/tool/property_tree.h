@@ -32,8 +32,8 @@ public:
 
 private:
 	std::vector<Property> kids_;
-	std::string       post_kids_whitespaces_; // whitespaces before '}'
-	std::string       pre_whitestaces_; // preceding whitespaces. may include commented out lines
+	std::string       post_kids_whitespaces_; // whitespaces + commented out lines, before '}'
+	std::string       pre_whitestaces_; // preceding whitespaces + commented out lines
 	std::string       text_;
 	std::string       key_;
 	std::string       val_;

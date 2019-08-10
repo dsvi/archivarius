@@ -35,8 +35,23 @@ void restore(Restore_settings &cfg)
 		if (num_ids == 0)
 			throw Exception("the archive is empty.");
 		auto state = cat.fs_state(cfg.from_ndx);
-		auto files = state.files();
-		for (auto &file : files){ // restore dirs
+		auto all_files = state.files();
+		vector<reference_wrapper<Filesystem_state::File>> files(all_files.begin(), all_files.end());
+		if (!cfg.prefix.empty()){
+			erase_if(files, [&](auto &f){
+				auto pref_it = cfg.prefix.begin();
+				for (auto &pe : f.get().path){
+					if (pref_it == cfg.prefix.end())
+						return false;
+					ASSERT(!pref_it->empty());
+					if (pe != *pref_it)
+						return true;
+					++pref_it;
+				}
+				return false;
+			});
+		}
+		for (Filesystem_state::File &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
 				continue;
 			auto re_path = cfg.to / file.path;
@@ -48,7 +63,7 @@ void restore(Restore_settings &cfg)
 			}
 		}
 		{ // restore non empty files
-			auto refs_only = files | ranges::view::remove_if([](auto &a){return !a.content_ref.has_value();});
+			auto refs_only = files | ranges::view::remove_if([](auto &a){return !a.get().content_ref.has_value();});
 			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs( refs_only.begin(), refs_only.end() );
 			ranges::action::sort(sorted_by_refs, [](auto a, auto b){
 				return a.get().content_ref.value() < b.get().content_ref.value();
@@ -89,7 +104,7 @@ void restore(Restore_settings &cfg)
 				}
 			}
 		}
-		for (auto &file : files){ // restore links and empty files
+		for (Filesystem_state::File &file : files){ // restore links and empty files
 			if (file.type == Filesystem_state::DIR)
 				continue;
 			auto re_path = cfg.to / file.path;
@@ -108,11 +123,10 @@ void restore(Restore_settings &cfg)
 				cfg.warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
-		vector<reference_wrapper<Filesystem_state::File>> sorted_files( files.begin(), files.end() );
-		ranges::action::sort(sorted_files, [](auto a, auto b){
+		sort(files.begin(), files.end(), [](auto a, auto b){
 			return a.get().path > b.get().path;
 		});
-		for (Filesystem_state::File &file : sorted_files){// restore attributes
+		for (Filesystem_state::File &file : files){// restore attributes
 			auto re_path = cfg.to / file.path;
 			try{
 				apply_attribs(re_path, file);

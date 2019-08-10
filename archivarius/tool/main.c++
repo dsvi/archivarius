@@ -80,6 +80,7 @@ int run(int argc, const char *argv[]){
 		  "		name\n"
 		  "		id\n"
 		  "		target-dir - where to restore\n"
+		  "		prefix - restore only the paths begining with this prefix\n"
 		  "		password\n"
 		  "	archive:\n"
 		  "		name - if not set, all tasks will be processed\n"
@@ -93,7 +94,8 @@ int run(int argc, const char *argv[]){
 
 		  "example:\n"
 		  "	archivarius restore archive=/nfs/backup target-dir=. password=\"qwerty asdfg\"\n"
-			) << endl;
+		  "	archivarius restore archive=/nfs/backup prefix=Pictures target-dir=. password=\"qwerty asdfg\"\n"
+		) << endl;
 		return 0;
 	}
 	auto cmd_line = parse_command_line(argc, argv);
@@ -168,6 +170,8 @@ int run(int argc, const char *argv[]){
 		rs.password = move(tp.password);
 		rs.to = cmd_line.param_str("target-dir");
 		rs.from_ndx = cmd_line.param_uint_opt("id").value_or(0);
+		if (auto pref = cmd_line.param_str_opt("prefix"); pref)
+			rs.prefix = *pref;
 		cmd_line.check_unused_arguments();
 		rs.warning = report_warning;
 		restore(rs);
