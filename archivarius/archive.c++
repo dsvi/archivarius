@@ -120,12 +120,14 @@ void Archive_settings::archive()
 					auto &size = content_file_waste[f.content_fn];
 					size -= min(f.size, size); // underflow protection
 				}
-				// now content_file_sizes contains wasted space for each file
+				// now content_file_waste contains wasted space for each file
+				u64 total_waste=0;
 				unordered_set<string_view> content_files_to_compact;
 				for (auto &cz: content_file_waste){
 					if (cz.second < min_content_file_size / 16)
 						continue;   // too little is wasted
 					content_files_to_compact.insert(cz.first);
+					total_waste += cz.second;
 				}
 				u64 total_size = 0;
 				for (auto &f : old_enough_to_compact ){
@@ -134,8 +136,10 @@ void Archive_settings::archive()
 					force_to_archive.insert(*f.path);
 					total_size += f.size;
 				}
-				if (total_size < min_content_file_size) //not enough even for one new content file
+				if (total_size < min_content_file_size and total_waste < 10*min_content_file_size){
+					//not enough even for one new content file, and less then 10 content files are wasted
 					force_to_archive.clear();
+				}
 			}
 		}
 

@@ -92,10 +92,11 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 		if (auto version = in.get_uint(); version > current_version)
 			throw Exception("Unsupported file version {0}. Max supported is {1}")(version, current_version);
 		Buffer buf;
-		auto header = get_message<proto::Catalog_header>(buf, in, cs_pipe);
+		google::protobuf::Arena arena;
+		auto header = get_message<proto::Catalog_header>(buf, in, cs_pipe, arena);
 		Filters_in filters;
-		if (header.has_filters()){
-			auto &f = header.filters();
+		if (header->has_filters()){
+			auto &f = header->filters();
 			if (f.has_chapoly_encryption()){
 				Chapoly &ein = filters.enc_chapo_in.emplace();
 				auto &iv = f.chapoly_encryption().iv();
@@ -114,9 +115,9 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 		Filtrator_in fltr(filters);
 		in << cs_pipe << fltr << src;
 
-		auto catalog = get_message<proto::Catalogue>(buf, in, cs_pipe);
+		auto catalog = get_message<proto::Catalogue>(buf, in, cs_pipe, arena);
 		// TODO: add more checks?
-		for (auto &file: catalog.state_files()){
+		for (auto &file: catalog->state_files()){
 			Fs_state_file state;
 			state.name = file.name();
 			state.time_created = file.time_created();
@@ -126,7 +127,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 			fs_state_files_.push_back(move(state));
 		}
 
-		for (auto &file: catalog.content_files()){
+		for (auto &file: catalog->content_files()){
 			File_content_ref ref;
 			if (file.has_filters())
 				ref.filters = get_filters(file.filters());
@@ -146,6 +147,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
 						throw Exception("Wrong blake2b size. Likely corrupt file.");
 					copy_n(pb2b.begin(), sizeof(b2b), b2b.begin());
 				}
+				ASSERT(ref.ref_count_ <= fs_state_files_.size());
 				content_refs_.insert(ref);
 			}
 		}
@@ -183,7 +185,7 @@ Filesystem_state Catalogue::latest_fs_state()
 	if (fs_state_files_.empty()){
 		return empty_fs_state();
 	}
-	auto &state_desc = fs_state_files_.back();
+	auto &state_desc = fs_state_files_.front();
 	return Filesystem_state(
 	  cat_file_.parent_path(),
 	  state_desc.name,
@@ -268,9 +270,10 @@ void Catalogue::commit()
 			filtr.encryption(*enc_);
 		out >> cs_pipe >> filtr >> dst;
 
-		proto::Catalogue cat_msg;
+		google::protobuf::Arena arena;
+		proto::Catalogue *cat_msg = google::protobuf::Arena::CreateMessage<proto::Catalogue>(&arena);
 		for (auto &fsf : fs_state_files_){
-			auto sfile = cat_msg.add_state_files();
+			auto sfile = cat_msg->add_state_files();
 			sfile->set_name(fsf.name);
 			sfile->set_time_created(fsf.time_created);
 			if (fsf.filters){
@@ -284,7 +287,7 @@ void Catalogue::commit()
 			auto &r = const_cast<File_content_ref&>(rc);
 			if (fn != r.fname){
 				fn = r.fname;
-				cfile = cat_msg.add_content_files();
+				cfile = cat_msg->add_content_files();
 				cfile->set_name(r.fname);
 				if (r.filters){
 					auto f = cfile->mutable_filters();
@@ -303,11 +306,11 @@ void Catalogue::commit()
 			if (auto h = get_if<Blake2b_hash>(&r.csum))
 				ref->set_blake2b(h, sizeof(*h));
 		}
-		put_message(cat_msg, buf, out, cs_pipe);
+		put_message(*cat_msg, buf, out, cs_pipe);
 		out.finish();
 		#ifdef COMPRESS_STAT
-		if (cat_msg.ByteSizeLong())
-			fmt::print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg.ByteSizeLong());
+		if (cat_msg->ByteSizeLong())
+			fmt::print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg->ByteSizeLong());
 		#endif
 		fs_sync();
 		fs::rename(new_file, cat_file_);

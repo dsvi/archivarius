@@ -52,8 +52,9 @@ Filesystem_state::Filesystem_state(
 	in << cs << filtr << file;
 
 	Buffer buf;
-	auto state = get_message<proto::Fs_state>(buf, in, cs);
-	for (auto &r : state.rec()){
+	google::protobuf::Arena arena;
+	auto state = get_message<proto::Fs_state>(buf, in, cs, arena);
+	for (auto &r : state->rec()){
 		File f;
 		f.path = r.pathname();
 		f.type = from_proto(r.type());
@@ -120,9 +121,10 @@ void Filesystem_state::commit()
 	Stream_out out(fn);
 	out >> cs >> filtrator_ >> file;
 
-	proto::Fs_state state;
+	google::protobuf::Arena arena;
+	proto::Fs_state *state = google::protobuf::Arena::CreateMessage<proto::Fs_state>(&arena);
 	for (auto &f : files()){
-		auto rec = state.add_rec();
+		auto rec = state->add_rec();
 		rec->set_pathname(f.path);
 		rec->set_type(to_proto(f.type));
 		if (f.content_ref){
@@ -143,11 +145,11 @@ void Filesystem_state::commit()
 			rec->set_posix_default_acl(f.default_acl);
 	}
 	Buffer buf;
-	put_message(state, buf, out, cs);
+	put_message(*state, buf, out, cs);
 	out.finish();
   #ifdef COMPRESS_STAT
-	if (state.ByteSizeLong())
-		fmt::print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state.ByteSizeLong());
+	if (state->ByteSizeLong())
+		fmt::print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state->ByteSizeLong());
   #endif
 }
 

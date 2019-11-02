@@ -165,6 +165,12 @@ class ZSTD_Compression_filter : public ::google::protobuf::MessageLite /* @@prot
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const ZSTD_Compression_filter& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -175,6 +181,7 @@ class ZSTD_Compression_filter : public ::google::protobuf::MessageLite /* @@prot
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     0;
 
+  void UnsafeArenaSwap(ZSTD_Compression_filter* other);
   void Swap(ZSTD_Compression_filter* other);
   friend void swap(ZSTD_Compression_filter& a, ZSTD_Compression_filter& b) {
     a.Swap(&b);
@@ -204,12 +211,17 @@ class ZSTD_Compression_filter : public ::google::protobuf::MessageLite /* @@prot
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(ZSTD_Compression_filter* other);
+  protected:
+  explicit ZSTD_Compression_filter(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -223,6 +235,9 @@ class ZSTD_Compression_filter : public ::google::protobuf::MessageLite /* @@prot
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   friend struct ::protobuf_format_2eproto::TableStruct;
@@ -263,6 +278,12 @@ class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@pr
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Chapoly_Encryption_filter& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -273,6 +294,7 @@ class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@pr
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     1;
 
+  void UnsafeArenaSwap(Chapoly_Encryption_filter* other);
   void Swap(Chapoly_Encryption_filter* other);
   friend void swap(Chapoly_Encryption_filter& a, Chapoly_Encryption_filter& b) {
     a.Swap(&b);
@@ -302,12 +324,17 @@ class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@pr
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Chapoly_Encryption_filter* other);
+  protected:
+  explicit Chapoly_Encryption_filter(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -331,6 +358,15 @@ class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@pr
   ::std::string* mutable_iv();
   ::std::string* release_iv();
   void set_allocated_iv(::std::string* iv);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_iv();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_iv(
+      ::std::string* iv);
 
   // optional bytes key = 2;
   bool has_key() const;
@@ -346,6 +382,15 @@ class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@pr
   ::std::string* mutable_key();
   ::std::string* release_key();
   void set_allocated_key(::std::string* key);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_key();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_key(
+      ::std::string* key);
 
   // @@protoc_insertion_point(class_scope:proto.Chapoly_Encryption_filter)
  private:
@@ -355,6 +400,9 @@ class Chapoly_Encryption_filter : public ::google::protobuf::MessageLite /* @@pr
   void clear_has_key();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr iv_;
@@ -397,6 +445,12 @@ class Chacha_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Chacha_Encryption_filter& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -407,6 +461,7 @@ class Chacha_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     2;
 
+  void UnsafeArenaSwap(Chacha_Encryption_filter* other);
   void Swap(Chacha_Encryption_filter* other);
   friend void swap(Chacha_Encryption_filter& a, Chacha_Encryption_filter& b) {
     a.Swap(&b);
@@ -436,12 +491,17 @@ class Chacha_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Chacha_Encryption_filter* other);
+  protected:
+  explicit Chacha_Encryption_filter(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -465,6 +525,15 @@ class Chacha_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
   ::std::string* mutable_iv();
   ::std::string* release_iv();
   void set_allocated_iv(::std::string* iv);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_iv();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_iv(
+      ::std::string* iv);
 
   // optional bytes key = 2;
   bool has_key() const;
@@ -480,6 +549,15 @@ class Chacha_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
   ::std::string* mutable_key();
   ::std::string* release_key();
   void set_allocated_key(::std::string* key);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_key();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_key(
+      ::std::string* key);
 
   // @@protoc_insertion_point(class_scope:proto.Chacha_Encryption_filter)
  private:
@@ -489,6 +567,9 @@ class Chacha_Encryption_filter : public ::google::protobuf::MessageLite /* @@pro
   void clear_has_key();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr iv_;
@@ -531,6 +612,12 @@ class Filters : public ::google::protobuf::MessageLite /* @@protoc_insertion_poi
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Filters& default_instance();
 
   enum EncryptionCase {
@@ -547,6 +634,7 @@ class Filters : public ::google::protobuf::MessageLite /* @@protoc_insertion_poi
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     3;
 
+  void UnsafeArenaSwap(Filters* other);
   void Swap(Filters* other);
   friend void swap(Filters& a, Filters& b) {
     a.Swap(&b);
@@ -576,12 +664,17 @@ class Filters : public ::google::protobuf::MessageLite /* @@protoc_insertion_poi
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Filters* other);
+  protected:
+  explicit Filters(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -595,28 +688,46 @@ class Filters : public ::google::protobuf::MessageLite /* @@protoc_insertion_poi
   bool has_zstd_compression() const;
   void clear_zstd_compression();
   static const int kZstdCompressionFieldNumber = 1;
+  private:
+  void _slow_mutable_zstd_compression();
+  public:
   const ::proto::ZSTD_Compression_filter& zstd_compression() const;
   ::proto::ZSTD_Compression_filter* release_zstd_compression();
   ::proto::ZSTD_Compression_filter* mutable_zstd_compression();
   void set_allocated_zstd_compression(::proto::ZSTD_Compression_filter* zstd_compression);
+  void unsafe_arena_set_allocated_zstd_compression(
+      ::proto::ZSTD_Compression_filter* zstd_compression);
+  ::proto::ZSTD_Compression_filter* unsafe_arena_release_zstd_compression();
 
   // optional .proto.Chapoly_Encryption_filter chapoly_encryption = 2;
   bool has_chapoly_encryption() const;
   void clear_chapoly_encryption();
   static const int kChapolyEncryptionFieldNumber = 2;
+  private:
+  void _slow_mutable_chapoly_encryption();
+  public:
   const ::proto::Chapoly_Encryption_filter& chapoly_encryption() const;
   ::proto::Chapoly_Encryption_filter* release_chapoly_encryption();
   ::proto::Chapoly_Encryption_filter* mutable_chapoly_encryption();
   void set_allocated_chapoly_encryption(::proto::Chapoly_Encryption_filter* chapoly_encryption);
+  void unsafe_arena_set_allocated_chapoly_encryption(
+      ::proto::Chapoly_Encryption_filter* chapoly_encryption);
+  ::proto::Chapoly_Encryption_filter* unsafe_arena_release_chapoly_encryption();
 
   // optional .proto.Chacha_Encryption_filter chacha_encryption = 3;
   bool has_chacha_encryption() const;
   void clear_chacha_encryption();
   static const int kChachaEncryptionFieldNumber = 3;
+  private:
+  void _slow_mutable_chacha_encryption();
+  public:
   const ::proto::Chacha_Encryption_filter& chacha_encryption() const;
   ::proto::Chacha_Encryption_filter* release_chacha_encryption();
   ::proto::Chacha_Encryption_filter* mutable_chacha_encryption();
   void set_allocated_chacha_encryption(::proto::Chacha_Encryption_filter* chacha_encryption);
+  void unsafe_arena_set_allocated_chacha_encryption(
+      ::proto::Chacha_Encryption_filter* chacha_encryption);
+  ::proto::Chacha_Encryption_filter* unsafe_arena_release_chacha_encryption();
 
   EncryptionCase encryption_case() const;
   // @@protoc_insertion_point(class_scope:proto.Filters)
@@ -631,6 +742,9 @@ class Filters : public ::google::protobuf::MessageLite /* @@protoc_insertion_poi
   inline void clear_has_encryption();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::proto::ZSTD_Compression_filter* zstd_compression_;
@@ -679,6 +793,12 @@ class Ref_to_refcount : public ::google::protobuf::MessageLite /* @@protoc_inser
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Ref_to_refcount& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -689,6 +809,7 @@ class Ref_to_refcount : public ::google::protobuf::MessageLite /* @@protoc_inser
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     4;
 
+  void UnsafeArenaSwap(Ref_to_refcount* other);
   void Swap(Ref_to_refcount* other);
   friend void swap(Ref_to_refcount& a, Ref_to_refcount& b) {
     a.Swap(&b);
@@ -718,12 +839,17 @@ class Ref_to_refcount : public ::google::protobuf::MessageLite /* @@protoc_inser
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Ref_to_refcount* other);
+  protected:
+  explicit Ref_to_refcount(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -747,6 +873,15 @@ class Ref_to_refcount : public ::google::protobuf::MessageLite /* @@protoc_inser
   ::std::string* mutable_content_fname();
   ::std::string* release_content_fname();
   void set_allocated_content_fname(::std::string* content_fname);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_content_fname();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_content_fname(
+      ::std::string* content_fname);
 
   // required uint64 from = 2;
   bool has_from() const;
@@ -766,6 +901,9 @@ class Ref_to_refcount : public ::google::protobuf::MessageLite /* @@protoc_inser
   size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr content_fname_;
@@ -808,6 +946,12 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Fs_record& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -818,6 +962,7 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     5;
 
+  void UnsafeArenaSwap(Fs_record* other);
   void Swap(Fs_record* other);
   friend void swap(Fs_record& a, Fs_record& b) {
     a.Swap(&b);
@@ -847,12 +992,17 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Fs_record* other);
+  protected:
+  explicit Fs_record(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -876,6 +1026,15 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* mutable_pathname();
   ::std::string* release_pathname();
   void set_allocated_pathname(::std::string* pathname);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_pathname();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_pathname(
+      ::std::string* pathname);
 
   // optional string symlink_target = 5;
   bool has_symlink_target() const;
@@ -891,6 +1050,15 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* mutable_symlink_target();
   ::std::string* release_symlink_target();
   void set_allocated_symlink_target(::std::string* symlink_target);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_symlink_target();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_symlink_target(
+      ::std::string* symlink_target);
 
   // optional string posix_acl = 7;
   bool has_posix_acl() const;
@@ -906,6 +1074,15 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* mutable_posix_acl();
   ::std::string* release_posix_acl();
   void set_allocated_posix_acl(::std::string* posix_acl);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_posix_acl();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_posix_acl(
+      ::std::string* posix_acl);
 
   // optional string posix_default_acl = 8;
   bool has_posix_default_acl() const;
@@ -921,15 +1098,30 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* mutable_posix_default_acl();
   ::std::string* release_posix_default_acl();
   void set_allocated_posix_default_acl(::std::string* posix_default_acl);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_posix_default_acl();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_posix_default_acl(
+      ::std::string* posix_default_acl);
 
   // optional .proto.Ref_to_refcount ref = 4;
   bool has_ref() const;
   void clear_ref();
   static const int kRefFieldNumber = 4;
+  private:
+  void _slow_mutable_ref();
+  public:
   const ::proto::Ref_to_refcount& ref() const;
   ::proto::Ref_to_refcount* release_ref();
   ::proto::Ref_to_refcount* mutable_ref();
   void set_allocated_ref(::proto::Ref_to_refcount* ref);
+  void unsafe_arena_set_allocated_ref(
+      ::proto::Ref_to_refcount* ref);
+  ::proto::Ref_to_refcount* unsafe_arena_release_ref();
 
   // optional uint64 modified_nanoseconds = 3;
   bool has_modified_nanoseconds() const;
@@ -975,6 +1167,9 @@ class Fs_record : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr pathname_;
@@ -1023,6 +1218,12 @@ class Fs_state : public ::google::protobuf::MessageLite /* @@protoc_insertion_po
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Fs_state& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1033,6 +1234,7 @@ class Fs_state : public ::google::protobuf::MessageLite /* @@protoc_insertion_po
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     6;
 
+  void UnsafeArenaSwap(Fs_state* other);
   void Swap(Fs_state* other);
   friend void swap(Fs_state& a, Fs_state& b) {
     a.Swap(&b);
@@ -1062,12 +1264,17 @@ class Fs_state : public ::google::protobuf::MessageLite /* @@protoc_insertion_po
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Fs_state* other);
+  protected:
+  explicit Fs_state(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -1093,6 +1300,9 @@ class Fs_state : public ::google::protobuf::MessageLite /* @@protoc_insertion_po
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::RepeatedPtrField< ::proto::Fs_record > rec_;
@@ -1134,6 +1344,12 @@ class State_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const State_file& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1144,6 +1360,7 @@ class State_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     7;
 
+  void UnsafeArenaSwap(State_file* other);
   void Swap(State_file* other);
   friend void swap(State_file& a, State_file& b) {
     a.Swap(&b);
@@ -1173,12 +1390,17 @@ class State_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(State_file* other);
+  protected:
+  explicit State_file(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -1202,15 +1424,30 @@ class State_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_
   ::std::string* mutable_name();
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_name();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_name(
+      ::std::string* name);
 
   // optional .proto.Filters filters = 1;
   bool has_filters() const;
   void clear_filters();
   static const int kFiltersFieldNumber = 1;
+  private:
+  void _slow_mutable_filters();
+  public:
   const ::proto::Filters& filters() const;
   ::proto::Filters* release_filters();
   ::proto::Filters* mutable_filters();
   void set_allocated_filters(::proto::Filters* filters);
+  void unsafe_arena_set_allocated_filters(
+      ::proto::Filters* filters);
+  ::proto::Filters* unsafe_arena_release_filters();
 
   // required uint64 time_created = 3;
   bool has_time_created() const;
@@ -1232,6 +1469,9 @@ class State_file : public ::google::protobuf::MessageLite /* @@protoc_insertion_
   size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::internal::ArenaStringPtr name_;
@@ -1275,6 +1515,12 @@ class Content_file : public ::google::protobuf::MessageLite /* @@protoc_insertio
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Content_file& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1285,6 +1531,7 @@ class Content_file : public ::google::protobuf::MessageLite /* @@protoc_insertio
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     8;
 
+  void UnsafeArenaSwap(Content_file* other);
   void Swap(Content_file* other);
   friend void swap(Content_file& a, Content_file& b) {
     a.Swap(&b);
@@ -1314,12 +1561,17 @@ class Content_file : public ::google::protobuf::MessageLite /* @@protoc_insertio
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Content_file* other);
+  protected:
+  explicit Content_file(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -1355,15 +1607,30 @@ class Content_file : public ::google::protobuf::MessageLite /* @@protoc_insertio
   ::std::string* mutable_name();
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_name();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_name(
+      ::std::string* name);
 
   // optional .proto.Filters filters = 1;
   bool has_filters() const;
   void clear_filters();
   static const int kFiltersFieldNumber = 1;
+  private:
+  void _slow_mutable_filters();
+  public:
   const ::proto::Filters& filters() const;
   ::proto::Filters* release_filters();
   ::proto::Filters* mutable_filters();
   void set_allocated_filters(::proto::Filters* filters);
+  void unsafe_arena_set_allocated_filters(
+      ::proto::Filters* filters);
+  ::proto::Filters* unsafe_arena_release_filters();
 
   // @@protoc_insertion_point(class_scope:proto.Content_file)
  private:
@@ -1373,6 +1640,9 @@ class Content_file : public ::google::protobuf::MessageLite /* @@protoc_insertio
   void clear_has_name();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::RepeatedPtrField< ::proto::Ref_count > refs_;
@@ -1416,6 +1686,12 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Ref_count& default_instance();
 
   enum CsumCase {
@@ -1432,6 +1708,7 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     9;
 
+  void UnsafeArenaSwap(Ref_count* other);
   void Swap(Ref_count* other);
   friend void swap(Ref_count& a, Ref_count& b) {
     a.Swap(&b);
@@ -1461,12 +1738,17 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Ref_count* other);
+  protected:
+  explicit Ref_count(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -1525,6 +1807,15 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   ::std::string* mutable_blake2b();
   ::std::string* release_blake2b();
   void set_allocated_blake2b(::std::string* blake2b);
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  ::std::string* unsafe_arena_release_blake2b();
+  PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_blake2b(
+      ::std::string* blake2b);
 
   CsumCase csum_case() const;
   // @@protoc_insertion_point(class_scope:proto.Ref_count)
@@ -1548,6 +1839,9 @@ class Ref_count : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   size_t RequiredFieldsByteSizeFallback() const;
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::uint64 from_;
@@ -1599,6 +1893,12 @@ class Catalogue : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Catalogue& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1609,6 +1909,7 @@ class Catalogue : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     10;
 
+  void UnsafeArenaSwap(Catalogue* other);
   void Swap(Catalogue* other);
   friend void swap(Catalogue& a, Catalogue& b) {
     a.Swap(&b);
@@ -1638,12 +1939,17 @@ class Catalogue : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Catalogue* other);
+  protected:
+  explicit Catalogue(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -1681,6 +1987,9 @@ class Catalogue : public ::google::protobuf::MessageLite /* @@protoc_insertion_p
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::google::protobuf::RepeatedPtrField< ::proto::State_file > state_files_;
@@ -1723,6 +2032,12 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
     return _internal_metadata_.mutable_unknown_fields();
   }
 
+  inline ::google::protobuf::Arena* GetArena() const PROTOBUF_FINAL {
+    return GetArenaNoVirtual();
+  }
+  inline void* GetMaybeArenaPointer() const PROTOBUF_FINAL {
+    return MaybeArenaPtr();
+  }
   static const Catalog_header& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
@@ -1733,6 +2048,7 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
   static PROTOBUF_CONSTEXPR int const kIndexInFileMessages =
     11;
 
+  void UnsafeArenaSwap(Catalog_header* other);
   void Swap(Catalog_header* other);
   friend void swap(Catalog_header& a, Catalog_header& b) {
     a.Swap(&b);
@@ -1762,12 +2078,17 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
   void SharedDtor();
   void SetCachedSize(int size) const;
   void InternalSwap(Catalog_header* other);
+  protected:
+  explicit Catalog_header(::google::protobuf::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::google::protobuf::Arena* arena);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return NULL;
+    return _internal_metadata_.arena();
   }
   inline void* MaybeArenaPtr() const {
-    return NULL;
+    return _internal_metadata_.raw_arena_ptr();
   }
   public:
 
@@ -1781,10 +2102,16 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
   bool has_filters() const;
   void clear_filters();
   static const int kFiltersFieldNumber = 1;
+  private:
+  void _slow_mutable_filters();
+  public:
   const ::proto::Filters& filters() const;
   ::proto::Filters* release_filters();
   ::proto::Filters* mutable_filters();
   void set_allocated_filters(::proto::Filters* filters);
+  void unsafe_arena_set_allocated_filters(
+      ::proto::Filters* filters);
+  ::proto::Filters* unsafe_arena_release_filters();
 
   // @@protoc_insertion_point(class_scope:proto.Catalog_header)
  private:
@@ -1792,6 +2119,9 @@ class Catalog_header : public ::google::protobuf::MessageLite /* @@protoc_insert
   void clear_has_filters();
 
   ::google::protobuf::internal::InternalMetadataWithArenaLite _internal_metadata_;
+  template <typename T> friend class ::google::protobuf::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
   ::google::protobuf::internal::HasBits<1> _has_bits_;
   mutable int _cached_size_;
   ::proto::Filters* filters_;
@@ -1824,47 +2154,49 @@ inline void Chapoly_Encryption_filter::clear_has_iv() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void Chapoly_Encryption_filter::clear_iv() {
-  iv_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  iv_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_iv();
 }
 inline const ::std::string& Chapoly_Encryption_filter::iv() const {
   // @@protoc_insertion_point(field_get:proto.Chapoly_Encryption_filter.iv)
-  return iv_.GetNoArena();
+  return iv_.Get();
 }
 inline void Chapoly_Encryption_filter::set_iv(const ::std::string& value) {
   set_has_iv();
-  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Chapoly_Encryption_filter.iv)
 }
 #if LANG_CXX11
 inline void Chapoly_Encryption_filter::set_iv(::std::string&& value) {
   set_has_iv();
-  iv_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  iv_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Chapoly_Encryption_filter.iv)
 }
 #endif
 inline void Chapoly_Encryption_filter::set_iv(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_iv();
-  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Chapoly_Encryption_filter.iv)
 }
-inline void Chapoly_Encryption_filter::set_iv(const void* value, size_t size) {
+inline void Chapoly_Encryption_filter::set_iv(const void* value,
+    size_t size) {
   set_has_iv();
-  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Chapoly_Encryption_filter.iv)
 }
 inline ::std::string* Chapoly_Encryption_filter::mutable_iv() {
   set_has_iv();
   // @@protoc_insertion_point(field_mutable:proto.Chapoly_Encryption_filter.iv)
-  return iv_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return iv_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Chapoly_Encryption_filter::release_iv() {
   // @@protoc_insertion_point(field_release:proto.Chapoly_Encryption_filter.iv)
   clear_has_iv();
-  return iv_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return iv_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Chapoly_Encryption_filter::set_allocated_iv(::std::string* iv) {
   if (iv != NULL) {
@@ -1872,8 +2204,28 @@ inline void Chapoly_Encryption_filter::set_allocated_iv(::std::string* iv) {
   } else {
     clear_has_iv();
   }
-  iv_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), iv);
+  iv_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), iv,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Chapoly_Encryption_filter.iv)
+}
+inline ::std::string* Chapoly_Encryption_filter::unsafe_arena_release_iv() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Chapoly_Encryption_filter.iv)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_iv();
+  return iv_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Chapoly_Encryption_filter::unsafe_arena_set_allocated_iv(
+    ::std::string* iv) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (iv != NULL) {
+    set_has_iv();
+  } else {
+    clear_has_iv();
+  }
+  iv_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      iv, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Chapoly_Encryption_filter.iv)
 }
 
 // optional bytes key = 2;
@@ -1887,47 +2239,49 @@ inline void Chapoly_Encryption_filter::clear_has_key() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void Chapoly_Encryption_filter::clear_key() {
-  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  key_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_key();
 }
 inline const ::std::string& Chapoly_Encryption_filter::key() const {
   // @@protoc_insertion_point(field_get:proto.Chapoly_Encryption_filter.key)
-  return key_.GetNoArena();
+  return key_.Get();
 }
 inline void Chapoly_Encryption_filter::set_key(const ::std::string& value) {
   set_has_key();
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Chapoly_Encryption_filter.key)
 }
 #if LANG_CXX11
 inline void Chapoly_Encryption_filter::set_key(::std::string&& value) {
   set_has_key();
-  key_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  key_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Chapoly_Encryption_filter.key)
 }
 #endif
 inline void Chapoly_Encryption_filter::set_key(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_key();
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Chapoly_Encryption_filter.key)
 }
-inline void Chapoly_Encryption_filter::set_key(const void* value, size_t size) {
+inline void Chapoly_Encryption_filter::set_key(const void* value,
+    size_t size) {
   set_has_key();
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Chapoly_Encryption_filter.key)
 }
 inline ::std::string* Chapoly_Encryption_filter::mutable_key() {
   set_has_key();
   // @@protoc_insertion_point(field_mutable:proto.Chapoly_Encryption_filter.key)
-  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return key_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Chapoly_Encryption_filter::release_key() {
   // @@protoc_insertion_point(field_release:proto.Chapoly_Encryption_filter.key)
   clear_has_key();
-  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return key_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Chapoly_Encryption_filter::set_allocated_key(::std::string* key) {
   if (key != NULL) {
@@ -1935,8 +2289,28 @@ inline void Chapoly_Encryption_filter::set_allocated_key(::std::string* key) {
   } else {
     clear_has_key();
   }
-  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  key_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Chapoly_Encryption_filter.key)
+}
+inline ::std::string* Chapoly_Encryption_filter::unsafe_arena_release_key() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Chapoly_Encryption_filter.key)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_key();
+  return key_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Chapoly_Encryption_filter::unsafe_arena_set_allocated_key(
+    ::std::string* key) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (key != NULL) {
+    set_has_key();
+  } else {
+    clear_has_key();
+  }
+  key_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      key, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Chapoly_Encryption_filter.key)
 }
 
 // -------------------------------------------------------------------
@@ -1954,47 +2328,49 @@ inline void Chacha_Encryption_filter::clear_has_iv() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void Chacha_Encryption_filter::clear_iv() {
-  iv_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  iv_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_iv();
 }
 inline const ::std::string& Chacha_Encryption_filter::iv() const {
   // @@protoc_insertion_point(field_get:proto.Chacha_Encryption_filter.iv)
-  return iv_.GetNoArena();
+  return iv_.Get();
 }
 inline void Chacha_Encryption_filter::set_iv(const ::std::string& value) {
   set_has_iv();
-  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Chacha_Encryption_filter.iv)
 }
 #if LANG_CXX11
 inline void Chacha_Encryption_filter::set_iv(::std::string&& value) {
   set_has_iv();
-  iv_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  iv_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Chacha_Encryption_filter.iv)
 }
 #endif
 inline void Chacha_Encryption_filter::set_iv(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_iv();
-  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Chacha_Encryption_filter.iv)
 }
-inline void Chacha_Encryption_filter::set_iv(const void* value, size_t size) {
+inline void Chacha_Encryption_filter::set_iv(const void* value,
+    size_t size) {
   set_has_iv();
-  iv_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Chacha_Encryption_filter.iv)
 }
 inline ::std::string* Chacha_Encryption_filter::mutable_iv() {
   set_has_iv();
   // @@protoc_insertion_point(field_mutable:proto.Chacha_Encryption_filter.iv)
-  return iv_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return iv_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Chacha_Encryption_filter::release_iv() {
   // @@protoc_insertion_point(field_release:proto.Chacha_Encryption_filter.iv)
   clear_has_iv();
-  return iv_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return iv_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Chacha_Encryption_filter::set_allocated_iv(::std::string* iv) {
   if (iv != NULL) {
@@ -2002,8 +2378,28 @@ inline void Chacha_Encryption_filter::set_allocated_iv(::std::string* iv) {
   } else {
     clear_has_iv();
   }
-  iv_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), iv);
+  iv_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), iv,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Chacha_Encryption_filter.iv)
+}
+inline ::std::string* Chacha_Encryption_filter::unsafe_arena_release_iv() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Chacha_Encryption_filter.iv)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_iv();
+  return iv_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Chacha_Encryption_filter::unsafe_arena_set_allocated_iv(
+    ::std::string* iv) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (iv != NULL) {
+    set_has_iv();
+  } else {
+    clear_has_iv();
+  }
+  iv_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      iv, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Chacha_Encryption_filter.iv)
 }
 
 // optional bytes key = 2;
@@ -2017,47 +2413,49 @@ inline void Chacha_Encryption_filter::clear_has_key() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void Chacha_Encryption_filter::clear_key() {
-  key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  key_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_key();
 }
 inline const ::std::string& Chacha_Encryption_filter::key() const {
   // @@protoc_insertion_point(field_get:proto.Chacha_Encryption_filter.key)
-  return key_.GetNoArena();
+  return key_.Get();
 }
 inline void Chacha_Encryption_filter::set_key(const ::std::string& value) {
   set_has_key();
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Chacha_Encryption_filter.key)
 }
 #if LANG_CXX11
 inline void Chacha_Encryption_filter::set_key(::std::string&& value) {
   set_has_key();
-  key_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  key_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Chacha_Encryption_filter.key)
 }
 #endif
 inline void Chacha_Encryption_filter::set_key(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_key();
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Chacha_Encryption_filter.key)
 }
-inline void Chacha_Encryption_filter::set_key(const void* value, size_t size) {
+inline void Chacha_Encryption_filter::set_key(const void* value,
+    size_t size) {
   set_has_key();
-  key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Chacha_Encryption_filter.key)
 }
 inline ::std::string* Chacha_Encryption_filter::mutable_key() {
   set_has_key();
   // @@protoc_insertion_point(field_mutable:proto.Chacha_Encryption_filter.key)
-  return key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return key_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Chacha_Encryption_filter::release_key() {
   // @@protoc_insertion_point(field_release:proto.Chacha_Encryption_filter.key)
   clear_has_key();
-  return key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return key_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Chacha_Encryption_filter::set_allocated_key(::std::string* key) {
   if (key != NULL) {
@@ -2065,8 +2463,28 @@ inline void Chacha_Encryption_filter::set_allocated_key(::std::string* key) {
   } else {
     clear_has_key();
   }
-  key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key);
+  key_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), key,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Chacha_Encryption_filter.key)
+}
+inline ::std::string* Chacha_Encryption_filter::unsafe_arena_release_key() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Chacha_Encryption_filter.key)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_key();
+  return key_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Chacha_Encryption_filter::unsafe_arena_set_allocated_key(
+    ::std::string* key) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (key != NULL) {
+    set_has_key();
+  } else {
+    clear_has_key();
+  }
+  key_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      key, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Chacha_Encryption_filter.key)
 }
 
 // -------------------------------------------------------------------
@@ -2097,13 +2515,23 @@ inline ::proto::ZSTD_Compression_filter* Filters::release_zstd_compression() {
   // @@protoc_insertion_point(field_release:proto.Filters.zstd_compression)
   clear_has_zstd_compression();
   ::proto::ZSTD_Compression_filter* temp = zstd_compression_;
+  if (GetArenaNoVirtual() != NULL) {
+    temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+  }
+  zstd_compression_ = NULL;
+  return temp;
+}
+inline ::proto::ZSTD_Compression_filter* Filters::unsafe_arena_release_zstd_compression() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Filters.zstd_compression)
+  clear_has_zstd_compression();
+  ::proto::ZSTD_Compression_filter* temp = zstd_compression_;
   zstd_compression_ = NULL;
   return temp;
 }
 inline ::proto::ZSTD_Compression_filter* Filters::mutable_zstd_compression() {
   set_has_zstd_compression();
   if (zstd_compression_ == NULL) {
-    zstd_compression_ = new ::proto::ZSTD_Compression_filter;
+    _slow_mutable_zstd_compression();
   }
   // @@protoc_insertion_point(field_mutable:proto.Filters.zstd_compression)
   return zstd_compression_;
@@ -2114,7 +2542,8 @@ inline void Filters::set_allocated_zstd_compression(::proto::ZSTD_Compression_fi
     delete zstd_compression_;
   }
   if (zstd_compression) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(zstd_compression);
     if (message_arena != submessage_arena) {
       zstd_compression = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, zstd_compression, submessage_arena);
@@ -2136,7 +2565,9 @@ inline void Filters::set_has_chapoly_encryption() {
 }
 inline void Filters::clear_chapoly_encryption() {
   if (has_chapoly_encryption()) {
-    delete encryption_.chapoly_encryption_;
+    if (GetArenaNoVirtual() == NULL) {
+      delete encryption_.chapoly_encryption_;
+    }
     clear_has_encryption();
   }
 }
@@ -2145,6 +2576,9 @@ inline ::proto::Chapoly_Encryption_filter* Filters::release_chapoly_encryption()
   if (has_chapoly_encryption()) {
     clear_has_encryption();
       ::proto::Chapoly_Encryption_filter* temp = encryption_.chapoly_encryption_;
+    if (GetArenaNoVirtual() != NULL) {
+      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+    }
     encryption_.chapoly_encryption_ = NULL;
     return temp;
   } else {
@@ -2157,11 +2591,32 @@ inline const ::proto::Chapoly_Encryption_filter& Filters::chapoly_encryption() c
       ? *encryption_.chapoly_encryption_
       : *reinterpret_cast< ::proto::Chapoly_Encryption_filter*>(&::proto::_Chapoly_Encryption_filter_default_instance_);
 }
+inline ::proto::Chapoly_Encryption_filter* Filters::unsafe_arena_release_chapoly_encryption() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Filters.chapoly_encryption)
+  if (has_chapoly_encryption()) {
+    clear_has_encryption();
+    ::proto::Chapoly_Encryption_filter* temp = encryption_.chapoly_encryption_;
+    encryption_.chapoly_encryption_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Filters::unsafe_arena_set_allocated_chapoly_encryption(::proto::Chapoly_Encryption_filter* chapoly_encryption) {
+  clear_encryption();
+  if (chapoly_encryption) {
+    set_has_chapoly_encryption();
+    encryption_.chapoly_encryption_ = chapoly_encryption;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Filters.chapoly_encryption)
+}
 inline ::proto::Chapoly_Encryption_filter* Filters::mutable_chapoly_encryption() {
   if (!has_chapoly_encryption()) {
     clear_encryption();
     set_has_chapoly_encryption();
-    encryption_.chapoly_encryption_ = new ::proto::Chapoly_Encryption_filter;
+    encryption_.chapoly_encryption_ = 
+      ::google::protobuf::Arena::CreateMessage< ::proto::Chapoly_Encryption_filter >(
+      GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:proto.Filters.chapoly_encryption)
   return encryption_.chapoly_encryption_;
@@ -2176,7 +2631,9 @@ inline void Filters::set_has_chacha_encryption() {
 }
 inline void Filters::clear_chacha_encryption() {
   if (has_chacha_encryption()) {
-    delete encryption_.chacha_encryption_;
+    if (GetArenaNoVirtual() == NULL) {
+      delete encryption_.chacha_encryption_;
+    }
     clear_has_encryption();
   }
 }
@@ -2185,6 +2642,9 @@ inline ::proto::Chacha_Encryption_filter* Filters::release_chacha_encryption() {
   if (has_chacha_encryption()) {
     clear_has_encryption();
       ::proto::Chacha_Encryption_filter* temp = encryption_.chacha_encryption_;
+    if (GetArenaNoVirtual() != NULL) {
+      temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+    }
     encryption_.chacha_encryption_ = NULL;
     return temp;
   } else {
@@ -2197,11 +2657,32 @@ inline const ::proto::Chacha_Encryption_filter& Filters::chacha_encryption() con
       ? *encryption_.chacha_encryption_
       : *reinterpret_cast< ::proto::Chacha_Encryption_filter*>(&::proto::_Chacha_Encryption_filter_default_instance_);
 }
+inline ::proto::Chacha_Encryption_filter* Filters::unsafe_arena_release_chacha_encryption() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Filters.chacha_encryption)
+  if (has_chacha_encryption()) {
+    clear_has_encryption();
+    ::proto::Chacha_Encryption_filter* temp = encryption_.chacha_encryption_;
+    encryption_.chacha_encryption_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Filters::unsafe_arena_set_allocated_chacha_encryption(::proto::Chacha_Encryption_filter* chacha_encryption) {
+  clear_encryption();
+  if (chacha_encryption) {
+    set_has_chacha_encryption();
+    encryption_.chacha_encryption_ = chacha_encryption;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Filters.chacha_encryption)
+}
 inline ::proto::Chacha_Encryption_filter* Filters::mutable_chacha_encryption() {
   if (!has_chacha_encryption()) {
     clear_encryption();
     set_has_chacha_encryption();
-    encryption_.chacha_encryption_ = new ::proto::Chacha_Encryption_filter;
+    encryption_.chacha_encryption_ = 
+      ::google::protobuf::Arena::CreateMessage< ::proto::Chacha_Encryption_filter >(
+      GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:proto.Filters.chacha_encryption)
   return encryption_.chacha_encryption_;
@@ -2231,47 +2712,49 @@ inline void Ref_to_refcount::clear_has_content_fname() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void Ref_to_refcount::clear_content_fname() {
-  content_fname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  content_fname_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_content_fname();
 }
 inline const ::std::string& Ref_to_refcount::content_fname() const {
   // @@protoc_insertion_point(field_get:proto.Ref_to_refcount.content_fname)
-  return content_fname_.GetNoArena();
+  return content_fname_.Get();
 }
 inline void Ref_to_refcount::set_content_fname(const ::std::string& value) {
   set_has_content_fname();
-  content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  content_fname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Ref_to_refcount.content_fname)
 }
 #if LANG_CXX11
 inline void Ref_to_refcount::set_content_fname(::std::string&& value) {
   set_has_content_fname();
-  content_fname_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  content_fname_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Ref_to_refcount.content_fname)
 }
 #endif
 inline void Ref_to_refcount::set_content_fname(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_content_fname();
-  content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  content_fname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Ref_to_refcount.content_fname)
 }
-inline void Ref_to_refcount::set_content_fname(const char* value, size_t size) {
+inline void Ref_to_refcount::set_content_fname(const char* value,
+    size_t size) {
   set_has_content_fname();
-  content_fname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  content_fname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Ref_to_refcount.content_fname)
 }
 inline ::std::string* Ref_to_refcount::mutable_content_fname() {
   set_has_content_fname();
   // @@protoc_insertion_point(field_mutable:proto.Ref_to_refcount.content_fname)
-  return content_fname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return content_fname_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Ref_to_refcount::release_content_fname() {
   // @@protoc_insertion_point(field_release:proto.Ref_to_refcount.content_fname)
   clear_has_content_fname();
-  return content_fname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return content_fname_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Ref_to_refcount::set_allocated_content_fname(::std::string* content_fname) {
   if (content_fname != NULL) {
@@ -2279,8 +2762,28 @@ inline void Ref_to_refcount::set_allocated_content_fname(::std::string* content_
   } else {
     clear_has_content_fname();
   }
-  content_fname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content_fname);
+  content_fname_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), content_fname,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Ref_to_refcount.content_fname)
+}
+inline ::std::string* Ref_to_refcount::unsafe_arena_release_content_fname() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Ref_to_refcount.content_fname)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_content_fname();
+  return content_fname_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Ref_to_refcount::unsafe_arena_set_allocated_content_fname(
+    ::std::string* content_fname) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (content_fname != NULL) {
+    set_has_content_fname();
+  } else {
+    clear_has_content_fname();
+  }
+  content_fname_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      content_fname, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Ref_to_refcount.content_fname)
 }
 
 // required uint64 from = 2;
@@ -2322,47 +2825,49 @@ inline void Fs_record::clear_has_pathname() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void Fs_record::clear_pathname() {
-  pathname_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  pathname_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_pathname();
 }
 inline const ::std::string& Fs_record::pathname() const {
   // @@protoc_insertion_point(field_get:proto.Fs_record.pathname)
-  return pathname_.GetNoArena();
+  return pathname_.Get();
 }
 inline void Fs_record::set_pathname(const ::std::string& value) {
   set_has_pathname();
-  pathname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  pathname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Fs_record.pathname)
 }
 #if LANG_CXX11
 inline void Fs_record::set_pathname(::std::string&& value) {
   set_has_pathname();
-  pathname_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  pathname_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Fs_record.pathname)
 }
 #endif
 inline void Fs_record::set_pathname(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_pathname();
-  pathname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  pathname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Fs_record.pathname)
 }
-inline void Fs_record::set_pathname(const char* value, size_t size) {
+inline void Fs_record::set_pathname(const char* value,
+    size_t size) {
   set_has_pathname();
-  pathname_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  pathname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Fs_record.pathname)
 }
 inline ::std::string* Fs_record::mutable_pathname() {
   set_has_pathname();
   // @@protoc_insertion_point(field_mutable:proto.Fs_record.pathname)
-  return pathname_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return pathname_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Fs_record::release_pathname() {
   // @@protoc_insertion_point(field_release:proto.Fs_record.pathname)
   clear_has_pathname();
-  return pathname_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return pathname_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Fs_record::set_allocated_pathname(::std::string* pathname) {
   if (pathname != NULL) {
@@ -2370,8 +2875,28 @@ inline void Fs_record::set_allocated_pathname(::std::string* pathname) {
   } else {
     clear_has_pathname();
   }
-  pathname_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), pathname);
+  pathname_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), pathname,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Fs_record.pathname)
+}
+inline ::std::string* Fs_record::unsafe_arena_release_pathname() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Fs_record.pathname)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_pathname();
+  return pathname_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Fs_record::unsafe_arena_set_allocated_pathname(
+    ::std::string* pathname) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (pathname != NULL) {
+    set_has_pathname();
+  } else {
+    clear_has_pathname();
+  }
+  pathname_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      pathname, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Fs_record.pathname)
 }
 
 // required .proto.File_type type = 2;
@@ -2447,13 +2972,23 @@ inline ::proto::Ref_to_refcount* Fs_record::release_ref() {
   // @@protoc_insertion_point(field_release:proto.Fs_record.ref)
   clear_has_ref();
   ::proto::Ref_to_refcount* temp = ref_;
+  if (GetArenaNoVirtual() != NULL) {
+    temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+  }
+  ref_ = NULL;
+  return temp;
+}
+inline ::proto::Ref_to_refcount* Fs_record::unsafe_arena_release_ref() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Fs_record.ref)
+  clear_has_ref();
+  ::proto::Ref_to_refcount* temp = ref_;
   ref_ = NULL;
   return temp;
 }
 inline ::proto::Ref_to_refcount* Fs_record::mutable_ref() {
   set_has_ref();
   if (ref_ == NULL) {
-    ref_ = new ::proto::Ref_to_refcount;
+    _slow_mutable_ref();
   }
   // @@protoc_insertion_point(field_mutable:proto.Fs_record.ref)
   return ref_;
@@ -2464,7 +2999,8 @@ inline void Fs_record::set_allocated_ref(::proto::Ref_to_refcount* ref) {
     delete ref_;
   }
   if (ref) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(ref);
     if (message_arena != submessage_arena) {
       ref = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, ref, submessage_arena);
@@ -2488,47 +3024,49 @@ inline void Fs_record::clear_has_symlink_target() {
   _has_bits_[0] &= ~0x00000002u;
 }
 inline void Fs_record::clear_symlink_target() {
-  symlink_target_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  symlink_target_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_symlink_target();
 }
 inline const ::std::string& Fs_record::symlink_target() const {
   // @@protoc_insertion_point(field_get:proto.Fs_record.symlink_target)
-  return symlink_target_.GetNoArena();
+  return symlink_target_.Get();
 }
 inline void Fs_record::set_symlink_target(const ::std::string& value) {
   set_has_symlink_target();
-  symlink_target_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  symlink_target_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Fs_record.symlink_target)
 }
 #if LANG_CXX11
 inline void Fs_record::set_symlink_target(::std::string&& value) {
   set_has_symlink_target();
-  symlink_target_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  symlink_target_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Fs_record.symlink_target)
 }
 #endif
 inline void Fs_record::set_symlink_target(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_symlink_target();
-  symlink_target_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  symlink_target_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Fs_record.symlink_target)
 }
-inline void Fs_record::set_symlink_target(const char* value, size_t size) {
+inline void Fs_record::set_symlink_target(const char* value,
+    size_t size) {
   set_has_symlink_target();
-  symlink_target_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  symlink_target_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Fs_record.symlink_target)
 }
 inline ::std::string* Fs_record::mutable_symlink_target() {
   set_has_symlink_target();
   // @@protoc_insertion_point(field_mutable:proto.Fs_record.symlink_target)
-  return symlink_target_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return symlink_target_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Fs_record::release_symlink_target() {
   // @@protoc_insertion_point(field_release:proto.Fs_record.symlink_target)
   clear_has_symlink_target();
-  return symlink_target_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return symlink_target_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Fs_record::set_allocated_symlink_target(::std::string* symlink_target) {
   if (symlink_target != NULL) {
@@ -2536,8 +3074,28 @@ inline void Fs_record::set_allocated_symlink_target(::std::string* symlink_targe
   } else {
     clear_has_symlink_target();
   }
-  symlink_target_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), symlink_target);
+  symlink_target_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), symlink_target,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Fs_record.symlink_target)
+}
+inline ::std::string* Fs_record::unsafe_arena_release_symlink_target() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Fs_record.symlink_target)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_symlink_target();
+  return symlink_target_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Fs_record::unsafe_arena_set_allocated_symlink_target(
+    ::std::string* symlink_target) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (symlink_target != NULL) {
+    set_has_symlink_target();
+  } else {
+    clear_has_symlink_target();
+  }
+  symlink_target_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      symlink_target, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Fs_record.symlink_target)
 }
 
 // optional uint32 unix_permissions = 6;
@@ -2575,47 +3133,49 @@ inline void Fs_record::clear_has_posix_acl() {
   _has_bits_[0] &= ~0x00000004u;
 }
 inline void Fs_record::clear_posix_acl() {
-  posix_acl_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  posix_acl_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_posix_acl();
 }
 inline const ::std::string& Fs_record::posix_acl() const {
   // @@protoc_insertion_point(field_get:proto.Fs_record.posix_acl)
-  return posix_acl_.GetNoArena();
+  return posix_acl_.Get();
 }
 inline void Fs_record::set_posix_acl(const ::std::string& value) {
   set_has_posix_acl();
-  posix_acl_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  posix_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Fs_record.posix_acl)
 }
 #if LANG_CXX11
 inline void Fs_record::set_posix_acl(::std::string&& value) {
   set_has_posix_acl();
-  posix_acl_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  posix_acl_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Fs_record.posix_acl)
 }
 #endif
 inline void Fs_record::set_posix_acl(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_posix_acl();
-  posix_acl_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  posix_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Fs_record.posix_acl)
 }
-inline void Fs_record::set_posix_acl(const char* value, size_t size) {
+inline void Fs_record::set_posix_acl(const char* value,
+    size_t size) {
   set_has_posix_acl();
-  posix_acl_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  posix_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Fs_record.posix_acl)
 }
 inline ::std::string* Fs_record::mutable_posix_acl() {
   set_has_posix_acl();
   // @@protoc_insertion_point(field_mutable:proto.Fs_record.posix_acl)
-  return posix_acl_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return posix_acl_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Fs_record::release_posix_acl() {
   // @@protoc_insertion_point(field_release:proto.Fs_record.posix_acl)
   clear_has_posix_acl();
-  return posix_acl_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return posix_acl_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Fs_record::set_allocated_posix_acl(::std::string* posix_acl) {
   if (posix_acl != NULL) {
@@ -2623,8 +3183,28 @@ inline void Fs_record::set_allocated_posix_acl(::std::string* posix_acl) {
   } else {
     clear_has_posix_acl();
   }
-  posix_acl_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), posix_acl);
+  posix_acl_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), posix_acl,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Fs_record.posix_acl)
+}
+inline ::std::string* Fs_record::unsafe_arena_release_posix_acl() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Fs_record.posix_acl)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_posix_acl();
+  return posix_acl_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Fs_record::unsafe_arena_set_allocated_posix_acl(
+    ::std::string* posix_acl) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (posix_acl != NULL) {
+    set_has_posix_acl();
+  } else {
+    clear_has_posix_acl();
+  }
+  posix_acl_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      posix_acl, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Fs_record.posix_acl)
 }
 
 // optional string posix_default_acl = 8;
@@ -2638,47 +3218,49 @@ inline void Fs_record::clear_has_posix_default_acl() {
   _has_bits_[0] &= ~0x00000008u;
 }
 inline void Fs_record::clear_posix_default_acl() {
-  posix_default_acl_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  posix_default_acl_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_posix_default_acl();
 }
 inline const ::std::string& Fs_record::posix_default_acl() const {
   // @@protoc_insertion_point(field_get:proto.Fs_record.posix_default_acl)
-  return posix_default_acl_.GetNoArena();
+  return posix_default_acl_.Get();
 }
 inline void Fs_record::set_posix_default_acl(const ::std::string& value) {
   set_has_posix_default_acl();
-  posix_default_acl_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  posix_default_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Fs_record.posix_default_acl)
 }
 #if LANG_CXX11
 inline void Fs_record::set_posix_default_acl(::std::string&& value) {
   set_has_posix_default_acl();
-  posix_default_acl_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  posix_default_acl_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Fs_record.posix_default_acl)
 }
 #endif
 inline void Fs_record::set_posix_default_acl(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_posix_default_acl();
-  posix_default_acl_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  posix_default_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Fs_record.posix_default_acl)
 }
-inline void Fs_record::set_posix_default_acl(const char* value, size_t size) {
+inline void Fs_record::set_posix_default_acl(const char* value,
+    size_t size) {
   set_has_posix_default_acl();
-  posix_default_acl_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  posix_default_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Fs_record.posix_default_acl)
 }
 inline ::std::string* Fs_record::mutable_posix_default_acl() {
   set_has_posix_default_acl();
   // @@protoc_insertion_point(field_mutable:proto.Fs_record.posix_default_acl)
-  return posix_default_acl_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return posix_default_acl_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Fs_record::release_posix_default_acl() {
   // @@protoc_insertion_point(field_release:proto.Fs_record.posix_default_acl)
   clear_has_posix_default_acl();
-  return posix_default_acl_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return posix_default_acl_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Fs_record::set_allocated_posix_default_acl(::std::string* posix_default_acl) {
   if (posix_default_acl != NULL) {
@@ -2686,8 +3268,28 @@ inline void Fs_record::set_allocated_posix_default_acl(::std::string* posix_defa
   } else {
     clear_has_posix_default_acl();
   }
-  posix_default_acl_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), posix_default_acl);
+  posix_default_acl_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), posix_default_acl,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Fs_record.posix_default_acl)
+}
+inline ::std::string* Fs_record::unsafe_arena_release_posix_default_acl() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Fs_record.posix_default_acl)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_posix_default_acl();
+  return posix_default_acl_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Fs_record::unsafe_arena_set_allocated_posix_default_acl(
+    ::std::string* posix_default_acl) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (posix_default_acl != NULL) {
+    set_has_posix_default_acl();
+  } else {
+    clear_has_posix_default_acl();
+  }
+  posix_default_acl_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      posix_default_acl, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Fs_record.posix_default_acl)
 }
 
 // -------------------------------------------------------------------
@@ -2752,13 +3354,23 @@ inline ::proto::Filters* State_file::release_filters() {
   // @@protoc_insertion_point(field_release:proto.State_file.filters)
   clear_has_filters();
   ::proto::Filters* temp = filters_;
+  if (GetArenaNoVirtual() != NULL) {
+    temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+  }
+  filters_ = NULL;
+  return temp;
+}
+inline ::proto::Filters* State_file::unsafe_arena_release_filters() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.State_file.filters)
+  clear_has_filters();
+  ::proto::Filters* temp = filters_;
   filters_ = NULL;
   return temp;
 }
 inline ::proto::Filters* State_file::mutable_filters() {
   set_has_filters();
   if (filters_ == NULL) {
-    filters_ = new ::proto::Filters;
+    _slow_mutable_filters();
   }
   // @@protoc_insertion_point(field_mutable:proto.State_file.filters)
   return filters_;
@@ -2769,7 +3381,8 @@ inline void State_file::set_allocated_filters(::proto::Filters* filters) {
     delete filters_;
   }
   if (filters) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(filters);
     if (message_arena != submessage_arena) {
       filters = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, filters, submessage_arena);
@@ -2793,47 +3406,49 @@ inline void State_file::clear_has_name() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void State_file::clear_name() {
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  name_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_name();
 }
 inline const ::std::string& State_file::name() const {
   // @@protoc_insertion_point(field_get:proto.State_file.name)
-  return name_.GetNoArena();
+  return name_.Get();
 }
 inline void State_file::set_name(const ::std::string& value) {
   set_has_name();
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.State_file.name)
 }
 #if LANG_CXX11
 inline void State_file::set_name(::std::string&& value) {
   set_has_name();
-  name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  name_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.State_file.name)
 }
 #endif
 inline void State_file::set_name(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_name();
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.State_file.name)
 }
-inline void State_file::set_name(const char* value, size_t size) {
+inline void State_file::set_name(const char* value,
+    size_t size) {
   set_has_name();
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.State_file.name)
 }
 inline ::std::string* State_file::mutable_name() {
   set_has_name();
   // @@protoc_insertion_point(field_mutable:proto.State_file.name)
-  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return name_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* State_file::release_name() {
   // @@protoc_insertion_point(field_release:proto.State_file.name)
   clear_has_name();
-  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return name_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void State_file::set_allocated_name(::std::string* name) {
   if (name != NULL) {
@@ -2841,8 +3456,28 @@ inline void State_file::set_allocated_name(::std::string* name) {
   } else {
     clear_has_name();
   }
-  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  name_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.State_file.name)
+}
+inline ::std::string* State_file::unsafe_arena_release_name() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.State_file.name)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_name();
+  return name_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void State_file::unsafe_arena_set_allocated_name(
+    ::std::string* name) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (name != NULL) {
+    set_has_name();
+  } else {
+    clear_has_name();
+  }
+  name_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      name, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.State_file.name)
 }
 
 // required uint64 time_created = 3;
@@ -2897,13 +3532,23 @@ inline ::proto::Filters* Content_file::release_filters() {
   // @@protoc_insertion_point(field_release:proto.Content_file.filters)
   clear_has_filters();
   ::proto::Filters* temp = filters_;
+  if (GetArenaNoVirtual() != NULL) {
+    temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+  }
+  filters_ = NULL;
+  return temp;
+}
+inline ::proto::Filters* Content_file::unsafe_arena_release_filters() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Content_file.filters)
+  clear_has_filters();
+  ::proto::Filters* temp = filters_;
   filters_ = NULL;
   return temp;
 }
 inline ::proto::Filters* Content_file::mutable_filters() {
   set_has_filters();
   if (filters_ == NULL) {
-    filters_ = new ::proto::Filters;
+    _slow_mutable_filters();
   }
   // @@protoc_insertion_point(field_mutable:proto.Content_file.filters)
   return filters_;
@@ -2914,7 +3559,8 @@ inline void Content_file::set_allocated_filters(::proto::Filters* filters) {
     delete filters_;
   }
   if (filters) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(filters);
     if (message_arena != submessage_arena) {
       filters = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, filters, submessage_arena);
@@ -2938,47 +3584,49 @@ inline void Content_file::clear_has_name() {
   _has_bits_[0] &= ~0x00000001u;
 }
 inline void Content_file::clear_name() {
-  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  name_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   clear_has_name();
 }
 inline const ::std::string& Content_file::name() const {
   // @@protoc_insertion_point(field_get:proto.Content_file.name)
-  return name_.GetNoArena();
+  return name_.Get();
 }
 inline void Content_file::set_name(const ::std::string& value) {
   set_has_name();
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value, GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Content_file.name)
 }
 #if LANG_CXX11
 inline void Content_file::set_name(::std::string&& value) {
   set_has_name();
-  name_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  name_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Content_file.name)
 }
 #endif
 inline void Content_file::set_name(const char* value) {
   GOOGLE_DCHECK(value != NULL);
   set_has_name();
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Content_file.name)
 }
-inline void Content_file::set_name(const char* value, size_t size) {
+inline void Content_file::set_name(const char* value,
+    size_t size) {
   set_has_name();
-  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Content_file.name)
 }
 inline ::std::string* Content_file::mutable_name() {
   set_has_name();
   // @@protoc_insertion_point(field_mutable:proto.Content_file.name)
-  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return name_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline ::std::string* Content_file::release_name() {
   // @@protoc_insertion_point(field_release:proto.Content_file.name)
   clear_has_name();
-  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return name_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
 }
 inline void Content_file::set_allocated_name(::std::string* name) {
   if (name != NULL) {
@@ -2986,8 +3634,28 @@ inline void Content_file::set_allocated_name(::std::string* name) {
   } else {
     clear_has_name();
   }
-  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  name_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_allocated:proto.Content_file.name)
+}
+inline ::std::string* Content_file::unsafe_arena_release_name() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Content_file.name)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  clear_has_name();
+  return name_.UnsafeArenaRelease(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
+}
+inline void Content_file::unsafe_arena_set_allocated_name(
+    ::std::string* name) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (name != NULL) {
+    set_has_name();
+  } else {
+    clear_has_name();
+  }
+  name_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      name, GetArenaNoVirtual());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Content_file.name)
 }
 
 // repeated .proto.Ref_count refs = 3;
@@ -3158,25 +3826,26 @@ inline void Ref_count::set_has_blake2b() {
 }
 inline void Ref_count::clear_blake2b() {
   if (has_blake2b()) {
-    csum_.blake2b_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    csum_.blake2b_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+        GetArenaNoVirtual());
     clear_has_csum();
   }
 }
 inline const ::std::string& Ref_count::blake2b() const {
   // @@protoc_insertion_point(field_get:proto.Ref_count.blake2b)
   if (has_blake2b()) {
-    return csum_.blake2b_.GetNoArena();
+    return csum_.blake2b_.Get();
   }
   return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
 }
 inline void Ref_count::set_blake2b(const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:proto.Ref_count.blake2b)
   if (!has_blake2b()) {
     clear_csum();
     set_has_blake2b();
     csum_.blake2b_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  csum_.blake2b_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  csum_.blake2b_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value,
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set:proto.Ref_count.blake2b)
 }
 #if LANG_CXX11
@@ -3187,8 +3856,8 @@ inline void Ref_count::set_blake2b(::std::string&& value) {
     set_has_blake2b();
     csum_.blake2b_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  csum_.blake2b_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  csum_.blake2b_.SetLite(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_rvalue:proto.Ref_count.blake2b)
 }
 #endif
@@ -3199,18 +3868,21 @@ inline void Ref_count::set_blake2b(const char* value) {
     set_has_blake2b();
     csum_.blake2b_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  csum_.blake2b_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(value));
+  csum_.blake2b_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value), GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_char:proto.Ref_count.blake2b)
 }
-inline void Ref_count::set_blake2b(const void* value, size_t size) {
+inline void Ref_count::set_blake2b(const void* value,
+                             size_t size) {
   if (!has_blake2b()) {
     clear_csum();
     set_has_blake2b();
     csum_.blake2b_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  csum_.blake2b_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size));
+  csum_.blake2b_.SetLite(
+      &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size),
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_set_pointer:proto.Ref_count.blake2b)
 }
 inline ::std::string* Ref_count::mutable_blake2b() {
@@ -3219,14 +3891,16 @@ inline ::std::string* Ref_count::mutable_blake2b() {
     set_has_blake2b();
     csum_.blake2b_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
+  return csum_.blake2b_.Mutable(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      GetArenaNoVirtual());
   // @@protoc_insertion_point(field_mutable:proto.Ref_count.blake2b)
-  return csum_.blake2b_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* Ref_count::release_blake2b() {
   // @@protoc_insertion_point(field_release:proto.Ref_count.blake2b)
   if (has_blake2b()) {
     clear_has_csum();
-    return csum_.blake2b_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return csum_.blake2b_.Release(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+        GetArenaNoVirtual());
   } else {
     return NULL;
   }
@@ -3238,10 +3912,33 @@ inline void Ref_count::set_allocated_blake2b(::std::string* blake2b) {
   clear_csum();
   if (blake2b != NULL) {
     set_has_blake2b();
-    csum_.blake2b_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-        blake2b);
+    csum_.blake2b_.SetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), blake2b,
+        GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_set_allocated:proto.Ref_count.blake2b)
+}
+inline ::std::string* Ref_count::unsafe_arena_release_blake2b() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Ref_count.blake2b)
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (has_blake2b()) {
+    clear_has_csum();
+    return csum_.blake2b_.UnsafeArenaRelease(
+        &::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
+  } else {
+    return NULL;
+  }
+}
+inline void Ref_count::unsafe_arena_set_allocated_blake2b(::std::string* blake2b) {
+  GOOGLE_DCHECK(GetArenaNoVirtual() != NULL);
+  if (!has_blake2b()) {
+    csum_.blake2b_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  clear_csum();
+  if (blake2b) {
+    set_has_blake2b();
+    csum_.blake2b_.UnsafeArenaSetAllocated(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), blake2b, GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Ref_count.blake2b)
 }
 
 inline bool Ref_count::has_csum() const {
@@ -3345,13 +4042,23 @@ inline ::proto::Filters* Catalog_header::release_filters() {
   // @@protoc_insertion_point(field_release:proto.Catalog_header.filters)
   clear_has_filters();
   ::proto::Filters* temp = filters_;
+  if (GetArenaNoVirtual() != NULL) {
+    temp = ::google::protobuf::internal::DuplicateIfNonNull(temp, NULL);
+  }
+  filters_ = NULL;
+  return temp;
+}
+inline ::proto::Filters* Catalog_header::unsafe_arena_release_filters() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:proto.Catalog_header.filters)
+  clear_has_filters();
+  ::proto::Filters* temp = filters_;
   filters_ = NULL;
   return temp;
 }
 inline ::proto::Filters* Catalog_header::mutable_filters() {
   set_has_filters();
   if (filters_ == NULL) {
-    filters_ = new ::proto::Filters;
+    _slow_mutable_filters();
   }
   // @@protoc_insertion_point(field_mutable:proto.Catalog_header.filters)
   return filters_;
@@ -3362,7 +4069,8 @@ inline void Catalog_header::set_allocated_filters(::proto::Filters* filters) {
     delete filters_;
   }
   if (filters) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(filters);
     if (message_arena != submessage_arena) {
       filters = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, filters, submessage_arena);

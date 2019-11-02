@@ -50,6 +50,7 @@ struct fmt::formatter<std::filesystem::path> {
 #include "xxhash.h"
 
 #include <google/protobuf/message_lite.h>
+#include <google/protobuf/arena.h>
 
 #ifndef NDEBUG
 #define DEBUG

@@ -4,7 +4,6 @@
 #include "piping_xxhash.h"
 #include "buffer.h"
 
-
 namespace archi{
 
 
@@ -72,10 +71,10 @@ void Stream_out::name(std::string &&name)
 
 void read_message(Buffer &message, Stream_in &in, Pipe_xxhash_in &cs_pipe);
 template<class T>
-T get_message(Buffer &tmp, Stream_in &in, Pipe_xxhash_in &cs_pipe){
-	T msg;
+T *get_message(Buffer &tmp, Stream_in &in, Pipe_xxhash_in &cs_pipe, google::protobuf::Arena &arena){
+	T *msg = google::protobuf::Arena::CreateMessage<T>(&arena);
 	read_message(tmp, in, cs_pipe);
-	msg.ParseFromArray(tmp.raw(), tmp.size());
+	msg->ParseFromArray(tmp.raw(), tmp.size());
 	return msg;
 }
 

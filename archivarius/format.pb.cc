@@ -375,6 +375,14 @@ ZSTD_Compression_filter::ZSTD_Compression_filter()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.ZSTD_Compression_filter)
 }
+ZSTD_Compression_filter::ZSTD_Compression_filter(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsZSTD_Compression_filter();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.ZSTD_Compression_filter)
+}
 ZSTD_Compression_filter::ZSTD_Compression_filter(const ZSTD_Compression_filter& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -394,8 +402,15 @@ ZSTD_Compression_filter::~ZSTD_Compression_filter() {
 }
 
 void ZSTD_Compression_filter::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
+void ZSTD_Compression_filter::ArenaDtor(void* object) {
+  ZSTD_Compression_filter* _this = reinterpret_cast< ZSTD_Compression_filter* >(object);
+  (void)_this;
+}
+void ZSTD_Compression_filter::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void ZSTD_Compression_filter::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -407,11 +422,7 @@ const ZSTD_Compression_filter& ZSTD_Compression_filter::default_instance() {
 }
 
 ZSTD_Compression_filter* ZSTD_Compression_filter::New(::google::protobuf::Arena* arena) const {
-  ZSTD_Compression_filter* n = new ZSTD_Compression_filter;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<ZSTD_Compression_filter>(arena);
 }
 
 void ZSTD_Compression_filter::Clear() {
@@ -506,6 +517,21 @@ bool ZSTD_Compression_filter::IsInitialized() const {
 
 void ZSTD_Compression_filter::Swap(ZSTD_Compression_filter* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    ZSTD_Compression_filter* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void ZSTD_Compression_filter::UnsafeArenaSwap(ZSTD_Compression_filter* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void ZSTD_Compression_filter::InternalSwap(ZSTD_Compression_filter* other) {
@@ -537,6 +563,14 @@ Chapoly_Encryption_filter::Chapoly_Encryption_filter()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Chapoly_Encryption_filter)
 }
+Chapoly_Encryption_filter::Chapoly_Encryption_filter(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsChapoly_Encryption_filter();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Chapoly_Encryption_filter)
+}
 Chapoly_Encryption_filter::Chapoly_Encryption_filter(const Chapoly_Encryption_filter& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -545,11 +579,13 @@ Chapoly_Encryption_filter::Chapoly_Encryption_filter(const Chapoly_Encryption_fi
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   iv_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_iv()) {
-    iv_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.iv_);
+    iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.iv(),
+      GetArenaNoVirtual());
   }
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_key()) {
-    key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
+    key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key(),
+      GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(copy_constructor:proto.Chapoly_Encryption_filter)
 }
@@ -566,10 +602,17 @@ Chapoly_Encryption_filter::~Chapoly_Encryption_filter() {
 }
 
 void Chapoly_Encryption_filter::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   iv_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
+void Chapoly_Encryption_filter::ArenaDtor(void* object) {
+  Chapoly_Encryption_filter* _this = reinterpret_cast< Chapoly_Encryption_filter* >(object);
+  (void)_this;
+}
+void Chapoly_Encryption_filter::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Chapoly_Encryption_filter::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -581,11 +624,7 @@ const Chapoly_Encryption_filter& Chapoly_Encryption_filter::default_instance() {
 }
 
 Chapoly_Encryption_filter* Chapoly_Encryption_filter::New(::google::protobuf::Arena* arena) const {
-  Chapoly_Encryption_filter* n = new Chapoly_Encryption_filter;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Chapoly_Encryption_filter>(arena);
 }
 
 void Chapoly_Encryption_filter::Clear() {
@@ -598,11 +637,11 @@ void Chapoly_Encryption_filter::Clear() {
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
       GOOGLE_DCHECK(!iv_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*iv_.UnsafeRawStringPointer())->clear();
+      iv_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000002u) {
       GOOGLE_DCHECK(!key_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*key_.UnsafeRawStringPointer())->clear();
+      key_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
   }
   _has_bits_.Clear();
@@ -734,12 +773,10 @@ void Chapoly_Encryption_filter::MergeFrom(const Chapoly_Encryption_filter& from)
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
-      set_has_iv();
-      iv_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.iv_);
+      set_iv(from.iv());
     }
     if (cached_has_bits & 0x00000002u) {
-      set_has_key();
-      key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
+      set_key(from.key());
     }
   }
 }
@@ -758,6 +795,21 @@ bool Chapoly_Encryption_filter::IsInitialized() const {
 
 void Chapoly_Encryption_filter::Swap(Chapoly_Encryption_filter* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Chapoly_Encryption_filter* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Chapoly_Encryption_filter::UnsafeArenaSwap(Chapoly_Encryption_filter* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Chapoly_Encryption_filter::InternalSwap(Chapoly_Encryption_filter* other) {
@@ -791,6 +843,14 @@ Chacha_Encryption_filter::Chacha_Encryption_filter()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Chacha_Encryption_filter)
 }
+Chacha_Encryption_filter::Chacha_Encryption_filter(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsChacha_Encryption_filter();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Chacha_Encryption_filter)
+}
 Chacha_Encryption_filter::Chacha_Encryption_filter(const Chacha_Encryption_filter& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -799,11 +859,13 @@ Chacha_Encryption_filter::Chacha_Encryption_filter(const Chacha_Encryption_filte
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   iv_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_iv()) {
-    iv_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.iv_);
+    iv_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.iv(),
+      GetArenaNoVirtual());
   }
   key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_key()) {
-    key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
+    key_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key(),
+      GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(copy_constructor:proto.Chacha_Encryption_filter)
 }
@@ -820,10 +882,17 @@ Chacha_Encryption_filter::~Chacha_Encryption_filter() {
 }
 
 void Chacha_Encryption_filter::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   iv_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
+void Chacha_Encryption_filter::ArenaDtor(void* object) {
+  Chacha_Encryption_filter* _this = reinterpret_cast< Chacha_Encryption_filter* >(object);
+  (void)_this;
+}
+void Chacha_Encryption_filter::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Chacha_Encryption_filter::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -835,11 +904,7 @@ const Chacha_Encryption_filter& Chacha_Encryption_filter::default_instance() {
 }
 
 Chacha_Encryption_filter* Chacha_Encryption_filter::New(::google::protobuf::Arena* arena) const {
-  Chacha_Encryption_filter* n = new Chacha_Encryption_filter;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Chacha_Encryption_filter>(arena);
 }
 
 void Chacha_Encryption_filter::Clear() {
@@ -852,11 +917,11 @@ void Chacha_Encryption_filter::Clear() {
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
       GOOGLE_DCHECK(!iv_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*iv_.UnsafeRawStringPointer())->clear();
+      iv_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000002u) {
       GOOGLE_DCHECK(!key_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*key_.UnsafeRawStringPointer())->clear();
+      key_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
   }
   _has_bits_.Clear();
@@ -988,12 +1053,10 @@ void Chacha_Encryption_filter::MergeFrom(const Chacha_Encryption_filter& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
-      set_has_iv();
-      iv_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.iv_);
+      set_iv(from.iv());
     }
     if (cached_has_bits & 0x00000002u) {
-      set_has_key();
-      key_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.key_);
+      set_key(from.key());
     }
   }
 }
@@ -1012,6 +1075,21 @@ bool Chacha_Encryption_filter::IsInitialized() const {
 
 void Chacha_Encryption_filter::Swap(Chacha_Encryption_filter* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Chacha_Encryption_filter* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Chacha_Encryption_filter::UnsafeArenaSwap(Chacha_Encryption_filter* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Chacha_Encryption_filter::InternalSwap(Chacha_Encryption_filter* other) {
@@ -1034,11 +1112,29 @@ void Filters::InitAsDefaultInstance() {
   ::proto::_Filters_default_instance_._instance.get_mutable()->zstd_compression_ = const_cast< ::proto::ZSTD_Compression_filter*>(
       ::proto::ZSTD_Compression_filter::internal_default_instance());
 }
+void Filters::_slow_mutable_zstd_compression() {
+  zstd_compression_ = ::google::protobuf::Arena::CreateMessage< ::proto::ZSTD_Compression_filter >(
+      GetArenaNoVirtual());
+}
+void Filters::unsafe_arena_set_allocated_zstd_compression(
+    ::proto::ZSTD_Compression_filter* zstd_compression) {
+  if (GetArenaNoVirtual() == NULL) {
+    delete zstd_compression_;
+  }
+  zstd_compression_ = zstd_compression;
+  if (zstd_compression) {
+    set_has_zstd_compression();
+  } else {
+    clear_has_zstd_compression();
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Filters.zstd_compression)
+}
 void Filters::set_allocated_chapoly_encryption(::proto::Chapoly_Encryption_filter* chapoly_encryption) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   clear_encryption();
   if (chapoly_encryption) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(chapoly_encryption);
     if (message_arena != submessage_arena) {
       chapoly_encryption = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, chapoly_encryption, submessage_arena);
@@ -1052,7 +1148,8 @@ void Filters::set_allocated_chacha_encryption(::proto::Chacha_Encryption_filter*
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   clear_encryption();
   if (chacha_encryption) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
+    ::google::protobuf::Arena* submessage_arena =
+      ::google::protobuf::Arena::GetArena(chacha_encryption);
     if (message_arena != submessage_arena) {
       chacha_encryption = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, chacha_encryption, submessage_arena);
@@ -1075,6 +1172,14 @@ Filters::Filters()
   }
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Filters)
+}
+Filters::Filters(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsFilters();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Filters)
 }
 Filters::Filters(const Filters& from)
   : ::google::protobuf::MessageLite(),
@@ -1116,12 +1221,19 @@ Filters::~Filters() {
 }
 
 void Filters::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   if (this != internal_default_instance()) delete zstd_compression_;
   if (has_encryption()) {
     clear_encryption();
   }
 }
 
+void Filters::ArenaDtor(void* object) {
+  Filters* _this = reinterpret_cast< Filters* >(object);
+  (void)_this;
+}
+void Filters::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Filters::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -1133,22 +1245,22 @@ const Filters& Filters::default_instance() {
 }
 
 Filters* Filters::New(::google::protobuf::Arena* arena) const {
-  Filters* n = new Filters;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Filters>(arena);
 }
 
 void Filters::clear_encryption() {
 // @@protoc_insertion_point(one_of_clear_start:proto.Filters)
   switch (encryption_case()) {
     case kChapolyEncryption: {
-      delete encryption_.chapoly_encryption_;
+      if (GetArenaNoVirtual() == NULL) {
+        delete encryption_.chapoly_encryption_;
+      }
       break;
     }
     case kChachaEncryption: {
-      delete encryption_.chacha_encryption_;
+      if (GetArenaNoVirtual() == NULL) {
+        delete encryption_.chacha_encryption_;
+      }
       break;
     }
     case ENCRYPTION_NOT_SET: {
@@ -1375,6 +1487,21 @@ bool Filters::IsInitialized() const {
 
 void Filters::Swap(Filters* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Filters* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Filters::UnsafeArenaSwap(Filters* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Filters::InternalSwap(Filters* other) {
@@ -1409,6 +1536,14 @@ Ref_to_refcount::Ref_to_refcount()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Ref_to_refcount)
 }
+Ref_to_refcount::Ref_to_refcount(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsRef_to_refcount();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Ref_to_refcount)
+}
 Ref_to_refcount::Ref_to_refcount(const Ref_to_refcount& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -1417,7 +1552,8 @@ Ref_to_refcount::Ref_to_refcount(const Ref_to_refcount& from)
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   content_fname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_content_fname()) {
-    content_fname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_fname_);
+    content_fname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_fname(),
+      GetArenaNoVirtual());
   }
   from_ = from.from_;
   // @@protoc_insertion_point(copy_constructor:proto.Ref_to_refcount)
@@ -1435,9 +1571,16 @@ Ref_to_refcount::~Ref_to_refcount() {
 }
 
 void Ref_to_refcount::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   content_fname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
+void Ref_to_refcount::ArenaDtor(void* object) {
+  Ref_to_refcount* _this = reinterpret_cast< Ref_to_refcount* >(object);
+  (void)_this;
+}
+void Ref_to_refcount::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Ref_to_refcount::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -1449,11 +1592,7 @@ const Ref_to_refcount& Ref_to_refcount::default_instance() {
 }
 
 Ref_to_refcount* Ref_to_refcount::New(::google::protobuf::Arena* arena) const {
-  Ref_to_refcount* n = new Ref_to_refcount;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Ref_to_refcount>(arena);
 }
 
 void Ref_to_refcount::Clear() {
@@ -1465,7 +1604,7 @@ void Ref_to_refcount::Clear() {
   cached_has_bits = _has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
     GOOGLE_DCHECK(!content_fname_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-    (*content_fname_.UnsafeRawStringPointer())->clear();
+    content_fname_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
   }
   from_ = GOOGLE_ULONGLONG(0);
   _has_bits_.Clear();
@@ -1619,8 +1758,7 @@ void Ref_to_refcount::MergeFrom(const Ref_to_refcount& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
-      set_has_content_fname();
-      content_fname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.content_fname_);
+      set_content_fname(from.content_fname());
     }
     if (cached_has_bits & 0x00000002u) {
       from_ = from.from_;
@@ -1643,6 +1781,21 @@ bool Ref_to_refcount::IsInitialized() const {
 
 void Ref_to_refcount::Swap(Ref_to_refcount* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Ref_to_refcount* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Ref_to_refcount::UnsafeArenaSwap(Ref_to_refcount* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Ref_to_refcount::InternalSwap(Ref_to_refcount* other) {
@@ -1665,6 +1818,23 @@ void Fs_record::InitAsDefaultInstance() {
   ::proto::_Fs_record_default_instance_._instance.get_mutable()->ref_ = const_cast< ::proto::Ref_to_refcount*>(
       ::proto::Ref_to_refcount::internal_default_instance());
 }
+void Fs_record::_slow_mutable_ref() {
+  ref_ = ::google::protobuf::Arena::CreateMessage< ::proto::Ref_to_refcount >(
+      GetArenaNoVirtual());
+}
+void Fs_record::unsafe_arena_set_allocated_ref(
+    ::proto::Ref_to_refcount* ref) {
+  if (GetArenaNoVirtual() == NULL) {
+    delete ref_;
+  }
+  ref_ = ref;
+  if (ref) {
+    set_has_ref();
+  } else {
+    clear_has_ref();
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Fs_record.ref)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Fs_record::kPathnameFieldNumber;
 const int Fs_record::kTypeFieldNumber;
@@ -1684,6 +1854,14 @@ Fs_record::Fs_record()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Fs_record)
 }
+Fs_record::Fs_record(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsFs_record();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Fs_record)
+}
 Fs_record::Fs_record(const Fs_record& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -1692,19 +1870,23 @@ Fs_record::Fs_record(const Fs_record& from)
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   pathname_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_pathname()) {
-    pathname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.pathname_);
+    pathname_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.pathname(),
+      GetArenaNoVirtual());
   }
   symlink_target_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_symlink_target()) {
-    symlink_target_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.symlink_target_);
+    symlink_target_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.symlink_target(),
+      GetArenaNoVirtual());
   }
   posix_acl_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_posix_acl()) {
-    posix_acl_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.posix_acl_);
+    posix_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.posix_acl(),
+      GetArenaNoVirtual());
   }
   posix_default_acl_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_posix_default_acl()) {
-    posix_default_acl_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.posix_default_acl_);
+    posix_default_acl_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.posix_default_acl(),
+      GetArenaNoVirtual());
   }
   if (from.has_ref()) {
     ref_ = new ::proto::Ref_to_refcount(*from.ref_);
@@ -1734,6 +1916,7 @@ Fs_record::~Fs_record() {
 }
 
 void Fs_record::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   pathname_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   symlink_target_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   posix_acl_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
@@ -1741,6 +1924,12 @@ void Fs_record::SharedDtor() {
   if (this != internal_default_instance()) delete ref_;
 }
 
+void Fs_record::ArenaDtor(void* object) {
+  Fs_record* _this = reinterpret_cast< Fs_record* >(object);
+  (void)_this;
+}
+void Fs_record::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Fs_record::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -1752,11 +1941,7 @@ const Fs_record& Fs_record::default_instance() {
 }
 
 Fs_record* Fs_record::New(::google::protobuf::Arena* arena) const {
-  Fs_record* n = new Fs_record;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Fs_record>(arena);
 }
 
 void Fs_record::Clear() {
@@ -1769,19 +1954,19 @@ void Fs_record::Clear() {
   if (cached_has_bits & 31u) {
     if (cached_has_bits & 0x00000001u) {
       GOOGLE_DCHECK(!pathname_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*pathname_.UnsafeRawStringPointer())->clear();
+      pathname_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000002u) {
       GOOGLE_DCHECK(!symlink_target_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*symlink_target_.UnsafeRawStringPointer())->clear();
+      symlink_target_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000004u) {
       GOOGLE_DCHECK(!posix_acl_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*posix_acl_.UnsafeRawStringPointer())->clear();
+      posix_acl_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000008u) {
       GOOGLE_DCHECK(!posix_default_acl_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*posix_default_acl_.UnsafeRawStringPointer())->clear();
+      posix_default_acl_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000010u) {
       GOOGLE_DCHECK(ref_ != NULL);
@@ -2104,20 +2289,16 @@ void Fs_record::MergeFrom(const Fs_record& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 255u) {
     if (cached_has_bits & 0x00000001u) {
-      set_has_pathname();
-      pathname_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.pathname_);
+      set_pathname(from.pathname());
     }
     if (cached_has_bits & 0x00000002u) {
-      set_has_symlink_target();
-      symlink_target_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.symlink_target_);
+      set_symlink_target(from.symlink_target());
     }
     if (cached_has_bits & 0x00000004u) {
-      set_has_posix_acl();
-      posix_acl_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.posix_acl_);
+      set_posix_acl(from.posix_acl());
     }
     if (cached_has_bits & 0x00000008u) {
-      set_has_posix_default_acl();
-      posix_default_acl_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.posix_default_acl_);
+      set_posix_default_acl(from.posix_default_acl());
     }
     if (cached_has_bits & 0x00000010u) {
       mutable_ref()->::proto::Ref_to_refcount::MergeFrom(from.ref());
@@ -2152,6 +2333,21 @@ bool Fs_record::IsInitialized() const {
 
 void Fs_record::Swap(Fs_record* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Fs_record* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Fs_record::UnsafeArenaSwap(Fs_record* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Fs_record::InternalSwap(Fs_record* other) {
@@ -2190,6 +2386,15 @@ Fs_state::Fs_state()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Fs_state)
 }
+Fs_state::Fs_state(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena),
+  rec_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsFs_state();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Fs_state)
+}
 Fs_state::Fs_state(const Fs_state& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -2210,8 +2415,15 @@ Fs_state::~Fs_state() {
 }
 
 void Fs_state::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
+void Fs_state::ArenaDtor(void* object) {
+  Fs_state* _this = reinterpret_cast< Fs_state* >(object);
+  (void)_this;
+}
+void Fs_state::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Fs_state::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -2223,11 +2435,7 @@ const Fs_state& Fs_state::default_instance() {
 }
 
 Fs_state* Fs_state::New(::google::protobuf::Arena* arena) const {
-  Fs_state* n = new Fs_state;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Fs_state>(arena);
 }
 
 void Fs_state::Clear() {
@@ -2359,6 +2567,21 @@ bool Fs_state::IsInitialized() const {
 
 void Fs_state::Swap(Fs_state* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Fs_state* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Fs_state::UnsafeArenaSwap(Fs_state* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Fs_state::InternalSwap(Fs_state* other) {
@@ -2380,6 +2603,23 @@ void State_file::InitAsDefaultInstance() {
   ::proto::_State_file_default_instance_._instance.get_mutable()->filters_ = const_cast< ::proto::Filters*>(
       ::proto::Filters::internal_default_instance());
 }
+void State_file::_slow_mutable_filters() {
+  filters_ = ::google::protobuf::Arena::CreateMessage< ::proto::Filters >(
+      GetArenaNoVirtual());
+}
+void State_file::unsafe_arena_set_allocated_filters(
+    ::proto::Filters* filters) {
+  if (GetArenaNoVirtual() == NULL) {
+    delete filters_;
+  }
+  filters_ = filters;
+  if (filters) {
+    set_has_filters();
+  } else {
+    clear_has_filters();
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.State_file.filters)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int State_file::kFiltersFieldNumber;
 const int State_file::kNameFieldNumber;
@@ -2394,6 +2634,14 @@ State_file::State_file()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.State_file)
 }
+State_file::State_file(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsState_file();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.State_file)
+}
 State_file::State_file(const State_file& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -2402,7 +2650,8 @@ State_file::State_file(const State_file& from)
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_name()) {
-    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+    name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name(),
+      GetArenaNoVirtual());
   }
   if (from.has_filters()) {
     filters_ = new ::proto::Filters(*from.filters_);
@@ -2427,10 +2676,17 @@ State_file::~State_file() {
 }
 
 void State_file::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete filters_;
 }
 
+void State_file::ArenaDtor(void* object) {
+  State_file* _this = reinterpret_cast< State_file* >(object);
+  (void)_this;
+}
+void State_file::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void State_file::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -2442,11 +2698,7 @@ const State_file& State_file::default_instance() {
 }
 
 State_file* State_file::New(::google::protobuf::Arena* arena) const {
-  State_file* n = new State_file;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<State_file>(arena);
 }
 
 void State_file::Clear() {
@@ -2459,7 +2711,7 @@ void State_file::Clear() {
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
       GOOGLE_DCHECK(!name_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*name_.UnsafeRawStringPointer())->clear();
+      name_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000002u) {
       GOOGLE_DCHECK(filters_ != NULL);
@@ -2643,8 +2895,7 @@ void State_file::MergeFrom(const State_file& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 7u) {
     if (cached_has_bits & 0x00000001u) {
-      set_has_name();
-      name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+      set_name(from.name());
     }
     if (cached_has_bits & 0x00000002u) {
       mutable_filters()->::proto::Filters::MergeFrom(from.filters());
@@ -2673,6 +2924,21 @@ bool State_file::IsInitialized() const {
 
 void State_file::Swap(State_file* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    State_file* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void State_file::UnsafeArenaSwap(State_file* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void State_file::InternalSwap(State_file* other) {
@@ -2696,6 +2962,23 @@ void Content_file::InitAsDefaultInstance() {
   ::proto::_Content_file_default_instance_._instance.get_mutable()->filters_ = const_cast< ::proto::Filters*>(
       ::proto::Filters::internal_default_instance());
 }
+void Content_file::_slow_mutable_filters() {
+  filters_ = ::google::protobuf::Arena::CreateMessage< ::proto::Filters >(
+      GetArenaNoVirtual());
+}
+void Content_file::unsafe_arena_set_allocated_filters(
+    ::proto::Filters* filters) {
+  if (GetArenaNoVirtual() == NULL) {
+    delete filters_;
+  }
+  filters_ = filters;
+  if (filters) {
+    set_has_filters();
+  } else {
+    clear_has_filters();
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Content_file.filters)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Content_file::kFiltersFieldNumber;
 const int Content_file::kNameFieldNumber;
@@ -2710,6 +2993,15 @@ Content_file::Content_file()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Content_file)
 }
+Content_file::Content_file(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena),
+  refs_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsContent_file();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Content_file)
+}
 Content_file::Content_file(const Content_file& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -2719,7 +3011,8 @@ Content_file::Content_file(const Content_file& from)
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.has_name()) {
-    name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+    name_.SetLite(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name(),
+      GetArenaNoVirtual());
   }
   if (from.has_filters()) {
     filters_ = new ::proto::Filters(*from.filters_);
@@ -2741,10 +3034,17 @@ Content_file::~Content_file() {
 }
 
 void Content_file::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete filters_;
 }
 
+void Content_file::ArenaDtor(void* object) {
+  Content_file* _this = reinterpret_cast< Content_file* >(object);
+  (void)_this;
+}
+void Content_file::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Content_file::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -2756,11 +3056,7 @@ const Content_file& Content_file::default_instance() {
 }
 
 Content_file* Content_file::New(::google::protobuf::Arena* arena) const {
-  Content_file* n = new Content_file;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Content_file>(arena);
 }
 
 void Content_file::Clear() {
@@ -2774,7 +3070,7 @@ void Content_file::Clear() {
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
       GOOGLE_DCHECK(!name_.IsDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited()));
-      (*name_.UnsafeRawStringPointer())->clear();
+      name_.ClearToEmpty(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), GetArenaNoVirtual());
     }
     if (cached_has_bits & 0x00000002u) {
       GOOGLE_DCHECK(filters_ != NULL);
@@ -2940,8 +3236,7 @@ void Content_file::MergeFrom(const Content_file& from) {
   cached_has_bits = from._has_bits_[0];
   if (cached_has_bits & 3u) {
     if (cached_has_bits & 0x00000001u) {
-      set_has_name();
-      name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
+      set_name(from.name());
     }
     if (cached_has_bits & 0x00000002u) {
       mutable_filters()->::proto::Filters::MergeFrom(from.filters());
@@ -2967,6 +3262,21 @@ bool Content_file::IsInitialized() const {
 
 void Content_file::Swap(Content_file* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Content_file* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Content_file::UnsafeArenaSwap(Content_file* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Content_file::InternalSwap(Content_file* other) {
@@ -3004,6 +3314,14 @@ Ref_count::Ref_count()
   }
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Ref_count)
+}
+Ref_count::Ref_count(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsRef_count();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Ref_count)
 }
 Ref_count::Ref_count(const Ref_count& from)
   : ::google::protobuf::MessageLite(),
@@ -3045,11 +3363,18 @@ Ref_count::~Ref_count() {
 }
 
 void Ref_count::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   if (has_csum()) {
     clear_csum();
   }
 }
 
+void Ref_count::ArenaDtor(void* object) {
+  Ref_count* _this = reinterpret_cast< Ref_count* >(object);
+  (void)_this;
+}
+void Ref_count::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Ref_count::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -3061,11 +3386,7 @@ const Ref_count& Ref_count::default_instance() {
 }
 
 Ref_count* Ref_count::New(::google::protobuf::Arena* arena) const {
-  Ref_count* n = new Ref_count;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Ref_count>(arena);
 }
 
 void Ref_count::clear_csum() {
@@ -3076,7 +3397,8 @@ void Ref_count::clear_csum() {
       break;
     }
     case kBlake2B: {
-      csum_.blake2b_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+      csum_.blake2b_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+          GetArenaNoVirtual());
       break;
     }
     case CSUM_NOT_SET: {
@@ -3412,6 +3734,21 @@ bool Ref_count::IsInitialized() const {
 
 void Ref_count::Swap(Ref_count* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Ref_count* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Ref_count::UnsafeArenaSwap(Ref_count* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Ref_count::InternalSwap(Ref_count* other) {
@@ -3449,6 +3786,16 @@ Catalogue::Catalogue()
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Catalogue)
 }
+Catalogue::Catalogue(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena),
+  state_files_(arena),
+  content_files_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsCatalogue();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Catalogue)
+}
 Catalogue::Catalogue(const Catalogue& from)
   : ::google::protobuf::MessageLite(),
       _internal_metadata_(NULL),
@@ -3470,8 +3817,15 @@ Catalogue::~Catalogue() {
 }
 
 void Catalogue::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
+void Catalogue::ArenaDtor(void* object) {
+  Catalogue* _this = reinterpret_cast< Catalogue* >(object);
+  (void)_this;
+}
+void Catalogue::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Catalogue::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -3483,11 +3837,7 @@ const Catalogue& Catalogue::default_instance() {
 }
 
 Catalogue* Catalogue::New(::google::protobuf::Arena* arena) const {
-  Catalogue* n = new Catalogue;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Catalogue>(arena);
 }
 
 void Catalogue::Clear() {
@@ -3651,6 +4001,21 @@ bool Catalogue::IsInitialized() const {
 
 void Catalogue::Swap(Catalogue* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Catalogue* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Catalogue::UnsafeArenaSwap(Catalogue* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Catalogue::InternalSwap(Catalogue* other) {
@@ -3673,6 +4038,23 @@ void Catalog_header::InitAsDefaultInstance() {
   ::proto::_Catalog_header_default_instance_._instance.get_mutable()->filters_ = const_cast< ::proto::Filters*>(
       ::proto::Filters::internal_default_instance());
 }
+void Catalog_header::_slow_mutable_filters() {
+  filters_ = ::google::protobuf::Arena::CreateMessage< ::proto::Filters >(
+      GetArenaNoVirtual());
+}
+void Catalog_header::unsafe_arena_set_allocated_filters(
+    ::proto::Filters* filters) {
+  if (GetArenaNoVirtual() == NULL) {
+    delete filters_;
+  }
+  filters_ = filters;
+  if (filters) {
+    set_has_filters();
+  } else {
+    clear_has_filters();
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Catalog_header.filters)
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Catalog_header::kFiltersFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -3684,6 +4066,14 @@ Catalog_header::Catalog_header()
   }
   SharedCtor();
   // @@protoc_insertion_point(constructor:proto.Catalog_header)
+}
+Catalog_header::Catalog_header(::google::protobuf::Arena* arena)
+  : ::google::protobuf::MessageLite(),
+  _internal_metadata_(arena) {
+  ::protobuf_format_2eproto::InitDefaultsCatalog_header();
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:proto.Catalog_header)
 }
 Catalog_header::Catalog_header(const Catalog_header& from)
   : ::google::protobuf::MessageLite(),
@@ -3710,9 +4100,16 @@ Catalog_header::~Catalog_header() {
 }
 
 void Catalog_header::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
   if (this != internal_default_instance()) delete filters_;
 }
 
+void Catalog_header::ArenaDtor(void* object) {
+  Catalog_header* _this = reinterpret_cast< Catalog_header* >(object);
+  (void)_this;
+}
+void Catalog_header::RegisterArenaDtor(::google::protobuf::Arena* arena) {
+}
 void Catalog_header::SetCachedSize(int size) const {
   GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
   _cached_size_ = size;
@@ -3724,11 +4121,7 @@ const Catalog_header& Catalog_header::default_instance() {
 }
 
 Catalog_header* Catalog_header::New(::google::protobuf::Arena* arena) const {
-  Catalog_header* n = new Catalog_header;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
+  return ::google::protobuf::Arena::CreateMessage<Catalog_header>(arena);
 }
 
 void Catalog_header::Clear() {
@@ -3865,6 +4258,21 @@ bool Catalog_header::IsInitialized() const {
 
 void Catalog_header::Swap(Catalog_header* other) {
   if (other == this) return;
+  if (GetArenaNoVirtual() == other->GetArenaNoVirtual()) {
+    InternalSwap(other);
+  } else {
+    Catalog_header* temp = New(GetArenaNoVirtual());
+    temp->MergeFrom(*other);
+    other->CopyFrom(*this);
+    InternalSwap(temp);
+    if (GetArenaNoVirtual() == NULL) {
+      delete temp;
+    }
+  }
+}
+void Catalog_header::UnsafeArenaSwap(Catalog_header* other) {
+  if (other == this) return;
+  GOOGLE_DCHECK(GetArenaNoVirtual() == other->GetArenaNoVirtual());
   InternalSwap(other);
 }
 void Catalog_header::InternalSwap(Catalog_header* other) {
