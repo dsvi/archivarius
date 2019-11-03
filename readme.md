@@ -21,7 +21,7 @@ It's simple (less then 10k lines of C++ code) and easy to use.
 ## Supported attributes
 
 - Modification time (with nanosecond accuracy)
-- Softlink targets
+- Symlinks
 - ACLs
 - Unix premissions
 
@@ -34,8 +34,8 @@ Or you can build it yourself:
     hg clone https://bitbucket.org/baltic/archivarius
     cd archivarius
     hg up latest
-	mkdir build
-	cd build
+    mkdir build
+    cd build
 
 For Ubuntu you'll need `libacl1-dev` installed.
 
@@ -53,7 +53,7 @@ Create [archivarius.conf](./docs/config file format.md), and run the tool:
 The command `archive` tells archivarius to execute all the tasks in the config. You might want to add it to cron, to do it daily.
 To restore an archive run:
 
-	archivarius restore archive=path/to/archive target-dir=/home/me/
+    archivarius restore archive=path/to/archive target-dir=/home/me/
 
 ## Licence 
 

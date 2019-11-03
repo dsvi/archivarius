@@ -12,7 +12,7 @@ using namespace archi;
 //#define TEST
 
 void report_warning(std::string &&h, std::string &&w){
-	print(stderr, fg(fmt::terminal_color::red), "Warning! {}", h);
+	print(stderr, fg(fmt::terminal_color::red), "{}", h);
 	w.insert(0, "\n");
 	find_and_replace(w, "\n", "\n  ");
 	w += '\n';
