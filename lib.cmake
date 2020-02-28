@@ -80,11 +80,3 @@ set_target_properties(archivarius-lib PROPERTIES
 )
 target_link_libraries(archivarius-lib PUBLIC botan fmt zstd range-v3 libprotobuf-lite acl)
 
-# TODO: remove this, since new compilers dot require it
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  target_link_libraries(archivarius-lib PUBLIC c++fs)
-endif()
-
-if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  target_link_libraries(archivarius-lib PUBLIC stdc++fs)
-endif()

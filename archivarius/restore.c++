@@ -37,8 +37,13 @@ void restore(Restore_settings &cfg)
 		auto state = cat.fs_state(cfg.from_ndx);
 		auto all_files = state.files();
 		vector<reference_wrapper<Filesystem_state::File>> files(all_files.begin(), all_files.end());
+		auto mk_re_path = [&](fs::path &p){
+			ASSERT(cfg.prefix.empty() or p.string().starts_with(cfg.prefix.string()));
+			return cfg.to / p.lexically_relative(cfg.prefix.parent_path());
+		};
 		if (!cfg.prefix.empty()){
 			erase_if(files, [&](auto &f){
+				// this has to compare full path elements. not parts of them
 				auto pref_it = cfg.prefix.begin();
 				for (auto &pe : f.get().path){
 					if (pref_it == cfg.prefix.end())
@@ -48,13 +53,15 @@ void restore(Restore_settings &cfg)
 						return true;
 					++pref_it;
 				}
-				return false;
+				if (pref_it == cfg.prefix.end())
+					return false;
+				return true;
 			});
 		}
 		for (Filesystem_state::File &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
 				continue;
-			auto re_path = cfg.to / file.path;
+			auto re_path = mk_re_path(file.path);
 			try{
 				fs::create_directories(re_path);
 			}
@@ -77,7 +84,7 @@ void restore(Restore_settings &cfg)
 			for (auto fr : sorted_by_refs){
 				auto &file = fr.get();
 				auto &ref = file.content_ref.value();
-				auto re_path = cfg.to / file.path;
+				auto re_path = mk_re_path(file.path);
 				try {
 					if (fname != ref.fname){
 						auto content_path = cat.archive_path() / ref.fname;
@@ -107,7 +114,7 @@ void restore(Restore_settings &cfg)
 		for (Filesystem_state::File &file : files){ // restore links and empty files
 			if (file.type == Filesystem_state::DIR)
 				continue;
-			auto re_path = cfg.to / file.path;
+			auto re_path = mk_re_path(file.path);
 			try{
 				if (file.type == Filesystem_state::FILE){
 					if (file.content_ref)
@@ -127,7 +134,7 @@ void restore(Restore_settings &cfg)
 			return a.get().path > b.get().path;
 		});
 		for (Filesystem_state::File &file : files){// restore attributes
-			auto re_path = cfg.to / file.path;
+			auto re_path = mk_re_path(file.path);
 			try{
 				apply_attribs(re_path, file);
 			}
