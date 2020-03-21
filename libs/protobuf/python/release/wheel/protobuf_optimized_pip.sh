@@ -6,7 +6,7 @@ set -ex
 
 # Print usage and fail.
 function usage() {
-  echo "Usage: protobuf_optimized_pip.sh PROTOBUF_VERSION PYPI_USERNAME PYPI_PASSWORD" >&2
+  echo "Usage: protobuf_optimized_pip.sh PROTOBUF_VERSION" >&2
   exit 1   # Causes caller to exit because we use -e.
 }
 
@@ -25,7 +25,7 @@ if [ $0 != ./protobuf_optimized_pip.sh ]; then
   exit 1
 fi
 
-if [ $# -lt 3 ]; then
+if [ $# -lt 1 ]; then
   usage
   exit 1
 fi
@@ -39,7 +39,7 @@ PYTHON_VERSIONS=('cp27-cp27mu' 'cp33-cp33m' 'cp34-cp34m' 'cp35-cp35m' 'cp36-cp36
 
 mkdir -p ${DIR}
 cd ${DIR}
-curl -SsL -O https://github.com/google/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz
+curl -SsL -O https://github.com/protocolbuffers/protobuf/archive/v${PROTOBUF_VERSION}.tar.gz
 tar xzf v${PROTOBUF_VERSION}.tar.gz
 cd $DIR/protobuf-${PROTOBUF_VERSION}
 
@@ -63,7 +63,4 @@ do
   build_wheel $PYTHON_VERSION
 done
 
-/opt/python/cp27-cp27mu/bin/twine upload wheelhouse/* <<!
-$PYPI_USERNAME
-$PYPI_PASSWORD
-!
+/opt/python/cp27-cp27mu/bin/twine upload wheelhouse/*
