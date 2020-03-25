@@ -69,8 +69,7 @@ void Archive_settings::add(const fs::path &file_path)
 			if (sz != 0){
 				ASSERT(file.mod_time);
 				file.content_ref = prev_->get_ref_if_exist(file.path, *file.mod_time);
-				// TODO: switch to c++2a contains
-				if (!file.content_ref or force_to_archive.find(file.path) != force_to_archive.end())
+				if (!file.content_ref or force_to_archive.contains(file.path))
 					file.content_ref = creator_->add(file_path);
 			}
 		}
@@ -111,7 +110,7 @@ void Archive_settings::archive()
 				}
 				unordered_map<string_view, u64> content_file_waste;
 				for (auto &f : old_enough_to_compact){
-					if (content_file_waste.find(f.content_fn) != content_file_waste.end())
+					if (content_file_waste.contains(f.content_fn))
 						continue;
 					auto size = file_size(archive_path / f.content_fn);
 					content_file_waste[f.content_fn] = max(size, min_content_file_size);
@@ -131,7 +130,7 @@ void Archive_settings::archive()
 				}
 				u64 total_size = 0;
 				for (auto &f : old_enough_to_compact ){
-					if (content_files_to_compact.find(f.content_fn) == content_files_to_compact.end())
+					if (content_files_to_compact.contains(f.content_fn))
 						continue;
 					force_to_archive.insert(*f.path);
 					total_size += f.size;

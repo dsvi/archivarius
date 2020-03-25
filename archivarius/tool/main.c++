@@ -54,20 +54,31 @@ Archive_params get_archive_params(Cmd_line &cmd_line, string &cfg_path){
 }
 
 
+std::string to_human_readable_time(Time time)
+{
+	time_t t = time / Time_ticks_in_second;
+	auto tm = std::gmtime(&t);
+	char str[200];
+	if (!strftime(str, sizeof(str), "%Y %B %d %H:%M:%S", tm))
+		throw Exception("Can't format time string for current locale");
+	return str;
+}
+
 int run(int argc, const char *argv[]){
 	if (argc < 2){
 		cout << tr_txt(
-			"usage: archivarius <command> [params]\n\n"
+		  "usage: archivarius <command> [params]\n\n"
 		  "command is one of:\n"
-			"	restore - restore an archive to some path\n"
-		  "	archive - read config file and execute archiving tasks\n"
-		  "	          looks for file archivarius.conf in path:\n"
-		  "	          ~/.config\n"
-		  "	          /usr/local/etc\n"
-		  "	          /etc\n"
-		  "	          and follows instructions in it\n"
-		  "	list    - list versions in an archive\n"
-		  "	test    - check checksums in an archive, and report errors if they dont match.\n\n"
+		  "	restore    - restore an archive to some path\n"
+		  "	archive    - read config file and execute archiving tasks\n"
+		  "	             looks for file archivarius.conf in path:\n"
+		  "	             ~/.config\n"
+		  "	             /usr/local/etc\n"
+		  "	             /etc\n"
+		  "	             and follows instructions in it\n"
+		  "	list       - list versions in an archive\n"
+		  "	list-files - list content of a version in archive\n"
+		  "	test       - check checksums in an archive, and report errors if they dont match.\n\n"
 		  "params are in the form param1=value param2=value2\n"
 		  "params can be:\n"
 		  "	archive  - path to the archive. normally either this or 'name' should be set.\n"
@@ -88,9 +99,14 @@ int run(int argc, const char *argv[]){
 		  "	archive:\n"
 		  "		name - if not set, all tasks will be processed\n"
 		  "	list:\n"
-		  "		archive\n"
 		  "		name\n"
+		  "		archive\n"
 		  "		password\n"
+		  "	list-files:\n"
+		  "		name\n"
+		  "		archive\n"
+		  "		password\n"
+		  "		id\n"
 		  "	test:\n"
 		  "		archive\n"
 		  "		name\n\n"
@@ -98,6 +114,7 @@ int run(int argc, const char *argv[]){
 		  "example:\n"
 		  "	archivarius restore archive=/nfs/backup target-dir=. password=\"qwerty asdfg\"\n"
 		  "	archivarius restore archive=/nfs/backup prefix=Pictures target-dir=. password=\"qwerty asdfg\"\n"
+		  "	archivarius restore name=\"home folder backup\" prefix=Pictures target-dir=.\n"
 		) << endl;
 		return 0;
 	}
@@ -156,12 +173,36 @@ int run(int argc, const char *argv[]){
 		Catalogue cat(tp.archive_path, tp.password);
 		auto times = cat.state_times();
 		for (size_t i = 0; i < times.size(); i++){
-			time_t t = times[i]/ Time_ticks_in_second;
-			auto tm = std::gmtime(&t);
-			char str[200];
-			if (!strftime(str, sizeof(str), "%Y %B %d %H:%M:%S", tm))
-				throw Exception("Can't format time string for current locale");
-			fmt::print("{:-<5}-{}\n", i, str);
+			fmt::print("{:-<5}-{}\n", i, to_human_readable_time(times[i]));
+		}
+	}
+	else
+	if (cmd_line.command() == "list-files"){
+		auto tp = get_archive_params(cmd_line, cfg_path);
+		uint id = cmd_line.param_uint_opt("id").value_or(0);
+		cmd_line.check_unused_arguments();
+		Catalogue cat(tp.archive_path, tp.password);
+		auto st = cat.fs_state(id);
+		for (Filesystem_state::File &file: st.files()){
+			fmt::print(fg(fmt::terminal_color::green), "{}\n", file.path);
+			switch (file.type){
+			case Filesystem_state::File_type::FILE:
+				fmt::print(tr_txt("Is a file\n"));
+				if (file.content_ref.has_value())
+					fmt::print("Stored in: {}\n", file.content_ref->fname);
+				break;
+			case Filesystem_state::File_type::DIR:
+				fmt::print(tr_txt("Is a directory\n"));
+				break;
+			case Filesystem_state::File_type::SYMLINK:
+				fmt::print(tr_txt("Is a symlink to: {}\n"), file.symlink_target);
+				break;
+			default:
+				ASSERT(0);
+			}
+			if ( file.mod_time )
+				fmt::print("Modification time: {}\n", to_human_readable_time(file.mod_time.value()));
+			fmt::print("\n");
 		}
 	}
 	else
