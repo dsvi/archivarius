@@ -4,6 +4,7 @@
 #include "config.h"
 #include "test.h"
 #include <ctime>
+#include "version.h"
 
 using namespace std;
 namespace fs = std::filesystem;
@@ -78,7 +79,8 @@ int run(int argc, const char *argv[]){
 		  "	             and follows instructions in it\n"
 		  "	list       - list versions in an archive\n"
 		  "	list-files - list content of a version in archive\n"
-		  "	test       - check checksums in an archive, and report errors if they dont match.\n\n"
+		  "	test       - check checksums in an archive, and report errors if they dont match.\n"
+		  "	version    - prints version.\n\n"
 		  "params are in the form param1=value param2=value2\n"
 		  "params can be:\n"
 		  "	archive  - path to the archive. normally either this or 'name' should be set.\n"
@@ -231,6 +233,12 @@ int run(int argc, const char *argv[]){
 		cmd_line.check_unused_arguments();
 		test(ts);
 		fmt::print(tr_txt("Test finished.\n"));
+		return 0;
+	}
+	else
+	if (cmd_line.command() == "version"){
+		cmd_line.check_unused_arguments();
+		fmt::print("{}.{}.{}\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
 		return 0;
 	}
 	else{

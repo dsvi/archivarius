@@ -10,6 +10,7 @@ set(archivarius-tool-srcs
 ./archivarius/tool/property_tree.h
 ./archivarius/tool/test.c++
 ./archivarius/tool/test.h
+./archivarius/tool/version.h
 )
 
 
