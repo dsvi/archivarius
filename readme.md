@@ -31,18 +31,18 @@ You can get pre-built static binary for linux with no side dependencies [here.](
 
 Or you can build it yourself:
 
-    hg clone https://bitbucket.org/baltic/archivarius
+    git clone https://github.com/dsvi/archivarius.git
     cd archivarius
-    hg up latest
+    git checkout latest
     mkdir build
     cd build
 
 For Ubuntu you'll need `libacl1-dev` installed.
 
-Now you need a good C++17 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-8 libc++-8-dev lld-8`):
+Now you need a good C++20 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-9 libc++-9-dev lld-9`):
 
-    CXX=clang++-8 CC=clang-8 cmake ..
-    make archivarius
+    CXX=clang++-9 CC=clang-9 cmake ..
+    cmake --build . --target archivarius
 
 ## Using it
 
