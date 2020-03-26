@@ -17,8 +17,11 @@ void test(Test_settings &cfg)
 		Buffer tmp;
 		tmp.resize(128*1024);
 		Catalogue cat(cfg.archive_path, cfg.password);
-		for (size_t i = 0; i < cat.num_states(); i++)
+		cfg.progress_status(tr_txt("Checking versions."));
+		for (size_t i = 0; i < cat.num_states(); i++){
 			cat.fs_state(i);
+			cfg.progress(i * 1000 / cat.num_states());
+		}
 		File_source in;
 		Stream_in sin;
 		Stream_out sout;
@@ -26,7 +29,10 @@ void test(Test_settings &cfg)
 		Checksumer cs;
 		decltype(File_content_ref::fname) fname;
 		decltype(File_content_ref::from)  num_pumped;
-		for (auto ref : cat.content_refs()){
+		cfg.progress_status(tr_txt("Checking files content."));
+		auto total_refs = cat.content_refs().size();
+		uint progress = 10000;
+		for (decltype(total_refs) i = 0; auto ref : cat.content_refs()){
 			try {
 				if (fname != ref.fname){
 					auto content_path = cat.archive_path() / ref.fname;
@@ -48,6 +54,12 @@ void test(Test_settings &cfg)
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
 				cfg.warning(format(tr_txt("Problem with {0}"), ref.fname), message(e));
+			}
+			ASSERT(total_refs);
+			uint p = i *1000 / total_refs;
+			if (p != progress){
+				cfg.progress(p);
+				progress = p;
 			}
 		}
 	}

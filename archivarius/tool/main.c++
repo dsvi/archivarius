@@ -231,6 +231,12 @@ int run(int argc, const char *argv[]){
 		ts.name = move(tp.name);
 		ts.password = move(tp.password);
 		cmd_line.check_unused_arguments();
+		ts.progress_status = [](std::string &&status_text){
+			cout << status_text << endl;
+		};
+		ts.progress = [](uint progress_in_permil){
+			cout << progress_in_permil/10 <<"."<< progress_in_permil % 10 << "%\r" << flush;
+		};
 		test(ts);
 		fmt::print(tr_txt("Test finished.\n"));
 		return 0;

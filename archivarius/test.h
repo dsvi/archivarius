@@ -9,6 +9,8 @@ struct Test_settings{
 	std::filesystem::path archive_path;
 	std::string password;
 	std::function<void(std::string &&header, std::string &&warning_message)> warning;
+	std::function<void(std::string &&status_text)> progress_status;
+	std::function<void(uint progress_in_permil)> progress;
 };
 
 void test(Test_settings &cfg);
