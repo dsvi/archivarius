@@ -67,10 +67,14 @@ void Archive_settings::add(const fs::path &file_path)
 		if (file.type == Filesystem_state::FILE){
 			auto sz = fs::file_size(file_path);
 			if (sz != 0){
-				ASSERT(file.mod_time);
-				file.content_ref = prev_->get_ref_if_exist(file.path, *file.mod_time);
-				if (!file.content_ref or force_to_archive.contains(file.path))
-					file.content_ref = creator_->add(file_path);
+				if (force_to_archive.contains(file.path))
+					file.content_ref = long_term_content_->add(file_path);
+				else {
+					ASSERT(file.mod_time);
+					file.content_ref = prev_->get_ref_if_exist(file.path, *file.mod_time);
+					if (!file.content_ref)
+						file.content_ref = normal_content_->add(file_path);
+				}
 			}
 		}
 		next_->add(move(file));
@@ -97,7 +101,7 @@ void Archive_settings::archive()
 				struct Old_files{
 					fs::path *path;
 					string_view content_fn;
-					u64      size;
+					u64 space_taken;
 				};
 				vector<Old_files> old_enough_to_compact;
 				for (Filesystem_state::File &file: prev.files()){
@@ -105,7 +109,7 @@ void Archive_settings::archive()
 						auto &a = old_enough_to_compact.emplace_back();
 						a.path = &file.path;
 						a.content_fn = file.content_ref->fname;
-						a.size = file.content_ref->space_taken;
+						a.space_taken = file.content_ref->space_taken;
 					}
 				}
 				unordered_map<string_view, u64> content_file_waste;
@@ -117,7 +121,7 @@ void Archive_settings::archive()
 				}
 				for (auto &f :old_enough_to_compact){
 					auto &size = content_file_waste[f.content_fn];
-					size -= min(f.size, size); // underflow protection
+					size -= min(f.space_taken, size); // underflow protection
 				}
 				// now content_file_waste contains wasted space for each file
 				u64 total_waste=0;
@@ -130,10 +134,10 @@ void Archive_settings::archive()
 				}
 				u64 total_size = 0;
 				for (auto &f : old_enough_to_compact ){
-					if (content_files_to_compact.contains(f.content_fn))
+					if (not content_files_to_compact.contains(f.content_fn))
 						continue;
 					force_to_archive.insert(*f.path);
-					total_size += f.size;
+					total_size += f.space_taken;
 				}
 				if (total_size < min_content_file_size and total_waste < 10*min_content_file_size){
 					//not enough even for one new content file, and less then 10 content files are wasted
@@ -142,13 +146,21 @@ void Archive_settings::archive()
 			}
 		}
 
-		auto fcc = File_content_creator(archive_path);
-		fcc.min_file_size(min_content_file_size);
-		creator_ = &fcc;
-		if (!password.empty())
-			creator_->enable_encryption();
-		if (zstd)
-			creator_->enable_compression(*zstd);
+		auto fccn = File_content_creator(archive_path);
+		fccn.min_file_size(min_content_file_size);
+		normal_content_ = &fccn;
+		auto fccl = File_content_creator(archive_path);
+		fccl.min_file_size(min_content_file_size);
+		long_term_content_ = &fccl;
+
+		if (!password.empty()){
+			long_term_content_->enable_encryption();
+			normal_content_->enable_encryption();
+		}
+		if (zstd){
+			long_term_content_->enable_compression(*zstd);
+			normal_content_->enable_compression(*zstd);
+		}
 		if (!root.empty()){
 			for (auto &file : files_to_archive)
 				file = root / file;
@@ -171,9 +183,11 @@ void Archive_settings::archive()
 					recursive_add_from_dir(file);
 			}
 		}
-		creator_->finish();
+		long_term_content_->finish();
+		normal_content_->finish();
+		// TODO: get rid of
 		if (zstd){
-			auto cs = creator_->compression_statistic();
+			auto cs = normal_content_->compression_statistic();
 			if (cs.original){
 				auto percent = cs.compressed *100 / cs.original;
 				fmt::print("Archive compressed to {}% of original size\n", percent);

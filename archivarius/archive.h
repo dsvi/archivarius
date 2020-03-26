@@ -29,7 +29,8 @@ private:
 
 	std::unordered_set<std::filesystem::path> force_to_archive;// relative to archive_path. list of files to 'compact'
 	Catalogue *catalog;
-	File_content_creator *creator_;
+	File_content_creator *normal_content_;
+	File_content_creator *long_term_content_;
 	Filesystem_state *prev_;
 	Filesystem_state *next_;
 	friend void archive(Archive_settings a);
