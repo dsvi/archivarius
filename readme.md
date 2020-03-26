@@ -27,17 +27,13 @@ It's simple (less then 10k lines of C++ code) and easy to use.
 
 ## Getting it
 
-You can get pre-built static binary for linux with no side dependencies [here.](https://bitbucket.org/baltic/archivarius/downloads/archivarius)
-
-Or you can build it yourself:
+You can build it yourself from sources. The only dependency is libacl (`libacl1-dev` package for Ubuntu) and a C++20 conformant compiler:
 
     git clone https://github.com/dsvi/archivarius.git
     cd archivarius
     git checkout latest
     mkdir build
     cd build
-
-For Ubuntu you'll need `libacl1-dev` installed.
 
 Now you need a good C++20 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-9 libc++-9-dev lld-9`):
 
@@ -46,7 +42,7 @@ Now you need a good C++20 conformant compiler. Clang with libc++ produces more e
 
 ## Using it
 
-Create [archivarius.conf](./docs/config file format.md), and run the tool:
+Create [archivarius.conf](./docs/config%20file%20format.md), and run the tool:
 
     archivarius archive
 
