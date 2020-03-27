@@ -27,7 +27,7 @@ It's simple (less then 10k lines of C++ code) and easy to use.
 
 ## Getting it
 
-You can build it yourself from sources. The only dependency is libacl (`libacl1-dev` package for Ubuntu) and a C++20 conformant compiler:
+You can build it yourself from sources. The only dependency is libacl and libzstd (`libacl1-dev libzstd1-dev` package for Ubuntu) and a C++20 conformant compiler:
 
     git clone https://github.com/dsvi/archivarius.git
     cd archivarius
@@ -35,9 +35,16 @@ You can build it yourself from sources. The only dependency is libacl (`libacl1-
     mkdir build
     cd build
 
-Now you need a good C++20 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-9 libc++-9-dev lld-9`):
+Now you need a good C++20 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-9 libc++-9-dev libc++abi-9-dev lld-9` also dont forget to install `make` if you don't yet have it):
 
     CXX=clang++-9 CC=clang-9 cmake ..
+
+If you prefer static build, with all the dependencies built into, use the `ARCHIVARIUS_STATIC_BUILD=ON` option. This way the resulting executable depends only on linux kernel.
+
+    CXX=clang++-9 CC=clang-9 cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
+
+Then run the build:
+
     cmake --build . --target archivarius
 
 ## Using it

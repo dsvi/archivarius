@@ -28,7 +28,8 @@ configure_file(${PROJECT_SOURCE_DIR}/version.h ${PROJECT_SOURCE_DIR}/archivarius
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message("Using libc++")
     string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
-    string(APPEND CMAKE_EXE_LINKER_FLAGS " -fuse-ld=lld")
+    # -lc++abi is required for static build to work
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -fuse-ld=lld -lc++abi")
 endif()
 
 include(console-tool.cmake)
