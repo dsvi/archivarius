@@ -1,5 +1,4 @@
 add_subdirectory("libs/botan")
-add_subdirectory("libs/zstd")
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 add_subdirectory("libs/range-v3")
 add_subdirectory("libs/protobuf/cmake")
