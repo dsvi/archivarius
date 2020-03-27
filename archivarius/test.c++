@@ -19,8 +19,8 @@ void test(Test_settings &cfg)
 		Catalogue cat(cfg.archive_path, cfg.password);
 		cfg.progress_status(tr_txt("Checking versions."));
 		for (size_t i = 0; i < cat.num_states(); i++){
-			cat.fs_state(i);
 			cfg.progress(i * 1000 / cat.num_states());
+			cat.fs_state(i);
 		}
 		File_source in;
 		Stream_in sin;
@@ -33,6 +33,12 @@ void test(Test_settings &cfg)
 		auto total_refs = cat.content_refs().size();
 		uint progress = 10000;
 		for (decltype(total_refs) i = 0; auto ref : cat.content_refs()){
+			ASSERT(total_refs);
+			uint p = i++ *1000 / total_refs;
+			if (p != progress){
+				cfg.progress(p);
+				progress = p;
+			}
 			try {
 				if (fname != ref.fname){
 					auto content_path = cat.archive_path() / ref.fname;
@@ -54,12 +60,6 @@ void test(Test_settings &cfg)
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
 				cfg.warning(format(tr_txt("Problem with {0}"), ref.fname), message(e));
-			}
-			ASSERT(total_refs);
-			uint p = i *1000 / total_refs;
-			if (p != progress){
-				cfg.progress(p);
-				progress = p;
 			}
 		}
 	}
