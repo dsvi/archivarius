@@ -18,12 +18,9 @@ if (ARCHIVARIUS_STATIC_BUILD)
     SET(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
-
 project(archivarius  
     VERSION 0.0.3
     DESCRIPTION "Archivarius lib and CLI tool")
-
-configure_file(${PROJECT_SOURCE_DIR}/version.h ${PROJECT_SOURCE_DIR}/archivarius/tool/)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message("Using libc++")
