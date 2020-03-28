@@ -26,7 +26,9 @@ It's simple (less then 10k lines of C++ code) and easy to use.
 
 ## Getting it
 
-You can build it yourself from sources. The only dependency is libacl and libzstd (`libacl1-dev libzstd1-dev` package for Ubuntu) and a C++20 conformant compiler:
+You can get pre-built static binary for linux with no side dependencies [here.](https://github.com/dsvi/archivarius/releases)
+
+Or you can build it yourself from sources. The only dependency is libacl and libzstd (`libacl1-dev libzstd1-dev` package for Ubuntu) and a C++20 conformant compiler:
 
     git clone https://github.com/dsvi/archivarius.git
     cd archivarius
@@ -35,7 +37,7 @@ You can build it yourself from sources. The only dependency is libacl and libzst
     cd build
 
 Clang with libc++ produces more efficient code. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu 19.10 the packages are `clang-9 libc++-9-dev libc++abi-9-dev lld-9`.
-You will also need cmake 3.15 of newer. You can get it from https://github.com/Kitware/CMake/releases/download/. To install, simply untar into /usr/local, like so:
+You will also need make and cmake 3.15 of newer. You can get it from https://github.com/Kitware/CMake/releases/download/. To install, simply untar into /usr/local, like so:
 
     wget https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.tar.gz
     tar zxf cmake-3.17.0-Linux-x86_64.tar.gz
