@@ -9,12 +9,11 @@ It's fast:
 - Uses modern encryption (ChaCha20+Poly1305) and compression (zstd).
 - Unlike [some other incremental backup tools][1], it does not require a few gigs of local cache to work efficiently over network. Neither does it require periodic full-backups. So it's much easier on network bandwidth.
 
+[1]: http://duplicity.nongnu.org/ "duplicity"
+
 It's reliable:
 
 - Never overwrites its files. It only adds new ones, and deletes obsolete ones. So even in case of power outage while archiving, your archive is safe.
-- Unlike [some other incremental backup tools][1], restore actually works, without hassle and cryptic errors.
-
-[1]: http://duplicity.nongnu.org/ "duplicity"
 
 It's simple (less then 10k lines of C++ code) and easy to use.
 
@@ -35,11 +34,18 @@ You can build it yourself from sources. The only dependency is libacl and libzst
     mkdir build
     cd build
 
-Now you need a good C++20 conformant compiler. Clang with libc++ produces more effective code for the tool. So do something like this (make sure you have clang, libc++ and lld installed on your system. For ubuntu 18.04 the packages are `clang-9 libc++-9-dev libc++abi-9-dev lld-9` also dont forget to install `make` if you don't yet have it):
+Clang with libc++ produces more efficient code. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu 19.10 the packages are `clang-9 libc++-9-dev libc++abi-9-dev lld-9`.
+You will also need cmake 3.15 of newer. You can get it from https://github.com/Kitware/CMake/releases/download/. To install, simply untar into /usr/local, like so:
+
+    wget https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.tar.gz
+    tar zxf cmake-3.17.0-Linux-x86_64.tar.gz
+    rsync -au ./cmake-3.17.0-Linux-x86_64/ /usr/local/
+
+Now you are ready to configure the build
 
     CXX=clang++-9 CC=clang-9 cmake ..
 
-If you prefer static build, with all the dependencies built into, use the `ARCHIVARIUS_STATIC_BUILD=ON` option. This way the resulting executable depends only on linux kernel.
+If you prefer static build, with all the dependencies built into, use the `ARCHIVARIUS_STATIC_BUILD=ON` option. This way the resulting executable depends only on the linux kernel.
 
     CXX=clang++-9 CC=clang-9 cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
 
@@ -56,7 +62,7 @@ Create [archivarius.conf](./docs/config%20file%20format.md), and run the tool:
 The command `archive` tells archivarius to execute all the tasks in the config. You might want to add it to cron, to do it daily.
 To restore an archive run:
 
-    archivarius restore archive=path/to/archive target-dir=/home/me/
+    archivarius restore archive=path/to/archive target-dir=/path/to/restore/archive/to/
 
 ## Licence 
 

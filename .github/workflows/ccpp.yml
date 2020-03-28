@@ -19,7 +19,9 @@ jobs:
         CXX=clang++-9 CC=clang-9 cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
     - name: build
       #run: cd build && cmake --build . --target archivarius
-      run: cd build && make VERBOSE=1 archivarius
+      run: |
+        cd build && make VERBOSE=1 archivarius 
+        strip archivarius      
 
     - uses: actions/upload-artifact@v1
       with:
