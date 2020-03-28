@@ -1,2 +1,0 @@
-/usr/bin/ar qc libgmock_main.a  CMakeFiles/gmock_main.dir/home/ds/prog/my/archivarius/libs/protobuf/third_party/googletest/googlemock/src/gmock_main.cc.o
-/usr/bin/ranlib libgmock_main.a

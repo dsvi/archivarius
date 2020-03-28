@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/protoc.dir/home/ds/prog/my/archivarius/libs/protobuf/src/google/protobuf/compiler/main.cc.o  -o protoc-3.11.4.0  -Wl,-rpath,:::::::::::::::: libprotoc.a libprotobuf.a -lpthread /usr/lib64/libz.so 
