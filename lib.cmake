@@ -1,5 +1,6 @@
 add_subdirectory("libs/botan")
 set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
+option(RANGES_ASSERTIONS "Enable assertions." OFF)
 add_subdirectory("libs/range-v3")
 add_subdirectory("libs/protobuf/cmake")
 add_subdirectory("libs/fmt")
