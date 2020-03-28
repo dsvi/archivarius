@@ -9,11 +9,19 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: prepare
+      run: 
+        sudo apt-get install libacl1-dev libzstd1-dev clang-9 libc++-9-dev lld-9 libc++abi-9-dev 
     - name: configure
       run: 
-        mkdir build1 &&
-        cd build1 &&
-        CXX=clang++-8 CC=clang-8 cmake ..
-    - name: make
-      run: make archivarius
+        mkdir build &&
+        cd build &&
+        CXX=clang++-9 CC=clang-9 cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
+    - name: build
+      #run: cd build && cmake --build . --target archivarius
+      run: cd build && make VERBOSE=1 archivarius
 
+    - uses: actions/upload-artifact@v1
+      with:
+        name: archivarius
+        path: build/archivarius
