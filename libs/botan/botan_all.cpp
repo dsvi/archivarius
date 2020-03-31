@@ -1,5 +1,5 @@
 /*
-* Botan 2.9.0 Amalgamation
+* Botan 2.13.0 Amalgamation
 * (C) 1999-2018 The Botan Authors
 *
 * Botan is released under the Simplified BSD License (see license.txt)
@@ -53,6 +53,7 @@ std::unique_ptr<AEAD_Mode> AEAD_Mode::create(const std::string& algo,
                                              Cipher_Dir dir,
                                              const std::string& provider)
    {
+   BOTAN_UNUSED(provider);
 #if defined(BOTAN_HAS_AEAD_CHACHA20_POLY1305)
    if(algo == "ChaCha20Poly1305")
       {
@@ -166,6 +167,58 @@ std::unique_ptr<AEAD_Mode> AEAD_Mode::create(const std::string& algo,
 
 }
 /*
+* (C) 2019 Jack Lloyd
+*
+* Botan is released under the Simplified BSD License (see license.txt)
+*/
+
+
+namespace Botan {
+
+void Buffered_Computation::update_be(uint16_t val)
+   {
+   uint8_t inb[sizeof(val)];
+   store_be(val, inb);
+   add_data(inb, sizeof(inb));
+   }
+
+void Buffered_Computation::update_be(uint32_t val)
+   {
+   uint8_t inb[sizeof(val)];
+   store_be(val, inb);
+   add_data(inb, sizeof(inb));
+   }
+
+void Buffered_Computation::update_be(uint64_t val)
+   {
+   uint8_t inb[sizeof(val)];
+   store_be(val, inb);
+   add_data(inb, sizeof(inb));
+   }
+
+void Buffered_Computation::update_le(uint16_t val)
+   {
+   uint8_t inb[sizeof(val)];
+   store_le(val, inb);
+   add_data(inb, sizeof(inb));
+   }
+
+void Buffered_Computation::update_le(uint32_t val)
+   {
+   uint8_t inb[sizeof(val)];
+   store_le(val, inb);
+   add_data(inb, sizeof(inb));
+   }
+
+void Buffered_Computation::update_le(uint64_t val)
+   {
+   uint8_t inb[sizeof(val)];
+   store_le(val, inb);
+   add_data(inb, sizeof(inb));
+   }
+
+}
+/*
 * SCAN Name Abstraction
 * (C) 2008-2009,2015 Jack Lloyd
 *
@@ -177,8 +230,7 @@ namespace Botan {
 
 namespace {
 
-std::string make_arg(
-   const std::vector<std::pair<size_t, std::string> >& name, size_t start)
+std::string make_arg(const std::vector<std::pair<size_t, std::string>>& name, size_t start)
    {
    std::string output = name[start].second;
    size_t level = name[start].first;
@@ -224,7 +276,10 @@ SCAN_Name::SCAN_Name(const char* algo_spec) : SCAN_Name(std::string(algo_spec))
 
 SCAN_Name::SCAN_Name(std::string algo_spec) : m_orig_algo_spec(algo_spec), m_alg_name(), m_args(), m_mode_info()
    {
-   std::vector<std::pair<size_t, std::string> > name;
+   if(algo_spec.size() == 0)
+      throw Invalid_Argument("Expected algorithm name, got empty string");
+
+   std::vector<std::pair<size_t, std::string>> name;
    size_t level = 0;
    std::pair<size_t, std::string> accum = std::make_pair(level, "");
 
@@ -287,7 +342,7 @@ std::string SCAN_Name::arg(size_t i) const
    {
    if(i >= arg_count())
       throw Invalid_Argument("SCAN_Name::arg " + std::to_string(i) +
-                             " out of range for '" + as_string() + "'");
+                             " out of range for '" + to_string() + "'");
    return m_args[i];
    }
 
@@ -344,7 +399,7 @@ namespace Botan {
 OctetString::OctetString(RandomNumberGenerator& rng,
                          size_t len)
    {
-   m_data = rng.random_vec(len);
+   rng.random_vec(m_data, len);
    }
 
 /*
@@ -352,8 +407,11 @@ OctetString::OctetString(RandomNumberGenerator& rng,
 */
 OctetString::OctetString(const std::string& hex_string)
    {
-   m_data.resize(1 + hex_string.length() / 2);
-   m_data.resize(hex_decode(m_data.data(), hex_string));
+   if(!hex_string.empty())
+      {
+      m_data.resize(1 + hex_string.length() / 2);
+      m_data.resize(hex_decode(m_data.data(), hex_string));
+      }
    }
 
 /*
@@ -400,7 +458,7 @@ void OctetString::set_odd_parity()
 /*
 * Hex encode an OctetString
 */
-std::string OctetString::as_string() const
+std::string OctetString::to_string() const
    {
    return hex_encode(m_data.data(), m_data.size());
    }
@@ -456,7 +514,7 @@ OctetString operator^(const OctetString& k1, const OctetString& k2)
 
 }
 /*
-* Blake2b
+* BLAKE2b
 * (C) 2016 cynecx
 * (C) 2017 Jack Lloyd
 *
@@ -482,7 +540,7 @@ const uint64_t blake2b_IV[BLAKE2B_IVU64COUNT] = {
 
 }
 
-Blake2b::Blake2b(size_t output_bits) :
+BLAKE2b::BLAKE2b(size_t output_bits) :
    m_output_bits(output_bits),
    m_buffer(BLAKE2B_BLOCKBYTES),
    m_bufpos(0),
@@ -490,24 +548,25 @@ Blake2b::Blake2b(size_t output_bits) :
    {
    if(output_bits == 0 || output_bits > 512 || output_bits % 8 != 0)
       {
-      throw Invalid_Argument("Bad output bits size for Blake2b");
+      throw Invalid_Argument("Bad output bits size for BLAKE2b");
       }
 
    state_init();
    }
 
-void Blake2b::state_init()
+void BLAKE2b::state_init()
    {
    copy_mem(m_H.data(), blake2b_IV, BLAKE2B_IVU64COUNT);
    m_H[0] ^= 0x01010000 ^ static_cast<uint8_t>(output_length());
    m_T[0] = m_T[1] = 0;
    m_F[0] = m_F[1] = 0;
+   m_bufpos = 0;
    }
 
 namespace {
 
-inline void G(uint64_t& a, uint64_t& b, uint64_t& c, uint64_t& d,
-              uint64_t M0, uint64_t M1)
+BOTAN_FORCE_INLINE void G(uint64_t& a, uint64_t& b, uint64_t& c, uint64_t& d,
+                          uint64_t M0, uint64_t M1)
    {
    a = a + b + M0;
    d = rotr<32>(d ^ a);
@@ -521,7 +580,7 @@ inline void G(uint64_t& a, uint64_t& b, uint64_t& c, uint64_t& d,
 
 template<size_t i0, size_t i1, size_t i2, size_t i3, size_t i4, size_t i5, size_t i6, size_t i7,
          size_t i8, size_t i9, size_t iA, size_t iB, size_t iC, size_t iD, size_t iE, size_t iF>
-inline void ROUND(uint64_t* v, const uint64_t* M)
+BOTAN_FORCE_INLINE void ROUND(uint64_t* v, const uint64_t* M)
    {
    G(v[ 0], v[ 4], v[ 8], v[12], M[i0], M[i1]);
    G(v[ 1], v[ 5], v[ 9], v[13], M[i2], M[i3]);
@@ -536,7 +595,7 @@ inline void ROUND(uint64_t* v, const uint64_t* M)
 
 }
 
-void Blake2b::compress(const uint8_t* input, size_t blocks, uint64_t increment)
+void BLAKE2b::compress(const uint8_t* input, size_t blocks, uint64_t increment)
    {
    for(size_t b = 0; b != blocks; ++b)
       {
@@ -582,7 +641,7 @@ void Blake2b::compress(const uint8_t* input, size_t blocks, uint64_t increment)
       }
    }
 
-void Blake2b::add_data(const uint8_t input[], size_t length)
+void BLAKE2b::add_data(const uint8_t input[], size_t length)
    {
    if(length == 0)
       return;
@@ -621,32 +680,32 @@ void Blake2b::add_data(const uint8_t input[], size_t length)
       }
    }
 
-void Blake2b::final_result(uint8_t output[])
+void BLAKE2b::final_result(uint8_t output[])
    {
    if(m_bufpos != BLAKE2B_BLOCKBYTES)
       clear_mem(&m_buffer[m_bufpos], BLAKE2B_BLOCKBYTES - m_bufpos);
    m_F[0] = 0xFFFFFFFFFFFFFFFF;
    compress(m_buffer.data(), 1, m_bufpos);
    copy_out_vec_le(output, output_length(), m_H);
-   clear();
+   state_init();
    }
 
-std::string Blake2b::name() const
+std::string BLAKE2b::name() const
    {
-   return "Blake2b(" + std::to_string(m_output_bits) + ")";
+   return "BLAKE2b(" + std::to_string(m_output_bits) + ")";
    }
 
-HashFunction* Blake2b::clone() const
+HashFunction* BLAKE2b::clone() const
    {
-   return new Blake2b(m_output_bits);
+   return new BLAKE2b(m_output_bits);
    }
 
-std::unique_ptr<HashFunction> Blake2b::copy_state() const
+std::unique_ptr<HashFunction> BLAKE2b::copy_state() const
    {
-   return std::unique_ptr<HashFunction>(new Blake2b(*this));
+   return std::unique_ptr<HashFunction>(new BLAKE2b(*this));
    }
 
-void Blake2b::clear()
+void BLAKE2b::clear()
    {
    zeroise(m_H);
    zeroise(m_buffer);
@@ -1101,11 +1160,12 @@ void ChaCha20Poly1305_Mode::start_msg(const uint8_t nonce[], size_t nonce_len)
 
    m_chacha->set_iv(nonce, nonce_len);
 
-   secure_vector<uint8_t> first_block(64);
-   m_chacha->write_keystream(first_block.data(), first_block.size());
+   uint8_t first_block[64];
+   m_chacha->write_keystream(first_block, sizeof(first_block));
 
-   m_poly1305->set_key(first_block.data(), 32);
+   m_poly1305->set_key(first_block, 32);
    // Remainder of first block is discarded
+   secure_scrub_memory(first_block, sizeof(first_block));
 
    m_poly1305->update(m_ad);
 
@@ -1145,8 +1205,8 @@ void ChaCha20Poly1305_Encryption::finish(secure_vector<uint8_t>& buffer, size_t 
       }
    update_len(m_ctext_len);
 
-   const secure_vector<uint8_t> mac = m_poly1305->final();
-   buffer += std::make_pair(mac.data(), tag_size());
+   buffer.resize(buffer.size() + tag_size());
+   m_poly1305->final(&buffer[buffer.size() - tag_size()]);
    m_ctext_len = 0;
    m_nonce_len = 0;
    }
@@ -1187,228 +1247,20 @@ void ChaCha20Poly1305_Decryption::finish(secure_vector<uint8_t>& buffer, size_t 
       }
 
    update_len(m_ctext_len);
-   const secure_vector<uint8_t> mac = m_poly1305->final();
+
+   uint8_t mac[16];
+   m_poly1305->final(mac);
 
    const uint8_t* included_tag = &buf[remaining];
 
    m_ctext_len = 0;
    m_nonce_len = 0;
 
-   if(!constant_time_compare(mac.data(), included_tag, tag_size()))
-      throw Integrity_Failure("ChaCha20Poly1305 tag check failed");
+   if(!constant_time_compare(mac, included_tag, tag_size()))
+      throw Invalid_Authentication_Tag("ChaCha20Poly1305 tag check failed");
    buffer.resize(offset + remaining);
    }
 
-}
-/*
-* (C) 2018 Jack Lloyd
-*
-* Botan is released under the Simplified BSD License (see license.txt)
-*/
-
-
-namespace Botan {
-
-//static
-BOTAN_FUNC_ISA("avx2")
-void ChaCha::chacha_avx2_x8(uint8_t output[64*8], uint32_t state[16], size_t rounds)
-   {
-   SIMD_8x32::reset_registers();
-
-   BOTAN_ASSERT(rounds % 2 == 0, "Valid rounds");
-   const SIMD_8x32 CTR0 = SIMD_8x32(0, 1, 2, 3, 4, 5, 6, 7);
-
-   const uint32_t C = 0xFFFFFFFF - state[12];
-   const SIMD_8x32 CTR1 = SIMD_8x32(0, C < 1, C < 2, C < 3, C < 4, C < 5, C < 6, C < 7);
-
-   SIMD_8x32 R00 = SIMD_8x32::splat(state[ 0]);
-   SIMD_8x32 R01 = SIMD_8x32::splat(state[ 1]);
-   SIMD_8x32 R02 = SIMD_8x32::splat(state[ 2]);
-   SIMD_8x32 R03 = SIMD_8x32::splat(state[ 3]);
-   SIMD_8x32 R04 = SIMD_8x32::splat(state[ 4]);
-   SIMD_8x32 R05 = SIMD_8x32::splat(state[ 5]);
-   SIMD_8x32 R06 = SIMD_8x32::splat(state[ 6]);
-   SIMD_8x32 R07 = SIMD_8x32::splat(state[ 7]);
-   SIMD_8x32 R08 = SIMD_8x32::splat(state[ 8]);
-   SIMD_8x32 R09 = SIMD_8x32::splat(state[ 9]);
-   SIMD_8x32 R10 = SIMD_8x32::splat(state[10]);
-   SIMD_8x32 R11 = SIMD_8x32::splat(state[11]);
-   SIMD_8x32 R12 = SIMD_8x32::splat(state[12]) + CTR0;
-   SIMD_8x32 R13 = SIMD_8x32::splat(state[13]) + CTR1;
-   SIMD_8x32 R14 = SIMD_8x32::splat(state[14]);
-   SIMD_8x32 R15 = SIMD_8x32::splat(state[15]);
-
-   for(size_t r = 0; r != rounds / 2; ++r)
-      {
-      R00 += R04;
-      R01 += R05;
-      R02 += R06;
-      R03 += R07;
-
-      R12 ^= R00;
-      R13 ^= R01;
-      R14 ^= R02;
-      R15 ^= R03;
-
-      R12 = R12.rotl<16>();
-      R13 = R13.rotl<16>();
-      R14 = R14.rotl<16>();
-      R15 = R15.rotl<16>();
-
-      R08 += R12;
-      R09 += R13;
-      R10 += R14;
-      R11 += R15;
-
-      R04 ^= R08;
-      R05 ^= R09;
-      R06 ^= R10;
-      R07 ^= R11;
-
-      R04 = R04.rotl<12>();
-      R05 = R05.rotl<12>();
-      R06 = R06.rotl<12>();
-      R07 = R07.rotl<12>();
-
-      R00 += R04;
-      R01 += R05;
-      R02 += R06;
-      R03 += R07;
-
-      R12 ^= R00;
-      R13 ^= R01;
-      R14 ^= R02;
-      R15 ^= R03;
-
-      R12 = R12.rotl<8>();
-      R13 = R13.rotl<8>();
-      R14 = R14.rotl<8>();
-      R15 = R15.rotl<8>();
-
-      R08 += R12;
-      R09 += R13;
-      R10 += R14;
-      R11 += R15;
-
-      R04 ^= R08;
-      R05 ^= R09;
-      R06 ^= R10;
-      R07 ^= R11;
-
-      R04 = R04.rotl<7>();
-      R05 = R05.rotl<7>();
-      R06 = R06.rotl<7>();
-      R07 = R07.rotl<7>();
-
-      R00 += R05;
-      R01 += R06;
-      R02 += R07;
-      R03 += R04;
-
-      R15 ^= R00;
-      R12 ^= R01;
-      R13 ^= R02;
-      R14 ^= R03;
-
-      R15 = R15.rotl<16>();
-      R12 = R12.rotl<16>();
-      R13 = R13.rotl<16>();
-      R14 = R14.rotl<16>();
-
-      R10 += R15;
-      R11 += R12;
-      R08 += R13;
-      R09 += R14;
-
-      R05 ^= R10;
-      R06 ^= R11;
-      R07 ^= R08;
-      R04 ^= R09;
-
-      R05 = R05.rotl<12>();
-      R06 = R06.rotl<12>();
-      R07 = R07.rotl<12>();
-      R04 = R04.rotl<12>();
-
-      R00 += R05;
-      R01 += R06;
-      R02 += R07;
-      R03 += R04;
-
-      R15 ^= R00;
-      R12 ^= R01;
-      R13 ^= R02;
-      R14 ^= R03;
-
-      R15 = R15.rotl<8>();
-      R12 = R12.rotl<8>();
-      R13 = R13.rotl<8>();
-      R14 = R14.rotl<8>();
-
-      R10 += R15;
-      R11 += R12;
-      R08 += R13;
-      R09 += R14;
-
-      R05 ^= R10;
-      R06 ^= R11;
-      R07 ^= R08;
-      R04 ^= R09;
-
-      R05 = R05.rotl<7>();
-      R06 = R06.rotl<7>();
-      R07 = R07.rotl<7>();
-      R04 = R04.rotl<7>();
-      }
-
-   R00 += SIMD_8x32::splat(state[0]);
-   R01 += SIMD_8x32::splat(state[1]);
-   R02 += SIMD_8x32::splat(state[2]);
-   R03 += SIMD_8x32::splat(state[3]);
-   R04 += SIMD_8x32::splat(state[4]);
-   R05 += SIMD_8x32::splat(state[5]);
-   R06 += SIMD_8x32::splat(state[6]);
-   R07 += SIMD_8x32::splat(state[7]);
-   R08 += SIMD_8x32::splat(state[8]);
-   R09 += SIMD_8x32::splat(state[9]);
-   R10 += SIMD_8x32::splat(state[10]);
-   R11 += SIMD_8x32::splat(state[11]);
-   R12 += SIMD_8x32::splat(state[12]) + CTR0;
-   R13 += SIMD_8x32::splat(state[13]) + CTR1;
-   R14 += SIMD_8x32::splat(state[14]);
-   R15 += SIMD_8x32::splat(state[15]);
-
-   SIMD_8x32::transpose(R00, R01, R02, R03);
-   SIMD_8x32::transpose(R04, R05, R06, R07);
-   SIMD_8x32::transpose(R08, R09, R10, R11);
-   SIMD_8x32::transpose(R12, R13, R14, R15);
-
-   __m256i* output_mm = reinterpret_cast<__m256i*>(output);
-
-   _mm256_storeu_si256(output_mm     , _mm256_permute2x128_si256(R00.handle(), R04.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  1, _mm256_permute2x128_si256(R08.handle(), R12.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  2, _mm256_permute2x128_si256(R01.handle(), R05.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  3, _mm256_permute2x128_si256(R09.handle(), R13.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  4, _mm256_permute2x128_si256(R02.handle(), R06.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  5, _mm256_permute2x128_si256(R10.handle(), R14.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  6, _mm256_permute2x128_si256(R03.handle(), R07.handle(), 0 + (2 << 4)));
-   _mm256_storeu_si256(output_mm +  7, _mm256_permute2x128_si256(R11.handle(), R15.handle(), 0 + (2 << 4)));
-
-   _mm256_storeu_si256(output_mm +  8, _mm256_permute2x128_si256(R00.handle(), R04.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm +  9, _mm256_permute2x128_si256(R08.handle(), R12.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm + 10, _mm256_permute2x128_si256(R01.handle(), R05.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm + 11, _mm256_permute2x128_si256(R09.handle(), R13.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm + 12, _mm256_permute2x128_si256(R02.handle(), R06.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm + 13, _mm256_permute2x128_si256(R10.handle(), R14.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm + 14, _mm256_permute2x128_si256(R03.handle(), R07.handle(), 1 + (3 << 4)));
-   _mm256_storeu_si256(output_mm + 15, _mm256_permute2x128_si256(R11.handle(), R15.handle(), 1 + (3 << 4)));
-
-   SIMD_8x32::zero_registers();
-
-   state[12] += 8;
-   if(state[12] < 8)
-      state[13]++;
-   }
 }
 /*
 * Runtime CPU detection
@@ -1420,10 +1272,6 @@ void ChaCha::chacha_avx2_x8(uint8_t output[64*8], uint32_t state[16], size_t rou
 #include <ostream>
 
 namespace Botan {
-
-uint64_t CPUID::g_processor_features = 0;
-size_t CPUID::g_cache_line_size = BOTAN_TARGET_CPU_DEFAULT_CACHE_LINE_SIZE;
-CPUID::Endian_status CPUID::g_endian_status = ENDIAN_UNKNOWN;
 
 bool CPUID::has_simd_32()
    {
@@ -1467,7 +1315,8 @@ std::string CPUID::to_string()
 
 #if defined(BOTAN_TARGET_CPU_IS_PPC_FAMILY)
    CPUID_PRINT(altivec);
-   CPUID_PRINT(ppc_crypto);
+   CPUID_PRINT(power_crypto);
+   CPUID_PRINT(darn_rng);
 #endif
 
 #if defined(BOTAN_TARGET_CPU_IS_ARM_FAMILY)
@@ -1498,36 +1347,44 @@ void CPUID::print(std::ostream& o)
 //static
 void CPUID::initialize()
    {
-   g_processor_features = 0;
+   state() = CPUID_Data();
+   }
 
+CPUID::CPUID_Data::CPUID_Data()
+   {
 #if defined(BOTAN_TARGET_CPU_IS_PPC_FAMILY) || \
     defined(BOTAN_TARGET_CPU_IS_ARM_FAMILY) || \
     defined(BOTAN_TARGET_CPU_IS_X86_FAMILY)
 
-   g_processor_features = CPUID::detect_cpu_features(&g_cache_line_size);
+   m_cache_line_size = 0;
+   m_processor_features = detect_cpu_features(&m_cache_line_size);
 
 #endif
 
-   g_endian_status = runtime_check_endian();
-   g_processor_features |= CPUID::CPUID_INITIALIZED_BIT;
+   m_processor_features |= CPUID::CPUID_INITIALIZED_BIT;
+
+   if(m_cache_line_size == 0)
+      m_cache_line_size = BOTAN_TARGET_CPU_DEFAULT_CACHE_LINE_SIZE;
+
+   m_endian_status = runtime_check_endian();
    }
 
 //static
-CPUID::Endian_status CPUID::runtime_check_endian()
+CPUID::Endian_Status CPUID::CPUID_Data::runtime_check_endian()
    {
    // Check runtime endian
    const uint32_t endian32 = 0x01234567;
    const uint8_t* e8 = reinterpret_cast<const uint8_t*>(&endian32);
 
-   Endian_status endian = ENDIAN_UNKNOWN;
+   CPUID::Endian_Status endian = CPUID::Endian_Status::Unknown;
 
    if(e8[0] == 0x01 && e8[1] == 0x23 && e8[2] == 0x45 && e8[3] == 0x67)
       {
-      endian = ENDIAN_BIG;
+      endian = CPUID::Endian_Status::Big;
       }
    else if(e8[0] == 0x67 && e8[1] == 0x45 && e8[2] == 0x23 && e8[3] == 0x01)
       {
-      endian = ENDIAN_LITTLE;
+      endian = CPUID::Endian_Status::Little;
       }
    else
       {
@@ -1536,9 +1393,9 @@ CPUID::Endian_status CPUID::runtime_check_endian()
 
    // If we were compiled with a known endian, verify it matches at runtime
 #if defined(BOTAN_TARGET_CPU_IS_LITTLE_ENDIAN)
-   BOTAN_ASSERT(endian == ENDIAN_LITTLE, "Build and runtime endian match");
+   BOTAN_ASSERT(endian == CPUID::Endian_Status::Little, "Build and runtime endian match");
 #elif defined(BOTAN_TARGET_CPU_IS_BIG_ENDIAN)
-   BOTAN_ASSERT(endian == ENDIAN_BIG, "Build and runtime endian match");
+   BOTAN_ASSERT(endian == CPUID::Endian_Status::Big, "Build and runtime endian match");
 #endif
 
    return endian;
@@ -1570,8 +1427,8 @@ CPUID::bit_from_string(const std::string& tok)
 #elif defined(BOTAN_TARGET_CPU_IS_PPC_FAMILY)
    if(tok == "altivec" || tok == "simd")
       return {Botan::CPUID::CPUID_ALTIVEC_BIT};
-   if(tok == "ppc_crypto")
-      return {Botan::CPUID::CPUID_PPC_CRYPTO_BIT};
+   if(tok == "power_crypto")
+      return {Botan::CPUID::CPUID_POWER_CRYPTO_BIT};
 
 #elif defined(BOTAN_TARGET_CPU_IS_ARM_FAMILY)
    if(tok == "neon" || tok == "simd")
@@ -1611,10 +1468,7 @@ CPUID::bit_from_string(const std::string& tok)
 
 #if defined(BOTAN_TARGET_CPU_IS_ARM_FAMILY)
 
-#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL)
-  #include <sys/auxv.h>
-
-#elif defined(BOTAN_TARGET_OS_IS_IOS)
+#if defined(BOTAN_TARGET_OS_IS_IOS)
   #include <sys/types.h>
   #include <sys/sysctl.h>
 
@@ -1703,11 +1557,11 @@ uint64_t flags_by_ios_machine_type(const std::string& machine)
 
 #endif
 
-uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
+uint64_t CPUID::CPUID_Data::detect_cpu_features(size_t* cache_line_size)
    {
    uint64_t detected_features = 0;
 
-#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL)
+#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL) || defined(BOTAN_TARGET_OS_HAS_ELF_AUX_INFO)
    /*
    * On systems with getauxval these bits should normally be defined
    * in bits/auxv.h but some buggy? glibc installs seem to miss them.
@@ -1743,14 +1597,17 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
    };
 
 #if defined(AT_DCACHEBSIZE)
+   // Exists only on Linux
    const unsigned long dcache_line = ::getauxval(AT_DCACHEBSIZE);
 
    // plausibility check
    if(dcache_line == 32 || dcache_line == 64 || dcache_line == 128)
       *cache_line_size = static_cast<size_t>(dcache_line);
+#else
+   BOTAN_UNUSED(cache_line_size);
 #endif
 
-   const unsigned long hwcap_neon = ::getauxval(ARM_hwcap_bit::ARCH_hwcap_neon);
+   const unsigned long hwcap_neon = OS::get_auxval(ARM_hwcap_bit::ARCH_hwcap_neon);
    if(hwcap_neon & ARM_hwcap_bit::NEON_bit)
       detected_features |= CPUID::CPUID_ARM_NEON_BIT;
 
@@ -1759,7 +1616,7 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
    It doesn't seem worth optimizing this out, since getauxval is
    just reading a field in the ELF header.
    */
-   const unsigned long hwcap_crypto = ::getauxval(ARM_hwcap_bit::ARCH_hwcap_crypto);
+   const unsigned long hwcap_crypto = OS::get_auxval(ARM_hwcap_bit::ARCH_hwcap_crypto);
    if(hwcap_crypto & ARM_hwcap_bit::AES_bit)
       detected_features |= CPUID::CPUID_ARM_AES_BIT;
    if(hwcap_crypto & ARM_hwcap_bit::PMULL_bit)
@@ -1801,11 +1658,11 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
    NEON registers v0-v7 are caller saved in Aarch64
    */
 
-   auto neon_probe  = []() -> int { asm("and v0.16b, v0.16b, v0.16b"); return 1; };
-   auto aes_probe   = []() -> int { asm(".word 0x4e284800"); return 1; };
-   auto pmull_probe = []() -> int { asm(".word 0x0ee0e000"); return 1; };
-   auto sha1_probe  = []() -> int { asm(".word 0x5e280800"); return 1; };
-   auto sha2_probe  = []() -> int { asm(".word 0x5e282800"); return 1; };
+   auto neon_probe  = []() noexcept -> int { asm("and v0.16b, v0.16b, v0.16b"); return 1; };
+   auto aes_probe   = []() noexcept -> int { asm(".word 0x4e284800"); return 1; };
+   auto pmull_probe = []() noexcept -> int { asm(".word 0x0ee0e000"); return 1; };
+   auto sha1_probe  = []() noexcept -> int { asm(".word 0x5e280800"); return 1; };
+   auto sha2_probe  = []() noexcept -> int { asm(".word 0x5e282800"); return 1; };
 
    // Only bother running the crypto detection if we found NEON
 
@@ -1842,16 +1699,14 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
 #if defined(BOTAN_TARGET_CPU_IS_PPC_FAMILY)
 
 /*
-* On Darwin and OpenBSD ppc, use sysctl to detect AltiVec
+* On macOS and OpenBSD ppc, use sysctl to detect AltiVec
 */
-#if defined(BOTAN_TARGET_OS_IS_DARWIN)
+#if defined(BOTAN_TARGET_OS_IS_MACOS)
   #include <sys/sysctl.h>
 #elif defined(BOTAN_TARGET_OS_IS_OPENBSD)
   #include <sys/param.h>
   #include <sys/sysctl.h>
   #include <machine/cpu.h>
-#elif defined(BOTAN_TARGET_OS_HAS_GETAUXVAL)
-  #include <sys/auxv.h>
 #endif
 
 #endif
@@ -1864,12 +1719,12 @@ namespace Botan {
 * PowerPC specific block: check for AltiVec using either
 * sysctl or by reading processor version number register.
 */
-uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
+uint64_t CPUID::CPUID_Data::detect_cpu_features(size_t* cache_line_size)
    {
    BOTAN_UNUSED(cache_line_size);
 
-#if defined(BOTAN_TARGET_OS_IS_DARWIN) || defined(BOTAN_TARGET_OS_IS_OPENBSD)
-   // On Darwin/OS X and OpenBSD, use sysctl
+#if defined(BOTAN_TARGET_OS_IS_MACOS) || defined(BOTAN_TARGET_OS_IS_OPENBSD)
+   // On macOS and OpenBSD, use sysctl
 
    int sels[2] = {
 #if defined(BOTAN_TARGET_OS_IS_OPENBSD)
@@ -1886,11 +1741,12 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
    if(error == 0 && vector_type > 0)
       return CPUID::CPUID_ALTIVEC_BIT;
 
-#elif defined(BOTAN_TARGET_OS_HAS_GETAUXVAL) && defined(BOTAN_TARGET_ARCH_IS_PPC64)
+#elif (defined(BOTAN_TARGET_OS_HAS_GETAUXVAL) || defined(BOTAN_TARGET_HAS_ELF_AUX_INFO)) && defined(BOTAN_TARGET_ARCH_IS_PPC64)
 
    enum PPC_hwcap_bit {
       ALTIVEC_bit  = (1 << 28),
       CRYPTO_bit   = (1 << 25),
+      DARN_bit     = (1 << 21),
 
       ARCH_hwcap_altivec = 16, // AT_HWCAP
       ARCH_hwcap_crypto  = 26, // AT_HWCAP2
@@ -1898,13 +1754,15 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
 
    uint64_t detected_features = 0;
 
-   const unsigned long hwcap_altivec = ::getauxval(PPC_hwcap_bit::ARCH_hwcap_altivec);
+   const unsigned long hwcap_altivec = OS::get_auxval(PPC_hwcap_bit::ARCH_hwcap_altivec);
    if(hwcap_altivec & PPC_hwcap_bit::ALTIVEC_bit)
       detected_features |= CPUID::CPUID_ALTIVEC_BIT;
 
-   const unsigned long hwcap_crypto = ::getauxval(PPC_hwcap_bit::ARCH_hwcap_crypto);
+   const unsigned long hwcap_crypto = OS::get_auxval(PPC_hwcap_bit::ARCH_hwcap_crypto);
    if(hwcap_crypto & PPC_hwcap_bit::CRYPTO_bit)
-     detected_features |= CPUID::CPUID_PPC_CRYPTO_BIT;
+     detected_features |= CPUID::CPUID_POWER_CRYPTO_BIT;
+   if(hwcap_crypto & PPC_hwcap_bit::DARN_bit)
+     detected_features |= CPUID::CPUID_DARN_BIT;
 
    return detected_features;
 
@@ -1916,7 +1774,7 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
    (others, too, maybe?) will trap and emulate it for us.
    */
 
-   int pvr = OS::run_cpu_instruction_probe([]() -> int {
+   int pvr = OS::run_cpu_instruction_probe([]() noexcept -> int {
       uint32_t pvr = 0;
       asm volatile("mfspr %0, 287" : "=r" (pvr));
       // Top 16 bits suffice to identify the model
@@ -1984,7 +1842,7 @@ namespace Botan {
 
 #if defined(BOTAN_TARGET_CPU_IS_X86_FAMILY)
 
-uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
+uint64_t CPUID::CPUID_Data::detect_cpu_features(size_t* cache_line_size)
    {
 #if defined(BOTAN_BUILD_COMPILER_IS_MSVC)
   #define X86_CPUID(type, out) do { __cpuid((int*)out, type); } while(0)
@@ -2152,6 +2010,9 @@ uint64_t CPUID::detect_cpu_features(size_t* cache_line_size)
 #if defined(BOTAN_HAS_ENTROPY_SRC_RDSEED)
 #endif
 
+#if defined(BOTAN_HAS_ENTROPY_SRC_DARN)
+#endif
+
 #if defined(BOTAN_HAS_ENTROPY_SRC_DEV_RANDOM)
 #endif
 
@@ -2207,6 +2068,13 @@ std::unique_ptr<Entropy_Source> Entropy_Source::create(const std::string& name)
    if(name == "rdseed")
       {
       return std::unique_ptr<Entropy_Source>(new Intel_Rdseed);
+      }
+#endif
+
+#if defined(BOTAN_HAS_ENTROPY_SRC_DARN)
+   if(name == "p9_darn")
+      {
+      return std::unique_ptr<Entropy_Source>(new POWER9_DARN);
       }
 #endif
 
@@ -2384,9 +2252,6 @@ Entropy_Sources& Entropy_Sources::global_sources()
 #if defined(BOTAN_HAS_BLAKE2B)
 #endif
 
-#if defined(BOTAN_HAS_BEARSSL)
-#endif
-
 #if defined(BOTAN_HAS_OPENSSL)
 #endif
 
@@ -2414,17 +2279,6 @@ std::unique_ptr<HashFunction> HashFunction::create(const std::string& algo_spec,
    if(provider.empty() || provider == "openssl")
       {
       if(auto hash = make_openssl_hash(algo_spec))
-         return hash;
-
-      if(!provider.empty())
-         return nullptr;
-      }
-#endif
-
-#if defined(BOTAN_HAS_BEARSSL)
-   if(provider.empty() || provider == "bearssl")
-      {
-      if(auto hash = make_bearssl_hash(algo_spec))
          return hash;
 
       if(!provider.empty())
@@ -2549,7 +2403,7 @@ std::unique_ptr<HashFunction> HashFunction::create(const std::string& algo_spec,
 #endif
 
 #if defined(BOTAN_HAS_BLAKE2B)
-   if(req.algo_name() == "Blake2b")
+   if(req.algo_name() == "Blake2b" || req.algo_name() == "BLAKE2b")
       {
       return std::unique_ptr<HashFunction>(
          new Blake2b(req.arg_as_integer(0, 512)));
@@ -2656,7 +2510,7 @@ HashFunction::create_or_throw(const std::string& algo,
 
 std::vector<std::string> HashFunction::providers(const std::string& algo_spec)
    {
-   return probe_providers_of<HashFunction>(algo_spec, {"base", "bearssl", "openssl", "commoncrypto"});
+   return probe_providers_of<HashFunction>(algo_spec, {"base", "openssl", "commoncrypto"});
    }
 
 }
@@ -3423,119 +3277,6 @@ void Poly1305::final_result(uint8_t out[])
 
 }
 /*
-* Entropy Source Using Intel's rdrand instruction
-* (C) 2012,2015 Jack Lloyd
-* (C) 2015 Daniel Neus
-*
-* Botan is released under the Simplified BSD License (see license.txt)
-*/
-
-
-namespace Botan {
-
-size_t Intel_Rdrand::poll(RandomNumberGenerator& rng)
-   {
-   if(BOTAN_ENTROPY_INTEL_RNG_POLLS > 0 && RDRAND_RNG::available())
-      {
-      RDRAND_RNG rdrand_rng;
-      secure_vector<uint8_t> buf(4 * BOTAN_ENTROPY_INTEL_RNG_POLLS);
-
-      rdrand_rng.randomize(buf.data(), buf.size());
-      rng.add_entropy(buf.data(), buf.size());
-      }
-
-   // RDRAND is used but not trusted
-   return 0;
-   }
-
-}
-/*
-* RDRAND RNG
-* (C) 2016 Jack Lloyd
-*
-* Botan is released under the Simplified BSD License (see license.txt)
-*/
-
-
-#if !defined(BOTAN_USE_GCC_INLINE_ASM)
-  #include <immintrin.h>
-#endif
-
-namespace Botan {
-
-RDRAND_RNG::RDRAND_RNG()
-   {
-   if(!RDRAND_RNG::available())
-      throw Invalid_State("Current CPU does not support RDRAND instruction");
-   }
-
-//static
-bool RDRAND_RNG::available()
-   {
-   return CPUID::has_rdrand();
-   }
-
-//static
-uint32_t RDRAND_RNG::rdrand()
-   {
-   for(;;)
-      {
-      bool ok = false;
-      uint32_t r = rdrand_status(ok);
-      if(ok)
-         return r;
-      }
-   }
-
-//static
-BOTAN_FUNC_ISA("rdrnd")
-uint32_t RDRAND_RNG::rdrand_status(bool& ok)
-   {
-   ok = false;
-   uint32_t r = 0;
-
-   for(size_t i = 0; i != BOTAN_ENTROPY_RDRAND_RETRIES; ++i)
-      {
-#if defined(BOTAN_USE_GCC_INLINE_ASM)
-      int cf = 0;
-
-      // Encoding of rdrand %eax
-      asm(".byte 0x0F, 0xC7, 0xF0; adcl $0,%1" :
-          "=a" (r), "=r" (cf) : "0" (r), "1" (cf) : "cc");
-#else
-      int cf = _rdrand32_step(&r);
-#endif
-      if(1 == cf)
-         {
-         ok = true;
-         break;
-         }
-      }
-
-   return r;
-   }
-
-void RDRAND_RNG::randomize(uint8_t out[], size_t out_len)
-   {
-   while(out_len >= 4)
-      {
-      uint32_t r = RDRAND_RNG::rdrand();
-
-      store_le(r, out);
-      out += 4;
-      out_len -= 4;
-      }
-
-   if(out_len) // between 1 and 3 trailing bytes
-      {
-      uint32_t r = RDRAND_RNG::rdrand();
-      for(size_t i = 0; i != out_len; ++i)
-         out[i] = get_byte(i, r);
-      }
-   }
-
-}
-/*
 * (C) 2016 Jack Lloyd
 *
 * Botan is released under the Simplified BSD License (see license.txt)
@@ -3695,7 +3436,7 @@ std::unique_ptr<StreamCipher> StreamCipher::create(const std::string& algo_spec,
 #endif
 
 #if defined(BOTAN_HAS_SHAKE_CIPHER)
-   if(req.algo_name() == "SHAKE-128")
+   if(req.algo_name() == "SHAKE-128" || req.algo_name() == "SHAKE-128-XOF")
       {
       if(provider.empty() || provider == "base")
          return std::unique_ptr<StreamCipher>(new SHAKE_128_Cipher);
@@ -3774,21 +3515,21 @@ std::vector<std::string> StreamCipher::providers(const std::string& algo_spec)
   #include <windows.h>
 
 #elif defined(BOTAN_TARGET_OS_HAS_CRYPTO_NG)
-   #include <bcrypt.h>
+  #include <bcrypt.h>
 
 #elif defined(BOTAN_TARGET_OS_HAS_ARC4RANDOM)
-   #include <stdlib.h>
+  #include <stdlib.h>
 
 #elif defined(BOTAN_TARGET_OS_HAS_GETRANDOM)
-   #include <sys/random.h>
-   #include <errno.h>
+  #include <sys/random.h>
+  #include <errno.h>
 
 #elif defined(BOTAN_TARGET_OS_HAS_DEV_RANDOM)
-   #include <sys/types.h>
-   #include <sys/stat.h>
-   #include <fcntl.h>
-   #include <unistd.h>
-   #include <errno.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <unistd.h>
+  #include <errno.h>
 #endif
 
 namespace Botan {
@@ -3867,7 +3608,7 @@ class System_RNG_Impl final : public RandomNumberGenerator
       void clear() override { /* not possible */ }
       std::string name() const override { return "crypto_ng"; }
    private:
-      BCRYPT_ALG_HANDLE m_handle;
+      BCRYPT_ALG_HANDLE m_prov;
    };
 
 #elif defined(BOTAN_TARGET_OS_HAS_ARC4RANDOM)
@@ -3933,9 +3674,9 @@ class System_RNG_Impl final : public RandomNumberGenerator
    public:
       System_RNG_Impl()
          {
-         #ifndef O_NOCTTY
-            #define O_NOCTTY 0
-         #endif
+#ifndef O_NOCTTY
+#define O_NOCTTY 0
+#endif
 
          m_fd = ::open(BOTAN_SYSTEM_RNG_DEVICE, O_RDWR | O_NOCTTY);
 
@@ -4010,15 +3751,15 @@ void System_RNG_Impl::add_entropy(const uint8_t input[], size_t len)
 
          /*
          * This is seen on OS X CI, despite the fact that the man page
-         * for Darwin urandom explicitly states that writing to it is
+         * for macOS urandom explicitly states that writing to it is
          * supported, and write(2) does not document EPERM at all.
          * But in any case EPERM seems indicative of a policy decision
          * by the OS or sysadmin that additional entropy is not wanted
          * in the system pool, so we accept that and return here,
          * since there is no corrective action possible.
-	 *
-	 * In Linux EBADF or EPERM is returned if m_fd is not opened for
-	 * writing.
+         *
+         * In Linux EBADF or EPERM is returned if m_fd is not opened for
+         * writing.
          */
          if(errno == EPERM || errno == EBADF)
             return;
@@ -4159,13 +3900,18 @@ std::chrono::system_clock::time_point calendar_point::to_std_timepoint() const
    // 32 bit time_t ends at January 19, 2038
    // https://msdn.microsoft.com/en-us/library/2093ets1.aspx
    // Throw after 2037 if 32 bit time_t is used
-   if(get_year() > 2037 && sizeof(std::time_t) == 4)
+
+   BOTAN_IF_CONSTEXPR(sizeof(std::time_t) == 4)
       {
-      throw Invalid_Argument("calendar_point::to_std_timepoint() does not support years after 2037 on this system");
+      if(get_year() > 2037)
+         {
+         throw Invalid_Argument("calendar_point::to_std_timepoint() does not support years after 2037 on this system");
+         }
       }
-   else if(get_year() >= 2400)
+
+   // This upper bound is completely arbitrary
+   if(get_year() >= 2400)
       {
-      // This upper bound is somewhat arbitrary
       throw Invalid_Argument("calendar_point::to_std_timepoint() does not support years after 2400");
       }
 
@@ -4791,6 +4537,68 @@ DataSource_Stream::~DataSource_Stream()
 
 namespace Botan {
 
+std::string to_string(ErrorType type)
+   {
+   switch(type)
+      {
+      case ErrorType::Unknown:
+         return "Unknown";
+      case ErrorType::SystemError:
+         return "SystemError";
+      case ErrorType::NotImplemented:
+         return "NotImplemented";
+      case ErrorType::OutOfMemory:
+         return "OutOfMemory";
+      case ErrorType::InternalError:
+         return "InternalError";
+      case ErrorType::IoError:
+         return "IoError";
+      case ErrorType::InvalidObjectState :
+         return "InvalidObjectState";
+      case ErrorType::KeyNotSet:
+         return "KeyNotSet";
+      case ErrorType::InvalidArgument:
+         return "InvalidArgument";
+      case ErrorType::InvalidKeyLength:
+         return "InvalidKeyLength";
+      case ErrorType::InvalidNonceLength:
+         return "InvalidNonceLength";
+      case ErrorType::LookupError:
+         return "LookupError";
+      case ErrorType::EncodingFailure:
+         return "EncodingFailure";
+      case ErrorType::DecodingFailure:
+         return "DecodingFailure";
+      case ErrorType::TLSError:
+         return "TLSError";
+      case ErrorType::HttpError:
+         return "HttpError";
+      case ErrorType::InvalidTag:
+         return "InvalidTag";
+      case ErrorType::RoughtimeError:
+         return "RoughtimeError";
+      case ErrorType::OpenSSLError :
+         return "OpenSSLError";
+      case ErrorType::CommonCryptoError:
+         return "CommonCryptoError";
+      case ErrorType::Pkcs11Error:
+         return "Pkcs11Error";
+      case ErrorType::TPMError:
+         return "TPMError";
+      case ErrorType::DatabaseError:
+         return "DatabaseError";
+      case ErrorType::ZlibError :
+         return "ZlibError";
+      case ErrorType::Bzip2Error:
+         return "Bzip2Error" ;
+      case ErrorType::LzmaError:
+         return "LzmaError";
+      }
+
+   // No default case in above switch so compiler warns
+   return "Unrecognized Botan error";
+   }
+
 Exception::Exception(const std::string& msg) : m_msg(msg)
    {}
 
@@ -4876,8 +4684,8 @@ Decoding_Error::Decoding_Error(const std::string& msg, const std::exception& e) 
 Decoding_Error::Decoding_Error(const std::string& name, const char* exception_message) :
    Invalid_Argument(name + " failed with exception " + exception_message) {}
 
-Integrity_Failure::Integrity_Failure(const std::string& msg) :
-   Exception("Integrity failure: " + msg)
+Invalid_Authentication_Tag::Invalid_Authentication_Tag(const std::string& msg) :
+   Exception("Invalid authentication tag: " + msg)
    {}
 
 Invalid_OID::Invalid_OID(const std::string& oid) :
@@ -4903,18 +4711,14 @@ Not_Implemented::Not_Implemented(const std::string& err) :
 
 }
 /*
-* (C) 2015,2017 Jack Lloyd
+* (C) 2015,2017,2019 Jack Lloyd
 * (C) 2015 Simon Warta (Kullo GmbH)
 *
 * Botan is released under the Simplified BSD License (see license.txt)
 */
 
 
-#if defined(BOTAN_TARGET_OS_HAS_STL_FILESYSTEM_MSVC) && defined(BOTAN_BUILD_COMPILER_IS_MSVC)
-  #include <filesystem>
-#elif defined(BOTAN_HAS_BOOST_FILESYSTEM)
-  #include <boost/filesystem.hpp>
-#elif defined(BOTAN_TARGET_OS_HAS_POSIX1)
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1)
   #include <sys/types.h>
   #include <sys/stat.h>
   #include <dirent.h>
@@ -4928,53 +4732,7 @@ namespace Botan {
 
 namespace {
 
-#if defined(BOTAN_TARGET_OS_HAS_STL_FILESYSTEM_MSVC) && defined(BOTAN_BUILD_COMPILER_IS_MSVC)
-std::vector<std::string> impl_stl_filesystem(const std::string& dir)
-   {
-#if (_MSVC_LANG >= 201703L)
-   using namespace std::filesystem;
-#else
-   using namespace std::tr2::sys;
-#endif
-
-   std::vector<std::string> out;
-
-   path p(dir);
-
-   if(is_directory(p))
-      {
-      for(recursive_directory_iterator itr(p), end; itr != end; ++itr)
-         {
-         if(is_regular_file(itr->path()))
-            {
-            out.push_back(itr->path().string());
-            }
-         }
-      }
-
-   return out;
-   }
-
-#elif defined(BOTAN_HAS_BOOST_FILESYSTEM)
-
-std::vector<std::string> impl_boost_filesystem(const std::string& dir_path)
-{
-   namespace fs = boost::filesystem;
-
-   std::vector<std::string> out;
-
-   for(fs::recursive_directory_iterator dir(dir_path), end; dir != end; ++dir)
-      {
-      if(fs::is_regular_file(dir->path()))
-         {
-         out.push_back(dir->path().string());
-         }
-      }
-
-   return out;
-}
-
-#elif defined(BOTAN_TARGET_OS_HAS_POSIX1)
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1)
 
 std::vector<std::string> impl_readdir(const std::string& dir_path)
    {
@@ -5062,11 +4820,7 @@ std::vector<std::string> impl_win32(const std::string& dir_path)
 
 bool has_filesystem_impl()
    {
-#if defined(BOTAN_TARGET_OS_HAS_STL_FILESYSTEM_MSVC) && defined(BOTAN_BUILD_COMPILER_IS_MSVC)
-   return true;
-#elif defined(BOTAN_HAS_BOOST_FILESYSTEM)
-   return true;
-#elif defined(BOTAN_TARGET_OS_HAS_POSIX1)
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1)
    return true;
 #elif defined(BOTAN_TARGET_OS_HAS_WIN32)
    return true;
@@ -5079,11 +4833,7 @@ std::vector<std::string> get_files_recursive(const std::string& dir)
    {
    std::vector<std::string> files;
 
-#if defined(BOTAN_TARGET_OS_HAS_STL_FILESYSTEM_MSVC) && defined(BOTAN_BUILD_COMPILER_IS_MSVC)
-   files = impl_stl_filesystem(dir);
-#elif defined(BOTAN_HAS_BOOST_FILESYSTEM)
-   files = impl_boost_filesystem(dir);
-#elif defined(BOTAN_TARGET_OS_HAS_POSIX1)
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1)
    files = impl_readdir(dir);
 #elif defined(BOTAN_TARGET_OS_HAS_WIN32)
    files = impl_win32(dir);
@@ -5114,6 +4864,9 @@ namespace Botan {
 
 BOTAN_MALLOC_FN void* allocate_memory(size_t elems, size_t elem_size)
    {
+   if(elems == 0 || elem_size == 0)
+      return nullptr;
+
 #if defined(BOTAN_HAS_LOCKING_ALLOCATOR)
    if(void* p = mlock_allocator::instance().allocate(elems, elem_size))
       return p;
@@ -5170,6 +4923,10 @@ uint8_t ct_compare_u8(const uint8_t x[],
 
 
 
+#if defined(BOTAN_TARGET_OS_HAS_THREADS)
+  #include <thread>
+#endif
+
 #if defined(BOTAN_TARGET_OS_HAS_EXPLICIT_BZERO)
   #include <string.h>
 #endif
@@ -5190,13 +4947,24 @@ uint8_t ct_compare_u8(const uint8_t x[],
   #include <emscripten/emscripten.h>
 #endif
 
-#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL)
+#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL) || defined(BOTAN_TARGET_OS_IS_ANDROID) || \
+  defined(BOTAN_TARGET_OS_HAS_ELF_AUX_INFO)
   #include <sys/auxv.h>
 #endif
 
 #if defined(BOTAN_TARGET_OS_HAS_WIN32)
   #define NOMINMAX 1
+  #define _WINSOCKAPI_ // stop windows.h including winsock.h
   #include <windows.h>
+#endif
+
+#if defined(BOTAN_TARGET_OS_IS_ANDROID)
+  #include <elf.h>
+  extern "C" char **environ;
+#endif
+
+#if defined(BOTAN_TARGET_OS_IS_IOS) || defined(BOTAN_TARGET_OS_IS_MACOS)
+  #include <mach/vm_statistics.h>
 #endif
 
 namespace Botan {
@@ -5245,10 +5013,44 @@ uint32_t OS::get_process_id()
 #endif
    }
 
+unsigned long OS::get_auxval(unsigned long id)
+   {
+#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL)
+   return ::getauxval(id);
+#elif defined(BOTAN_TARGET_OS_IS_ANDROID) && defined(BOTAN_TARGET_ARCH_IS_ARM32)
+
+   if(id == 0)
+      return 0;
+
+   char **p = environ;
+
+   while(*p++ != nullptr)
+      ;
+
+   Elf32_auxv_t *e = reinterpret_cast<Elf32_auxv_t*>(p);
+
+   while(e != nullptr)
+      {
+      if(e->a_type == id)
+         return e->a_un.a_val;
+      e++;
+      }
+
+   return 0;
+#elif defined(BOTAN_TARGET_OS_HAS_ELF_AUX_INFO)
+   unsigned long auxinfo = 0;
+   ::elf_aux_info(id, &auxinfo, sizeof(auxinfo));
+   return auxinfo;
+#else
+   BOTAN_UNUSED(id);
+   return 0;
+#endif
+   }
+
 bool OS::running_in_privileged_state()
    {
-#if defined(BOTAN_TARGET_OS_HAS_GETAUXVAL) && defined(AT_SECURE)
-   return ::getauxval(AT_SECURE) != 0;
+#if defined(AT_SECURE)
+   return OS::get_auxval(AT_SECURE) != 0;
 #elif defined(BOTAN_TARGET_OS_HAS_POSIX1)
    return (::getuid() != ::geteuid()) || (::getgid() != ::getegid());
 #else
@@ -5286,10 +5088,10 @@ uint64_t OS::get_cpu_cycle_counter()
       asm volatile("mftbu %0" : "=r" (rtc_high2));
 
       if(rtc_high == rtc_high2)
-	 {
+         {
          rtc = (static_cast<uint64_t>(rtc_high) << 32) | rtc_low;
          break;
-	 }
+         }
       }
 
 #elif defined(BOTAN_TARGET_ARCH_IS_ALPHA)
@@ -5315,6 +5117,32 @@ uint64_t OS::get_cpu_cycle_counter()
 #endif
 
    return rtc;
+   }
+
+size_t OS::get_cpu_total()
+   {
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1) && defined(_SC_NPROCESSORS_CONF)
+   const long res = ::sysconf(_SC_NPROCESSORS_CONF);
+   if(res > 0)
+      return static_cast<size_t>(res);
+#endif
+
+#if defined(BOTAN_TARGET_OS_HAS_THREADS)
+   return static_cast<size_t>(std::thread::hardware_concurrency());
+#else
+   return 1;
+#endif
+   }
+
+size_t OS::get_cpu_available()
+   {
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1) && defined(_SC_NPROCESSORS_ONLN)
+   const long res = ::sysconf(_SC_NPROCESSORS_ONLN);
+   if(res > 0)
+      return static_cast<size_t>(res);
+#endif
+
+   return OS::get_cpu_total();
    }
 
 uint64_t OS::get_high_resolution_clock()
@@ -5394,6 +5222,7 @@ size_t OS::system_page_size()
    else
       return default_page_size;
 #elif defined(BOTAN_TARGET_OS_HAS_VIRTUAL_LOCK)
+   BOTAN_UNUSED(default_page_size);
    SYSTEM_INFO sys_info;
    ::GetSystemInfo(&sys_info);
    return sys_info.dwPageSize;
@@ -5417,20 +5246,9 @@ size_t OS::get_memory_locking_limit()
    * programs), but small enough that we should not cause problems
    * even if many processes are mlocking on the same machine.
    */
-   size_t mlock_requested = BOTAN_MLOCK_ALLOCATOR_MAX_LOCKED_KB;
+   const size_t user_req = read_env_variable_sz("BOTAN_MLOCK_POOL_SIZE", BOTAN_MLOCK_ALLOCATOR_MAX_LOCKED_KB);
 
-   /*
-   * Allow override via env variable
-   */
-   if(const char* env = read_env_variable("BOTAN_MLOCK_POOL_SIZE"))
-      {
-      try
-         {
-         const size_t user_req = std::stoul(env, nullptr);
-         mlock_requested = std::min(user_req, mlock_requested);
-         }
-      catch(std::exception&) { /* ignore it */ }
-      }
+   const size_t mlock_requested = std::min<size_t>(user_req, BOTAN_MLOCK_ALLOCATOR_MAX_LOCKED_KB);
 
    if(mlock_requested > 0)
       {
@@ -5457,22 +5275,15 @@ size_t OS::get_memory_locking_limit()
 
    // According to Microsoft MSDN:
    // The maximum number of pages that a process can lock is equal to the number of pages in its minimum working set minus a small overhead
-   // In the book "Windows Internals Part 2": the maximum lockable pages are minimum working set size - 8 pages 
+   // In the book "Windows Internals Part 2": the maximum lockable pages are minimum working set size - 8 pages
    // But the information in the book seems to be inaccurate/outdated
    // I've tested this on Windows 8.1 x64, Windows 10 x64 and Windows 7 x86
    // On all three OS the value is 11 instead of 8
-   size_t overhead = OS::system_page_size() * 11ULL;
+   const size_t overhead = OS::system_page_size() * 11;
    if(working_min > overhead)
       {
-      size_t lockable_bytes = working_min - overhead;
-      if(lockable_bytes < (BOTAN_MLOCK_ALLOCATOR_MAX_LOCKED_KB * 1024ULL))
-         {
-         return lockable_bytes;
-         }
-      else
-         {
-         return BOTAN_MLOCK_ALLOCATOR_MAX_LOCKED_KB * 1024ULL;
-         }
+      const size_t lockable_bytes = working_min - overhead;
+      return std::min<size_t>(lockable_bytes, BOTAN_MLOCK_ALLOCATOR_MAX_LOCKED_KB * 1024);
       }
 #endif
 
@@ -5480,81 +5291,203 @@ size_t OS::get_memory_locking_limit()
    return 0;
    }
 
-const char* OS::read_env_variable(const std::string& name)
+bool OS::read_env_variable(std::string& value_out, const std::string& name)
    {
-   if(running_in_privileged_state())
-      return nullptr;
+   value_out = "";
 
-   return std::getenv(name.c_str());
+   if(running_in_privileged_state())
+      return false;
+
+#if defined(BOTAN_TARGET_OS_HAS_WIN32) && defined(BOTAN_BUILD_COMPILER_IS_MSVC)
+   char val[128] = { 0 };
+   size_t req_size = 0;
+   if(getenv_s(&req_size, val, sizeof(val), name.c_str()) == 0)
+      {
+      value_out = std::string(val, req_size);
+      return true;
+      }
+#else
+   if(const char* val = std::getenv(name.c_str()))
+      {
+      value_out = val;
+      return true;
+      }
+#endif
+
+   return false;
    }
 
-void* OS::allocate_locked_pages(size_t length)
+size_t OS::read_env_variable_sz(const std::string& name, size_t def)
+   {
+   std::string value;
+   if(read_env_variable(value, name))
+      {
+      try
+         {
+         const size_t val = std::stoul(value, nullptr);
+         return val;
+         }
+      catch(std::exception&) { /* ignore it */ }
+      }
+
+   return def;
+   }
+
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1) && defined(BOTAN_TARGET_OS_HAS_POSIX_MLOCK)
+
+namespace {
+
+int get_locked_fd()
+   {
+#if defined(BOTAN_TARGET_OS_IS_IOS) || defined(BOTAN_TARGET_OS_IS_MACOS)
+   // On Darwin, tagging anonymous pages allows vmmap to track these.
+   // Allowed from 240 to 255 for userland applications
+   static constexpr int default_locked_fd = 255;
+   int locked_fd = default_locked_fd;
+
+   if(size_t locked_fdl = OS::read_env_variable_sz("BOTAN_LOCKED_FD", default_locked_fd))
+      {
+      if(locked_fdl < 240 || locked_fdl > 255)
+         {
+         locked_fdl = default_locked_fd;
+         }
+      locked_fd = static_cast<int>(locked_fdl);
+      }
+   return VM_MAKE_TAG(locked_fd);
+#else
+   return -1;
+#endif
+   }
+
+}
+
+#endif
+
+std::vector<void*> OS::allocate_locked_pages(size_t count)
    {
 #if defined(BOTAN_TARGET_OS_HAS_POSIX1) && defined(BOTAN_TARGET_OS_HAS_POSIX_MLOCK)
+   static const int locked_fd = get_locked_fd();
+#endif
+
+   std::vector<void*> result;
+   result.reserve(count);
 
    const size_t page_size = OS::system_page_size();
 
-   if(length % page_size != 0)
-      return nullptr;
+   for(size_t i = 0; i != count; ++i)
+      {
+      void* ptr = nullptr;
 
-   void* ptr = nullptr;
-   int rc = ::posix_memalign(&ptr, page_size, length);
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1) && defined(BOTAN_TARGET_OS_HAS_POSIX_MLOCK)
 
-   if(rc != 0 || ptr == nullptr)
-      return nullptr;
-
-#if defined(MADV_DONTDUMP)
-   ::madvise(ptr, length, MADV_DONTDUMP);
+#if !defined(MAP_ANONYMOUS)
+   #define MAP_ANONYMOUS MAP_ANON
 #endif
 
-   if(::mlock(ptr, length) != 0)
-      {
-      std::free(ptr);
-      return nullptr; // failed to lock
-      }
-
-   ::memset(ptr, 0, length);
-
-   return ptr;
-#elif defined(BOTAN_TARGET_OS_HAS_VIRTUAL_LOCK)
-   LPVOID ptr = ::VirtualAlloc(nullptr, length, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-   if(!ptr)
-      {
-      return nullptr;
-      }
-
-   if(::VirtualLock(ptr, length) == 0)
-      {
-      ::VirtualFree(ptr, 0, MEM_RELEASE);
-      return nullptr; // failed to lock
-      }
-
-   return ptr;
+#if !defined(MAP_NOCORE)
+#if defined(MAP_CONCEAL)
+   #define MAP_NOCORE MAP_CONCEAL
 #else
-   BOTAN_UNUSED(length);
-   return nullptr; /* not implemented */
+   #define MAP_NOCORE 0
+#endif
+#endif
+
+#if !defined(PROT_MAX)
+   #define PROT_MAX(p) 0
+#endif
+      const int pflags = PROT_READ | PROT_WRITE;
+
+      ptr = ::mmap(nullptr, 2*page_size,
+                   pflags | PROT_MAX(pflags),
+                   MAP_ANONYMOUS | MAP_PRIVATE | MAP_NOCORE,
+                   /*fd=*/locked_fd, /*offset=*/0);
+
+      if(ptr == MAP_FAILED)
+         {
+         continue;
+         }
+
+      // failed to lock
+      if(::mlock(ptr, page_size) != 0)
+         {
+         ::munmap(ptr, 2*page_size);
+         continue;
+         }
+
+#if defined(MADV_DONTDUMP)
+      // we ignore errors here, as DONTDUMP is just a bonus
+      ::madvise(ptr, page_size, MADV_DONTDUMP);
+#endif
+
+#elif defined(BOTAN_TARGET_OS_HAS_VIRTUAL_LOCK)
+      ptr = ::VirtualAlloc(nullptr, 2*page_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+      if(ptr == nullptr)
+         continue;
+
+      if(::VirtualLock(ptr, page_size) == 0)
+         {
+         ::VirtualFree(ptr, 0, MEM_RELEASE);
+         continue;
+         }
+#endif
+
+      std::memset(ptr, 0, 2*page_size); // zero both data and guard pages
+
+      // Make guard page following the data page
+      page_prohibit_access(static_cast<uint8_t*>(ptr) + page_size);
+
+      result.push_back(ptr);
+      }
+
+   return result;
+   }
+
+void OS::page_allow_access(void* page)
+   {
+   const size_t page_size = OS::system_page_size();
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1)
+   ::mprotect(page, page_size, PROT_READ | PROT_WRITE);
+#elif defined(BOTAN_TARGET_OS_HAS_VIRTUAL_LOCK)
+   DWORD old_perms = 0;
+   ::VirtualProtect(page, page_size, PAGE_READWRITE, &old_perms);
+   BOTAN_UNUSED(old_perms);
 #endif
    }
 
-void OS::free_locked_pages(void* ptr, size_t length)
+void OS::page_prohibit_access(void* page)
    {
-   if(ptr == nullptr || length == 0)
-      return;
+   const size_t page_size = OS::system_page_size();
+#if defined(BOTAN_TARGET_OS_HAS_POSIX1)
+   ::mprotect(page, page_size, PROT_NONE);
+#elif defined(BOTAN_TARGET_OS_HAS_VIRTUAL_LOCK)
+   DWORD old_perms = 0;
+   ::VirtualProtect(page, page_size, PAGE_NOACCESS, &old_perms);
+   BOTAN_UNUSED(old_perms);
+#endif
+   }
+
+void OS::free_locked_pages(const std::vector<void*>& pages)
+   {
+   const size_t page_size = OS::system_page_size();
+
+   for(size_t i = 0; i != pages.size(); ++i)
+      {
+      void* ptr = pages[i];
+
+      secure_scrub_memory(ptr, page_size);
+
+      // ptr points to the data page, guard page follows
+      page_allow_access(static_cast<uint8_t*>(ptr) + page_size);
 
 #if defined(BOTAN_TARGET_OS_HAS_POSIX1) && defined(BOTAN_TARGET_OS_HAS_POSIX_MLOCK)
-   secure_scrub_memory(ptr, length);
-   ::munlock(ptr, length);
-   std::free(ptr);
-
+      ::munlock(ptr, page_size);
+      ::munmap(ptr, 2*page_size);
 #elif defined(BOTAN_TARGET_OS_HAS_VIRTUAL_LOCK)
-   secure_scrub_memory(ptr, length);
-   ::VirtualUnlock(ptr, length);
-   ::VirtualFree(ptr, 0, MEM_RELEASE);
-
-#else
-   // Invalid argument because no way this pointer was allocated by us
-   throw Invalid_Argument("Invalid ptr to free_locked_pages");
+      ::VirtualUnlock(ptr, page_size);
+      ::VirtualFree(ptr, 0, MEM_RELEASE);
 #endif
+      }
    }
 
 #if defined(BOTAN_TARGET_OS_HAS_POSIX1) && !defined(BOTAN_TARGET_OS_IS_EMSCRIPTEN)
@@ -5606,19 +5539,6 @@ int OS::run_cpu_instruction_probe(std::function<int ()> probe_fn)
    rc = ::sigaction(SIGILL, &old_sigaction, nullptr);
    if(rc != 0)
       throw System_Error("run_cpu_instruction_probe sigaction restore failed", errno);
-
-#elif defined(BOTAN_TARGET_OS_IS_WINDOWS) && defined(BOTAN_TARGET_COMPILER_IS_MSVC)
-
-   // Windows SEH
-   __try
-      {
-      probe_result = probe_fn();
-      }
-   __except(::GetExceptionCode() == EXCEPTION_ILLEGAL_INSTRUCTION ?
-            EXCEPTION_EXECUTE_HANDLER : EXCEPTION_CONTINUE_SEARCH)
-      {
-      probe_result = -1;
-      }
 
 #else
    BOTAN_UNUSED(probe_fn);
@@ -5737,6 +5657,9 @@ std::unique_ptr<OS::Echo_Suppression> OS::suppress_echo_on_terminal()
 */
 
 #include <limits>
+
+#if defined(BOTAN_HAS_ASN1)
+#endif
 
 namespace Botan {
 
@@ -5916,32 +5839,12 @@ std::string string_join(const std::vector<std::string>& strs, char delim)
 */
 std::vector<uint32_t> parse_asn1_oid(const std::string& oid)
    {
-   std::string substring;
-   std::vector<uint32_t> oid_elems;
-
-   for(auto i = oid.begin(); i != oid.end(); ++i)
-      {
-      char c = *i;
-
-      if(c == '.')
-         {
-         if(substring.empty())
-            throw Invalid_OID(oid);
-         oid_elems.push_back(to_u32bit(substring));
-         substring.clear();
-         }
-      else
-         substring += c;
-      }
-
-   if(substring.empty())
-      throw Invalid_OID(oid);
-   oid_elems.push_back(to_u32bit(substring));
-
-   if(oid_elems.size() < 2)
-      throw Invalid_OID(oid);
-
-   return oid_elems;
+#if defined(BOTAN_HAS_ASN1)
+   return OID(oid).get_components();
+#else
+   BOTAN_UNUSED(oid);
+   throw Not_Implemented("ASN1 support not available");
+#endif
    }
 
 /*

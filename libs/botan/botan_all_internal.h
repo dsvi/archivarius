@@ -1,5 +1,5 @@
 /*
-* Botan 2.9.0 Amalgamation
+* Botan 2.13.0 Amalgamation
 * (C) 1999-2018 The Botan Authors
 *
 * Botan is released under the Simplified BSD License (see license.txt)
@@ -119,12 +119,14 @@ inline size_t ctz(T n)
    }
 
 template<typename T>
-size_t ceil_log2(T x)
+uint8_t ceil_log2(T x)
    {
+   static_assert(sizeof(T) < 32, "Abnormally large scalar");
+
    if(x >> (sizeof(T)*8-1))
       return sizeof(T)*8;
 
-   size_t result = 0;
+   uint8_t result = 0;
    T compare = 1;
 
    while(compare < x)
@@ -910,6 +912,19 @@ bool running_in_privileged_state();
 */
 uint64_t BOTAN_TEST_API get_cpu_cycle_counter();
 
+size_t BOTAN_TEST_API get_cpu_total();
+size_t BOTAN_TEST_API get_cpu_available();
+
+/**
+* Return the ELF auxiliary vector cooresponding to the given ID.
+* This only makes sense on Unix-like systems and is currently
+* only supported on Linux, Android, and FreeBSD.
+*
+* Returns zero if not supported on the current system or if
+* the id provided is not known.
+*/
+unsigned long get_auxval(unsigned long id);
+
 /*
 * @return best resolution timestamp available
 *
@@ -942,27 +957,55 @@ size_t get_memory_locking_limit();
 size_t system_page_size();
 
 /**
-* Read the value of an environment variable. Return nullptr if
-* no such variable is set. If the process seems to be running in
-* a privileged state (such as setuid) then always returns nullptr,
-* similiar to glibc's secure_getenv.
+* Read the value of an environment variable, setting it to value_out if it
+* exists.  Returns false and sets value_out to empty string if no such variable
+* is set. If the process seems to be running in a privileged state (such as
+* setuid) then always returns false and does not examine the environment.
 */
-const char* read_env_variable(const std::string& var_name);
+bool read_env_variable(std::string& value_out, const std::string& var_name);
 
 /**
-* Request so many bytes of page-aligned RAM locked into memory using
-* mlock, VirtualLock, or similar. Returns null on failure. The memory
-* returned is zeroed. Free it with free_locked_pages.
-* @param length requested allocation in bytes
+* Read the value of an environment variable and convert it to an
+* integer. If not set or conversion fails, returns the default value.
+*
+* If the process seems to be running in a privileged state (such as setuid)
+* then always returns nullptr, similiar to glibc's secure_getenv.
 */
-void* allocate_locked_pages(size_t length);
+size_t read_env_variable_sz(const std::string& var_name, size_t def_value = 0);
+
+/**
+* Request count pages of RAM which are locked into memory using mlock,
+* VirtualLock, or some similar OS specific API. Free it with free_locked_pages.
+*
+* Returns an empty list on failure. This function is allowed to return fewer
+* than count pages.
+*
+* The contents of the allocated pages are undefined.
+*
+* Each page is preceded by and followed by a page which is marked
+* as noaccess, such that accessing it will cause a crash. This turns
+* out of bound reads/writes into crash events.
+*
+* @param count requested number of locked pages
+*/
+std::vector<void*> allocate_locked_pages(size_t count);
 
 /**
 * Free memory allocated by allocate_locked_pages
-* @param ptr a pointer returned by allocate_locked_pages
-* @param length length passed to allocate_locked_pages
+* @param pages a list of pages returned by allocate_locked_pages
 */
-void free_locked_pages(void* ptr, size_t length);
+void free_locked_pages(const std::vector<void*>& pages);
+
+/**
+* Set the MMU to prohibit access to this page
+*/
+void page_prohibit_access(void* page);
+
+/**
+* Set the MMU to allow R/W access to this page
+*/
+void page_allow_access(void* page);
+
 
 /**
 * Run a probe instruction to test for support for a CPU instruction.
@@ -1045,21 +1088,6 @@ inline void prefetch_readwrite(const T* addr, size_t length)
 namespace Botan {
 
 /**
-* Entropy source using the rdrand instruction first introduced on
-* Intel's Ivy Bridge architecture.
-*/
-class Intel_Rdrand final : public Entropy_Source
-   {
-   public:
-      std::string name() const override { return "rdrand"; }
-      size_t poll(RandomNumberGenerator& rng) override;
-   };
-
-}
-
-namespace Botan {
-
-/**
 * Round up
 * @param n a non-negative integer
 * @param align_to the alignment boundary
@@ -1124,883 +1152,6 @@ inline size_t checked_add(size_t x, size_t y, const char* file, int line)
    }
 
 #define BOTAN_CHECKED_ADD(x,y) checked_add(x,y,__FILE__,__LINE__)
-
-}
-
-#if defined(BOTAN_TARGET_SUPPORTS_SSE2)
-  #include <emmintrin.h>
-  #define BOTAN_SIMD_USE_SSE2
-
-#elif defined(BOTAN_TARGET_SUPPORTS_ALTIVEC)
-  #include <altivec.h>
-  #undef vector
-  #undef bool
-  #define BOTAN_SIMD_USE_ALTIVEC
-
-#elif defined(BOTAN_TARGET_SUPPORTS_NEON)
-  #include <arm_neon.h>
-  #define BOTAN_SIMD_USE_NEON
-
-#else
-#endif
-
-namespace Botan {
-
-/**
-* 4x32 bit SIMD register
-*
-* This class is not a general purpose SIMD type, and only offers
-* instructions needed for evaluation of specific crypto primitives.
-* For example it does not currently have equality operators of any
-* kind.
-*
-* Implemented for SSE2, VMX (Altivec), and NEON.
-*/
-class SIMD_4x32 final
-   {
-   public:
-
-      SIMD_4x32& operator=(const SIMD_4x32& other) = default;
-      SIMD_4x32(const SIMD_4x32& other) = default;
-
-      SIMD_4x32& operator=(SIMD_4x32&& other) = default;
-      SIMD_4x32(SIMD_4x32&& other) = default;
-
-      /**
-      * Zero initialize SIMD register with 4 32-bit elements
-      */
-      SIMD_4x32() // zero initialized
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_setzero_si128();
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = vec_splat_u32(0);
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = vdupq_n_u32(0);
-#else
-         m_scalar[0] = 0;
-         m_scalar[1] = 0;
-         m_scalar[2] = 0;
-         m_scalar[3] = 0;
-#endif
-         }
-
-      /**
-      * Load SIMD register with 4 32-bit elements
-      */
-      explicit SIMD_4x32(const uint32_t B[4])
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_loadu_si128(reinterpret_cast<const __m128i*>(B));
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = (__vector unsigned int){B[0], B[1], B[2], B[3]};
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = vld1q_u32(B);
-#else
-         m_scalar[0] = B[0];
-         m_scalar[1] = B[1];
-         m_scalar[2] = B[2];
-         m_scalar[3] = B[3];
-#endif
-         }
-
-      /**
-      * Load SIMD register with 4 32-bit elements
-      */
-      SIMD_4x32(uint32_t B0, uint32_t B1, uint32_t B2, uint32_t B3)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_set_epi32(B3, B2, B1, B0);
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = (__vector unsigned int){B0, B1, B2, B3};
-#elif defined(BOTAN_SIMD_USE_NEON)
-         // Better way to do this?
-         const uint32_t B[4] = { B0, B1, B2, B3 };
-         m_neon = vld1q_u32(B);
-#else
-         m_scalar[0] = B0;
-         m_scalar[1] = B1;
-         m_scalar[2] = B2;
-         m_scalar[3] = B3;
-#endif
-         }
-
-      /**
-      * Load SIMD register with one 32-bit element repeated
-      */
-      static SIMD_4x32 splat(uint32_t B)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         return SIMD_4x32(_mm_set1_epi32(B));
-#elif defined(BOTAN_SIMD_USE_ARM)
-         return SIMD_4x32(vdupq_n_u32(B));
-#else
-         return SIMD_4x32(B, B, B, B);
-#endif
-         }
-
-      /**
-      * Load a SIMD register with little-endian convention
-      */
-      static SIMD_4x32 load_le(const void* in)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         return SIMD_4x32(_mm_loadu_si128(reinterpret_cast<const __m128i*>(in)));
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-
-         uint32_t R[4];
-         Botan::load_le(R, static_cast<const uint8_t*>(in), 4);
-         return SIMD_4x32(R);
-
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-         SIMD_4x32 l(vld1q_u32(static_cast<const uint32_t*>(in)));
-         return CPUID::is_big_endian() ? l.bswap() : l;
-#else
-         SIMD_4x32 out;
-         Botan::load_le(out.m_scalar, static_cast<const uint8_t*>(in), 4);
-         return out;
-#endif
-         }
-
-      /**
-      * Load a SIMD register with big-endian convention
-      */
-      static SIMD_4x32 load_be(const void* in)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-
-         return load_le(in).bswap();
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-
-         uint32_t R[4];
-         Botan::load_be(R, static_cast<const uint8_t*>(in), 4);
-         return SIMD_4x32(R);
-
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-         SIMD_4x32 l(vld1q_u32(static_cast<const uint32_t*>(in)));
-         return CPUID::is_little_endian() ? l.bswap() : l;
-
-#else
-         SIMD_4x32 out;
-         Botan::load_be(out.m_scalar, static_cast<const uint8_t*>(in), 4);
-         return out;
-#endif
-         }
-
-      /**
-      * Load a SIMD register with little-endian convention
-      */
-      void store_le(uint8_t out[]) const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-
-         _mm_storeu_si128(reinterpret_cast<__m128i*>(out), m_sse);
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-
-         union {
-            __vector unsigned int V;
-            uint32_t R[4];
-            } vec;
-         vec.V = m_vmx;
-         Botan::store_le(out, vec.R[0], vec.R[1], vec.R[2], vec.R[3]);
-
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-         if(CPUID::is_big_endian())
-            {
-            bswap().store_le(out);
-            }
-         else
-            {
-            vst1q_u8(out, vreinterpretq_u8_u32(m_neon));
-            }
-#else
-         Botan::store_le(out, m_scalar[0], m_scalar[1], m_scalar[2], m_scalar[3]);
-#endif
-         }
-
-      /**
-      * Load a SIMD register with big-endian convention
-      */
-      void store_be(uint8_t out[]) const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-
-         bswap().store_le(out);
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-
-         union {
-            __vector unsigned int V;
-            uint32_t R[4];
-            } vec;
-         vec.V = m_vmx;
-         Botan::store_be(out, vec.R[0], vec.R[1], vec.R[2], vec.R[3]);
-
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-         if(CPUID::is_little_endian())
-            {
-            bswap().store_le(out);
-            }
-         else
-            {
-            vst1q_u8(out, vreinterpretq_u8_u32(m_neon));
-            }
-
-#else
-         Botan::store_be(out, m_scalar[0], m_scalar[1], m_scalar[2], m_scalar[3]);
-#endif
-         }
-
-
-      /*
-      * This is used for SHA-2/SHACAL2
-      * Return rotr(ROT1) ^ rotr(ROT2) ^ rotr(ROT3)
-      */
-      template<size_t ROT1, size_t ROT2, size_t ROT3>
-      SIMD_4x32 rho() const
-         {
-         const SIMD_4x32 rot1 = this->rotr<ROT1>();
-         const SIMD_4x32 rot2 = this->rotr<ROT2>();
-         const SIMD_4x32 rot3 = this->rotr<ROT3>();
-         return (rot1 ^ rot2 ^ rot3);
-         }
-
-      /**
-      * Left rotation by a compile time constant
-      */
-      template<size_t ROT>
-      SIMD_4x32 rotl() const
-         {
-         static_assert(ROT > 0 && ROT < 32, "Invalid rotation constant");
-
-#if defined(BOTAN_SIMD_USE_SSE2)
-
-         return SIMD_4x32(_mm_or_si128(_mm_slli_epi32(m_sse, static_cast<int>(ROT)),
-                                       _mm_srli_epi32(m_sse, static_cast<int>(32-ROT))));
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-
-         const unsigned int r = static_cast<unsigned int>(ROT);
-         return SIMD_4x32(vec_rl(m_vmx, (__vector unsigned int){r, r, r, r}));
-
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-         #if defined(BOTAN_TARGET_ARCH_IS_ARM32)
-
-         return SIMD_4x32(vorrq_u32(vshlq_n_u32(m_neon, static_cast<int>(ROT)),
-                                    vshrq_n_u32(m_neon, static_cast<int>(32-ROT))));
-
-         #else
-
-         if(ROT == 8)
-            {
-            const uint8_t maskb[16] = { 3,0,1,2, 7,4,5,6, 11,8,9,10, 15,12,13,14 };
-            const uint8x16_t mask = vld1q_u8(maskb);
-            return SIMD_4x32(vreinterpretq_u32_u8(vqtbl1q_u8(vreinterpretq_u8_u32(m_neon), mask)));
-            }
-         else if(ROT == 16)
-            {
-            return SIMD_4x32(vreinterpretq_u32_u16(vrev32q_u16(vreinterpretq_u16_u32(m_neon))));
-            }
-         else
-            {
-            return SIMD_4x32(vorrq_u32(vshlq_n_u32(m_neon, static_cast<int>(ROT)),
-                                       vshrq_n_u32(m_neon, static_cast<int>(32-ROT))));
-            }
-
-         #endif
-
-#else
-         return SIMD_4x32(Botan::rotl<ROT>(m_scalar[0]),
-                          Botan::rotl<ROT>(m_scalar[1]),
-                          Botan::rotl<ROT>(m_scalar[2]),
-                          Botan::rotl<ROT>(m_scalar[3]));
-#endif
-         }
-
-      /**
-      * Right rotation by a compile time constant
-      */
-      template<size_t ROT>
-      SIMD_4x32 rotr() const
-         {
-         return this->rotl<32-ROT>();
-         }
-
-      /**
-      * Add elements of a SIMD vector
-      */
-      SIMD_4x32 operator+(const SIMD_4x32& other) const
-         {
-         SIMD_4x32 retval(*this);
-         retval += other;
-         return retval;
-         }
-
-      /**
-      * Subtract elements of a SIMD vector
-      */
-      SIMD_4x32 operator-(const SIMD_4x32& other) const
-         {
-         SIMD_4x32 retval(*this);
-         retval -= other;
-         return retval;
-         }
-
-      /**
-      * XOR elements of a SIMD vector
-      */
-      SIMD_4x32 operator^(const SIMD_4x32& other) const
-         {
-         SIMD_4x32 retval(*this);
-         retval ^= other;
-         return retval;
-         }
-
-      /**
-      * Binary OR elements of a SIMD vector
-      */
-      SIMD_4x32 operator|(const SIMD_4x32& other) const
-         {
-         SIMD_4x32 retval(*this);
-         retval |= other;
-         return retval;
-         }
-
-      /**
-      * Binary AND elements of a SIMD vector
-      */
-      SIMD_4x32 operator&(const SIMD_4x32& other) const
-         {
-         SIMD_4x32 retval(*this);
-         retval &= other;
-         return retval;
-         }
-
-      void operator+=(const SIMD_4x32& other)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_add_epi32(m_sse, other.m_sse);
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = vec_add(m_vmx, other.m_vmx);
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = vaddq_u32(m_neon, other.m_neon);
-#else
-         m_scalar[0] += other.m_scalar[0];
-         m_scalar[1] += other.m_scalar[1];
-         m_scalar[2] += other.m_scalar[2];
-         m_scalar[3] += other.m_scalar[3];
-#endif
-         }
-
-      void operator-=(const SIMD_4x32& other)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_sub_epi32(m_sse, other.m_sse);
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = vec_sub(m_vmx, other.m_vmx);
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = vsubq_u32(m_neon, other.m_neon);
-#else
-         m_scalar[0] -= other.m_scalar[0];
-         m_scalar[1] -= other.m_scalar[1];
-         m_scalar[2] -= other.m_scalar[2];
-         m_scalar[3] -= other.m_scalar[3];
-#endif
-         }
-
-      void operator^=(const SIMD_4x32& other)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_xor_si128(m_sse, other.m_sse);
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = vec_xor(m_vmx, other.m_vmx);
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = veorq_u32(m_neon, other.m_neon);
-#else
-         m_scalar[0] ^= other.m_scalar[0];
-         m_scalar[1] ^= other.m_scalar[1];
-         m_scalar[2] ^= other.m_scalar[2];
-         m_scalar[3] ^= other.m_scalar[3];
-#endif
-         }
-
-      void operator|=(const SIMD_4x32& other)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_or_si128(m_sse, other.m_sse);
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = vec_or(m_vmx, other.m_vmx);
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = vorrq_u32(m_neon, other.m_neon);
-#else
-         m_scalar[0] |= other.m_scalar[0];
-         m_scalar[1] |= other.m_scalar[1];
-         m_scalar[2] |= other.m_scalar[2];
-         m_scalar[3] |= other.m_scalar[3];
-#endif
-         }
-
-      void operator&=(const SIMD_4x32& other)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         m_sse = _mm_and_si128(m_sse, other.m_sse);
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         m_vmx = vec_and(m_vmx, other.m_vmx);
-#elif defined(BOTAN_SIMD_USE_NEON)
-         m_neon = vandq_u32(m_neon, other.m_neon);
-#else
-         m_scalar[0] &= other.m_scalar[0];
-         m_scalar[1] &= other.m_scalar[1];
-         m_scalar[2] &= other.m_scalar[2];
-         m_scalar[3] &= other.m_scalar[3];
-#endif
-         }
-
-
-      template<int SHIFT> SIMD_4x32 shl() const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         return SIMD_4x32(_mm_slli_epi32(m_sse, SHIFT));
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         const unsigned int s = static_cast<unsigned int>(SHIFT);
-         return SIMD_4x32(vec_sl(m_vmx, (__vector unsigned int){s, s, s, s}));
-#elif defined(BOTAN_SIMD_USE_NEON)
-         return SIMD_4x32(vshlq_n_u32(m_neon, SHIFT));
-#else
-         return SIMD_4x32(m_scalar[0] << SHIFT,
-                          m_scalar[1] << SHIFT,
-                          m_scalar[2] << SHIFT,
-                          m_scalar[3] << SHIFT);
-#endif
-         }
-
-      template<int SHIFT> SIMD_4x32 shr() const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         return SIMD_4x32(_mm_srli_epi32(m_sse, SHIFT));
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         const unsigned int s = static_cast<unsigned int>(SHIFT);
-         return SIMD_4x32(vec_sr(m_vmx, (__vector unsigned int){s, s, s, s}));
-#elif defined(BOTAN_SIMD_USE_NEON)
-         return SIMD_4x32(vshrq_n_u32(m_neon, SHIFT));
-#else
-         return SIMD_4x32(m_scalar[0] >> SHIFT, m_scalar[1] >> SHIFT,
-                          m_scalar[2] >> SHIFT, m_scalar[3] >> SHIFT);
-
-#endif
-         }
-
-      SIMD_4x32 operator~() const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         return SIMD_4x32(_mm_xor_si128(m_sse, _mm_set1_epi32(0xFFFFFFFF)));
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         return SIMD_4x32(vec_nor(m_vmx, m_vmx));
-#elif defined(BOTAN_SIMD_USE_NEON)
-         return SIMD_4x32(vmvnq_u32(m_neon));
-#else
-         return SIMD_4x32(~m_scalar[0], ~m_scalar[1], ~m_scalar[2], ~m_scalar[3]);
-#endif
-         }
-
-      // (~reg) & other
-      SIMD_4x32 andc(const SIMD_4x32& other) const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         return SIMD_4x32(_mm_andnot_si128(m_sse, other.m_sse));
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         /*
-         AltiVec does arg1 & ~arg2 rather than SSE's ~arg1 & arg2
-         so swap the arguments
-         */
-         return SIMD_4x32(vec_andc(other.m_vmx, m_vmx));
-#elif defined(BOTAN_SIMD_USE_NEON)
-         // NEON is also a & ~b
-         return SIMD_4x32(vbicq_u32(other.m_neon, m_neon));
-#else
-         return SIMD_4x32((~m_scalar[0]) & other.m_scalar[0],
-                          (~m_scalar[1]) & other.m_scalar[1],
-                          (~m_scalar[2]) & other.m_scalar[2],
-                          (~m_scalar[3]) & other.m_scalar[3]);
-#endif
-         }
-
-      /**
-      * Return copy *this with each word byte swapped
-      */
-      SIMD_4x32 bswap() const
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-
-         __m128i T = m_sse;
-         T = _mm_shufflehi_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
-         T = _mm_shufflelo_epi16(T, _MM_SHUFFLE(2, 3, 0, 1));
-         return SIMD_4x32(_mm_or_si128(_mm_srli_epi16(T, 8), _mm_slli_epi16(T, 8)));
-
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-
-         union {
-            __vector unsigned int V;
-            uint32_t R[4];
-            } vec;
-
-         vec.V = m_vmx;
-         bswap_4(vec.R);
-         return SIMD_4x32(vec.R[0], vec.R[1], vec.R[2], vec.R[3]);
-
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-         return SIMD_4x32(vreinterpretq_u32_u8(vrev32q_u8(vreinterpretq_u8_u32(m_neon))));
-
-#else
-         // scalar
-         return SIMD_4x32(reverse_bytes(m_scalar[0]),
-                          reverse_bytes(m_scalar[1]),
-                          reverse_bytes(m_scalar[2]),
-                          reverse_bytes(m_scalar[3]));
-#endif
-         }
-
-      /**
-      * 4x4 Transposition on SIMD registers
-      */
-      static void transpose(SIMD_4x32& B0, SIMD_4x32& B1,
-                            SIMD_4x32& B2, SIMD_4x32& B3)
-         {
-#if defined(BOTAN_SIMD_USE_SSE2)
-         const __m128i T0 = _mm_unpacklo_epi32(B0.m_sse, B1.m_sse);
-         const __m128i T1 = _mm_unpacklo_epi32(B2.m_sse, B3.m_sse);
-         const __m128i T2 = _mm_unpackhi_epi32(B0.m_sse, B1.m_sse);
-         const __m128i T3 = _mm_unpackhi_epi32(B2.m_sse, B3.m_sse);
-
-         B0.m_sse = _mm_unpacklo_epi64(T0, T1);
-         B1.m_sse = _mm_unpackhi_epi64(T0, T1);
-         B2.m_sse = _mm_unpacklo_epi64(T2, T3);
-         B3.m_sse = _mm_unpackhi_epi64(T2, T3);
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-         const __vector unsigned int T0 = vec_mergeh(B0.m_vmx, B2.m_vmx);
-         const __vector unsigned int T1 = vec_mergeh(B1.m_vmx, B3.m_vmx);
-         const __vector unsigned int T2 = vec_mergel(B0.m_vmx, B2.m_vmx);
-         const __vector unsigned int T3 = vec_mergel(B1.m_vmx, B3.m_vmx);
-
-         B0.m_vmx = vec_mergeh(T0, T1);
-         B1.m_vmx = vec_mergel(T0, T1);
-         B2.m_vmx = vec_mergeh(T2, T3);
-         B3.m_vmx = vec_mergel(T2, T3);
-#elif defined(BOTAN_SIMD_USE_NEON)
-
-#if defined(BOTAN_TARGET_ARCH_IS_ARM32)
-
-         const uint32x4x2_t T0 = vzipq_u32(B0.m_neon, B2.m_neon);
-         const uint32x4x2_t T1 = vzipq_u32(B1.m_neon, B3.m_neon);
-         const uint32x4x2_t O0 = vzipq_u32(T0.val[0], T1.val[0]);
-         const uint32x4x2_t O1 = vzipq_u32(T0.val[1], T1.val[1]);
-
-         B0.m_neon = O0.val[0];
-         B1.m_neon = O0.val[1];
-         B2.m_neon = O1.val[0];
-         B3.m_neon = O1.val[1];
-
-#elif defined(BOTAN_TARGET_ARCH_IS_ARM64)
-         const uint32x4_t T0 = vzip1q_u32(B0.m_neon, B2.m_neon);
-         const uint32x4_t T2 = vzip2q_u32(B0.m_neon, B2.m_neon);
-
-         const uint32x4_t T1 = vzip1q_u32(B1.m_neon, B3.m_neon);
-         const uint32x4_t T3 = vzip2q_u32(B1.m_neon, B3.m_neon);
-
-         B0.m_neon = vzip1q_u32(T0, T1);
-         B1.m_neon = vzip2q_u32(T0, T1);
-
-         B2.m_neon = vzip1q_u32(T2, T3);
-         B3.m_neon = vzip2q_u32(T2, T3);
-#endif
-
-#else
-         // scalar
-         SIMD_4x32 T0(B0.m_scalar[0], B1.m_scalar[0], B2.m_scalar[0], B3.m_scalar[0]);
-         SIMD_4x32 T1(B0.m_scalar[1], B1.m_scalar[1], B2.m_scalar[1], B3.m_scalar[1]);
-         SIMD_4x32 T2(B0.m_scalar[2], B1.m_scalar[2], B2.m_scalar[2], B3.m_scalar[2]);
-         SIMD_4x32 T3(B0.m_scalar[3], B1.m_scalar[3], B2.m_scalar[3], B3.m_scalar[3]);
-
-         B0 = T0;
-         B1 = T1;
-         B2 = T2;
-         B3 = T3;
-#endif
-         }
-
-   private:
-
-#if defined(BOTAN_SIMD_USE_SSE2)
-      explicit SIMD_4x32(__m128i in) : m_sse(in) {}
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-      explicit SIMD_4x32(__vector unsigned int in) : m_vmx(in) {}
-#elif defined(BOTAN_SIMD_USE_NEON)
-      explicit SIMD_4x32(uint32x4_t in) : m_neon(in) {}
-#endif
-
-#if defined(BOTAN_SIMD_USE_SSE2)
-      __m128i m_sse;
-#elif defined(BOTAN_SIMD_USE_ALTIVEC)
-      __vector unsigned int m_vmx;
-#elif defined(BOTAN_SIMD_USE_NEON)
-      uint32x4_t m_neon;
-#else
-      uint32_t m_scalar[4];
-#endif
-   };
-
-}
-#include <immintrin.h>
-
-namespace Botan {
-
-class SIMD_8x32 final
-   {
-   public:
-
-      SIMD_8x32& operator=(const SIMD_8x32& other) = default;
-      SIMD_8x32(const SIMD_8x32& other) = default;
-
-      SIMD_8x32& operator=(SIMD_8x32&& other) = default;
-      SIMD_8x32(SIMD_8x32&& other) = default;
-
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32()
-         {
-         m_avx2 = _mm256_setzero_si256();
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      explicit SIMD_8x32(const uint32_t B[8])
-         {
-         m_avx2 = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(B));
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      explicit SIMD_8x32(uint32_t B0, uint32_t B1, uint32_t B2, uint32_t B3,
-                         uint32_t B4, uint32_t B5, uint32_t B6, uint32_t B7)
-         {
-         m_avx2 = _mm256_set_epi32(B7, B6, B5, B4, B3, B2, B1, B0);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      static SIMD_8x32 splat(uint32_t B)
-         {
-         return SIMD_8x32(_mm256_set1_epi32(B));
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      static SIMD_8x32 load_le(const uint8_t* in)
-         {
-         return SIMD_8x32(_mm256_loadu_si256(reinterpret_cast<const __m256i*>(in)));
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      static SIMD_8x32 load_be(const uint8_t* in)
-         {
-         return load_le(in).bswap();
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void store_le(uint8_t out[]) const
-         {
-         _mm256_storeu_si256(reinterpret_cast<__m256i*>(out), m_avx2);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void store_be(uint8_t out[]) const
-         {
-         bswap().store_le(out);
-         }
-
-      template<size_t ROT>
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32 rotl() const
-         {
-         static_assert(ROT > 0 && ROT < 32, "Invalid rotation constant");
-
-         if(ROT == 8)
-            {
-            const __m256i shuf_rotl_8 = _mm256_set_epi8(14, 13, 12, 15, 10, 9, 8, 11, 6, 5, 4, 7, 2, 1, 0, 3,
-                                                        14, 13, 12, 15, 10, 9, 8, 11, 6, 5, 4, 7, 2, 1, 0, 3);
-
-            return SIMD_8x32(_mm256_shuffle_epi8(m_avx2, shuf_rotl_8));
-            }
-         else if(ROT == 16)
-            {
-            const __m256i shuf_rotl_16 = _mm256_set_epi8(13, 12, 15, 14, 9, 8, 11, 10, 5, 4, 7, 6, 1, 0, 3, 2,
-                                                         13, 12, 15, 14, 9, 8, 11, 10, 5, 4, 7, 6, 1, 0, 3, 2);
-
-            return SIMD_8x32(_mm256_shuffle_epi8(m_avx2, shuf_rotl_16));
-            }
-         else
-            {
-            return SIMD_8x32(_mm256_or_si256(_mm256_slli_epi32(m_avx2, static_cast<int>(ROT)),
-                                             _mm256_srli_epi32(m_avx2, static_cast<int>(32-ROT))));
-            }
-         }
-
-      template<size_t ROT>
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32 rotr() const
-         {
-         return this->rotl<32-ROT>();
-         }
-
-      SIMD_8x32 operator+(const SIMD_8x32& other) const
-         {
-         SIMD_8x32 retval(*this);
-         retval += other;
-         return retval;
-         }
-
-      SIMD_8x32 operator-(const SIMD_8x32& other) const
-         {
-         SIMD_8x32 retval(*this);
-         retval -= other;
-         return retval;
-         }
-
-      SIMD_8x32 operator^(const SIMD_8x32& other) const
-         {
-         SIMD_8x32 retval(*this);
-         retval ^= other;
-         return retval;
-         }
-
-      SIMD_8x32 operator|(const SIMD_8x32& other) const
-         {
-         SIMD_8x32 retval(*this);
-         retval |= other;
-         return retval;
-         }
-
-      SIMD_8x32 operator&(const SIMD_8x32& other) const
-         {
-         SIMD_8x32 retval(*this);
-         retval &= other;
-         return retval;
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void operator+=(const SIMD_8x32& other)
-         {
-         m_avx2 = _mm256_add_epi32(m_avx2, other.m_avx2);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void operator-=(const SIMD_8x32& other)
-         {
-         m_avx2 = _mm256_sub_epi32(m_avx2, other.m_avx2);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void operator^=(const SIMD_8x32& other)
-         {
-         m_avx2 = _mm256_xor_si256(m_avx2, other.m_avx2);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void operator|=(const SIMD_8x32& other)
-         {
-         m_avx2 = _mm256_or_si256(m_avx2, other.m_avx2);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      void operator&=(const SIMD_8x32& other)
-         {
-         m_avx2 = _mm256_and_si256(m_avx2, other.m_avx2);
-         }
-
-      template<int SHIFT> BOTAN_FUNC_ISA("avx2") SIMD_8x32 shl() const
-         {
-         return SIMD_8x32(_mm256_slli_epi32(m_avx2, SHIFT));
-         }
-
-      template<int SHIFT> BOTAN_FUNC_ISA("avx2")SIMD_8x32 shr() const
-         {
-         return SIMD_8x32(_mm256_srli_epi32(m_avx2, SHIFT));
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32 operator~() const
-         {
-         return SIMD_8x32(_mm256_xor_si256(m_avx2, _mm256_set1_epi32(0xFFFFFFFF)));
-         }
-
-      // (~reg) & other
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32 andc(const SIMD_8x32& other) const
-         {
-         return SIMD_8x32(_mm256_andnot_si256(m_avx2, other.m_avx2));
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32 bswap() const
-         {
-         const uint8_t BSWAP_MASK[32] = { 3, 2, 1, 0,
-                                          7, 6, 5, 4,
-                                          11, 10, 9, 8,
-                                          15, 14, 13, 12,
-                                          19, 18, 17, 16,
-                                          23, 22, 21, 20,
-                                          27, 26, 25, 24,
-                                          31, 30, 29, 28 };
-
-         const __m256i bswap = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(BSWAP_MASK));
-
-         const __m256i output = _mm256_shuffle_epi8(m_avx2, bswap);
-
-         return SIMD_8x32(output);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      static void transpose(SIMD_8x32& B0, SIMD_8x32& B1,
-                            SIMD_8x32& B2, SIMD_8x32& B3)
-         {
-         const __m256i T0 = _mm256_unpacklo_epi32(B0.m_avx2, B1.m_avx2);
-         const __m256i T1 = _mm256_unpacklo_epi32(B2.m_avx2, B3.m_avx2);
-         const __m256i T2 = _mm256_unpackhi_epi32(B0.m_avx2, B1.m_avx2);
-         const __m256i T3 = _mm256_unpackhi_epi32(B2.m_avx2, B3.m_avx2);
-
-         B0.m_avx2 = _mm256_unpacklo_epi64(T0, T1);
-         B1.m_avx2 = _mm256_unpackhi_epi64(T0, T1);
-         B2.m_avx2 = _mm256_unpacklo_epi64(T2, T3);
-         B3.m_avx2 = _mm256_unpackhi_epi64(T2, T3);
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      static void reset_registers()
-         {
-         _mm256_zeroupper();
-         }
-
-      BOTAN_FUNC_ISA("avx2")
-      static void zero_registers()
-         {
-         _mm256_zeroall();
-         }
-
-      __m256i handle() const { return m_avx2; }
-
-   private:
-
-      BOTAN_FUNC_ISA("avx2")
-      SIMD_8x32(__m256i x) : m_avx2(x) {}
-
-      __m256i m_avx2;
-   };
 
 }
 
@@ -2125,6 +1276,7 @@ class BOTAN_TEST_API Timer final
          {}
 
       Timer(const Timer& other) = default;
+      Timer& operator=(const Timer& other) = default;
 
       void start();
 

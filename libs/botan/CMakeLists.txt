@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
  
 
 project(botan  
-    VERSION 2.9 
+    VERSION 2.13.0 
     DESCRIPTION "Botan crypto library")
 
 add_library(botan STATIC botan_all.h botan_all.cpp botan_all_internal.h)
