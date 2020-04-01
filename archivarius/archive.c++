@@ -193,8 +193,8 @@ void Archive_settings::archive()
 				fmt::print("Archive compressed to {}% of original size\n", percent);
 			}
 		}
-		next_->commit();
-		catalog->add_fs_state(next);
+		next.commit();
+		catalog->add_fs_state(move(next));
 		if (max_storage_time){
 			try{
 				auto t = to_posix_time(fs::file_time_type::clock::now()) - *max_storage_time;
@@ -207,14 +207,12 @@ void Archive_settings::archive()
 						break;
 				}
 				ASSERT(cat.num_states() > num_states_to_remove);
-				while (num_states_to_remove-- > 0){
-					auto to_remove = cat.fs_state(cat.num_states() -1);
-					cat.remove_fs_state(to_remove);
-				}
+				while (num_states_to_remove-- > 0)
+					cat.remove_fs_state(cat.fs_state(cat.num_states() -1));
 			}
 			catch(std::exception &exp){
 				warning( tr_txt("Error while removing old state"), message(exp) );
-				throw; // rethrow since catalog is now in inconsistent state
+				throw; // rethrow because catalog might be in inconsistent state
 			}
 		}
 		catalog->commit();

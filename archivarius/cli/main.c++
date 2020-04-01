@@ -12,15 +12,6 @@ using namespace archi;
 
 //#define TEST
 
-void report_warning(std::string &&h, std::string &&w){
-	print(stderr, fg(fmt::terminal_color::red), "{}", h);
-	w.insert(0, "\n");
-	find_and_replace(w, "\n", "\n  ");
-	w += '\n';
-	fmt::print(stderr, w);
-	fflush(stderr);
-}
-
 struct Archive_params{
 	fs::path archive_path;
 	string name;
@@ -122,6 +113,16 @@ int run(int argc, const char *argv[]){
 	}
 	auto cmd_line = parse_command_line(argc, argv);
 	auto cfg_path = cmd_line.param_str_opt("cfg-file").value_or("");
+	int return_code = 0;
+	auto report_warning = [&return_code](std::string &&h, std::string &&w){
+		print(stderr, fg(fmt::terminal_color::red), "{}", h);
+		w.insert(0, "\n");
+		find_and_replace(w, "\n", "\n  ");
+		w += '\n';
+		fmt::print(stderr, w);
+		fflush(stderr);
+		return_code = 1;
+	};
 	if (cmd_line.command() == "archive"){
 		auto name = cmd_line.param_str_opt("name");
 		cmd_line.check_unused_arguments();
@@ -154,7 +155,7 @@ int run(int argc, const char *argv[]){
 					arc.zstd.emplace();
 					arc.zstd->compression_level = 11;
 				}
-				arc.warning = report_warning;
+				arc.warning = move(report_warning);
 				arc.process_acls = c.process_acl;
 				archive(move(arc));
 			} catch (std::exception &e) {
@@ -219,13 +220,13 @@ int run(int argc, const char *argv[]){
 		if (auto pref = cmd_line.param_str_opt("prefix"); pref)
 			rs.prefix = *pref;
 		cmd_line.check_unused_arguments();
-		rs.warning = report_warning;
+		rs.warning = move(report_warning);
 		restore(rs);
 	}
 	else
 	if (cmd_line.command() == "test"){
 		Test_settings ts;
-		ts.warning = report_warning;
+		ts.warning = move(report_warning);
 		auto tp = get_archive_params(cmd_line, cfg_path);
 		ts.archive_path = move(tp.archive_path);
 		ts.name = move(tp.name);
@@ -239,19 +240,17 @@ int run(int argc, const char *argv[]){
 		};
 		test(ts);
 		fmt::print(tr_txt("Test finished.\n"));
-		return 0;
 	}
 	else
 	if (cmd_line.command() == "version"){
 		cmd_line.check_unused_arguments();
 		fmt::print("{}.{}.{}\n", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
-		return 0;
 	}
 	else{
 		print(stderr, fg(fmt::terminal_color::red), tr_txt("unknown command {}\n"), cmd_line.command());
 		return 1;
 	}
-	return 0;
+	return return_code;
 }
 
 

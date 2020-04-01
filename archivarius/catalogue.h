@@ -31,8 +31,8 @@ public:
 	Filesystem_state latest_fs_state(); //or empty fs_state if no states available
 	Filesystem_state empty_fs_state();
 
-	void add_fs_state(Filesystem_state &fs);
-	void remove_fs_state(Filesystem_state &fs);
+	void add_fs_state(Filesystem_state &&fs);
+	void remove_fs_state(Filesystem_state &&fs);
 
 	// returns sorted
 	auto content_refs(){

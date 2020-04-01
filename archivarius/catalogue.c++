@@ -203,7 +203,7 @@ Filesystem_state Catalogue::empty_fs_state()
 	return Filesystem_state(cat_file_.parent_path(), f);
 }
 
-void Catalogue::add_fs_state(Filesystem_state &fs)
+void Catalogue::add_fs_state(Filesystem_state &&fs)
 {
 	Fs_state_file state_file;
 	state_file.name = fs.file_name();
@@ -221,7 +221,7 @@ void Catalogue::add_fs_state(Filesystem_state &fs)
 	}
 }
 
-void Catalogue::remove_fs_state(Filesystem_state &fs)
+void Catalogue::remove_fs_state(Filesystem_state &&fs)
 {
 	auto end = remove_if(fs_state_files_.begin(), fs_state_files_.end(), [&](auto &a){
 		return a.name == fs.file_name();
