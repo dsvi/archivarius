@@ -27,6 +27,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
     # -lc++abi is required for static build to work
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -fuse-ld=lld -lc++abi")
+    #string(APPEND CMAKE_CXX_FLAGS_DEBUG " -O1 -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer")
 endif()
 
 include(console-tool.cmake)

@@ -198,21 +198,23 @@ void Archive_settings::archive()
 		if (max_storage_time){
 			try{
 				auto t = to_posix_time(fs::file_time_type::clock::now()) - *max_storage_time;
-				vector<Filesystem_state> states_to_remove;
-				size_t ndx = 0;
-				for (auto state_time : cat.state_times()){
-					if (state_time < t)
-						states_to_remove.push_back(cat.fs_state(ndx));
-					ndx++;
+				size_t num_states_to_remove = 0;
+				ASSERT(cat.num_states());
+				for (size_t i = cat.num_states(); --i > 0;){ // leave at least one state
+					if (cat.state_time(i) < t)
+						num_states_to_remove++;
+					else
+						break;
 				}
-				// leave at least one state
-				if (cat.num_states() == states_to_remove.size())
-					states_to_remove.erase(states_to_remove.begin());
-				for (auto &fs_state : states_to_remove)
-					cat.remove_fs_state(fs_state);
+				ASSERT(cat.num_states() > num_states_to_remove);
+				while (num_states_to_remove-- > 0){
+					auto to_remove = cat.fs_state(cat.num_states() -1);
+					cat.remove_fs_state(to_remove);
+				}
 			}
 			catch(std::exception &exp){
-				warning( tr_txt("Error while remoing old state"), message(exp) );
+				warning( tr_txt("Error while removing old state"), message(exp) );
+				throw; // rethrow since catalog is now in inconsistent state
 			}
 		}
 		catalog->commit();

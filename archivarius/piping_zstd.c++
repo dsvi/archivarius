@@ -34,7 +34,7 @@ void Pipe_zstd_out::flush()
 		pump_next(out_buffer_.raw(), zout.pos);
 		if (err == 0)
 			break;
-	};
+	}
 }
 
 void Pipe_zstd_out::pump(u8 *from, u64 size)

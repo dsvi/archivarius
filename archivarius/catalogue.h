@@ -15,10 +15,16 @@ public:
 	std::filesystem::path archive_path();
 
 	void password(std::string_view password);
-	//std::vector<std::filesystem::file_time_type> state_times();
-	auto  state_times(){
+
+	// from newest to oldest
+	auto state_times(){
 		return fs_state_files_ | ranges::view::transform([](auto &fs){return fs.time_created;});
 	}
+	Time state_time(size_t ndx){
+		ASSERT(ndx < fs_state_files_.size());
+		return fs_state_files_[ndx].time_created;
+	}
+
 	size_t num_states();
 	// 0 is the latest state. up to num_states()
 	Filesystem_state fs_state(size_t ndx);
@@ -43,7 +49,7 @@ private:
 		Time        time_created;
 		Filters_in  filters;
 	};
-	std::vector<Fs_state_file> fs_state_files_;
+	std::vector<Fs_state_file> fs_state_files_; // sorted from newest to oldest
 	std::filesystem::path cat_file_;
 	std::unique_ptr<File_lock> file_lock_;
 	std::optional<Chapoly> enc_;
