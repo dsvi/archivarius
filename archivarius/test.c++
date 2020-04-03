@@ -1,3 +1,4 @@
+#include <tuple>
 #include "test.h"
 #include "precomp.h"
 #include "globals.h"
@@ -17,11 +18,36 @@ void test(Test_settings &cfg)
 		Buffer tmp;
 		tmp.resize(128*1024);
 		Catalogue cat(cfg.archive_path, cfg.password);
+		typedef tuple<string, u64> Discovered_key;
+		std::map<Discovered_key, u64> discovered_refs;
 		cfg.progress_status(tr_txt("Checking versions."));
 		for (size_t i = 0; i < cat.num_states(); i++){
 			cfg.progress(i * 1000 / cat.num_states());
-			cat.fs_state(i);
+			auto fs = cat.fs_state(i);
+			for (auto &f: fs.files()){
+				if (f.content_ref.has_value())
+					++discovered_refs[{f.content_ref->fname, f.content_ref->from}];
+			}
 		}
+		cfg.progress_status(tr_txt("Checking references consistency."));
+		for (auto &cf : cat.content_refs()){
+			Discovered_key t = {cf.fname, cf.from};
+			if (!discovered_refs.contains(t)){
+				cfg.warning(tr_txt("A useless ref is still in catalog."), cf.fname +":"+ to_string(cf.from));
+				continue;
+			}
+			auto &r = discovered_refs[t];
+			r -= cf.ref_count_;
+			if (r)
+				cfg.warning(tr_txt("Factual ref count doesnt match with catalog."), cf.fname +":"+ to_string(cf.from));
+			discovered_refs.erase(t);
+		}
+		if (!discovered_refs.empty())
+			cfg.warning(tr_txt("Some refs are used but are not in catalog."), "");
+
+		cfg.progress_status(tr_txt("Checking files content."));
+		auto total_refs = cat.content_refs().size();
+		uint progress = 10000;
 		File_source in;
 		Stream_in sin;
 		Stream_out sout;
@@ -29,9 +55,6 @@ void test(Test_settings &cfg)
 		Checksumer cs;
 		decltype(File_content_ref::fname) fname;
 		decltype(File_content_ref::from)  num_pumped;
-		cfg.progress_status(tr_txt("Checking files content."));
-		auto total_refs = cat.content_refs().size();
-		uint progress = 10000;
 		for (decltype(total_refs) i = 0; auto ref : cat.content_refs()){
 			ASSERT(total_refs);
 			uint p = i++ *1000 / total_refs;
