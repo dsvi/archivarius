@@ -19,7 +19,7 @@ if (ARCHIVARIUS_STATIC_BUILD)
 endif()
 
 project(archivarius  
-    VERSION 0.0.3
+    VERSION 0.0.4
     DESCRIPTION "Archivarius lib and CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
