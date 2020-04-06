@@ -12,6 +12,7 @@ struct Restore_settings{
 	std::string password;
 	std::filesystem::path prefix; // optional
 	std::function<void(std::string &&header, std::string &&warning_message)> warning;
+	std::function<void(uint progress_in_permil)> progress;
 };
 
 void restore(Restore_settings &cfg);

@@ -221,6 +221,9 @@ int run(int argc, const char *argv[]){
 			rs.prefix = *pref;
 		cmd_line.check_unused_arguments();
 		rs.warning = move(report_warning);
+		rs.progress = [](uint progress_in_permil){
+			cout << progress_in_permil/10 <<"."<< progress_in_permil % 10 << "%\r" << flush;
+		};
 		restore(rs);
 	}
 	else

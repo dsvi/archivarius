@@ -57,6 +57,8 @@ void restore(Restore_settings &cfg)
 					return false;
 				return true;
 			});
+			if (files.empty())
+				cfg.warning(tr_txt("The archive does not contain anything with the given prefix"),"");
 		}
 		for (Filesystem_state::File &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
@@ -75,6 +77,8 @@ void restore(Restore_settings &cfg)
 			ranges::action::sort(sorted_by_refs, [](auto a, auto b){
 				return a.get().content_ref.value() < b.get().content_ref.value();
 			});
+			uint progress = numeric_limits<uint>::max();
+			uint cur_ref_id = 0;
 			File_source in;
 			Stream_in sin;
 			Filtrator_in filters;
@@ -82,6 +86,11 @@ void restore(Restore_settings &cfg)
 			decltype(File_content_ref::from)  num_pumped;
 			Checksumer cs;
 			for (auto fr : sorted_by_refs){
+				uint p = cur_ref_id++ *1000 / sorted_by_refs.size();
+				if (p != progress){
+					cfg.progress(p);
+					progress = p;
+				}
 				auto &file = fr.get();
 				auto &ref = file.content_ref.value();
 				auto re_path = mk_re_path(file.path);

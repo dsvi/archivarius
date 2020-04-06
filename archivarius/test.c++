@@ -47,7 +47,7 @@ void test(Test_settings &cfg)
 
 		cfg.progress_status(tr_txt("Checking files content."));
 		auto total_refs = cat.content_refs().size();
-		uint progress = 10000;
+		uint progress = numeric_limits<uint>::max();
 		File_source in;
 		Stream_in sin;
 		Stream_out sout;

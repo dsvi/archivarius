@@ -3,13 +3,19 @@ Archivarius
 
 An incremental backup tool with versioning.
 
-- It's fast. To restore the latest saved version, it does not have to first restore the oldest one, and then incrementally refine it. It goes right to the latest, despite being incremental. So depth of your archive does not affect restoration performance.
-- It uses modern encryption (ChaCha20+Poly1305) and compression (zstd).
+It's fast:
+
+- To restore the latest saved version, it does not have to first restore the oldest one, and then incrementally refine it. It goes right to the latest, despite being incremental. So depth of your archive does not affect restoration performance.
+- Uses modern encryption (ChaCha20+Poly1305) and compression (zstd).
 - Unlike [some other incremental backup tools][1], it does not require a few gigs of local cache to work efficiently over network. Neither does it require periodic full-backups. So it's much easier on the network bandwidth.
-- It's reliable. It never overwrites files. It only adds new ones, and deletes the obsolete ones. So even in case of power outage while archiving, your archive is safe.
-- It's simple (less then 10k lines of C++ code) and easy to use.
 
 [1]: http://duplicity.nongnu.org/ "duplicity"
+
+It's reliable:
+
+- It never overwrites files. It only adds new ones, and deletes the obsolete ones. So even in case of power outage while archiving, your archive is safe.
+
+It's simple (less then 10k lines of C++ code) and easy to use.
 
 ## Supported attributes
 
@@ -31,7 +37,7 @@ Or you can build it yourself from sources. The only dependencies are libacl and 
     cd build
 
 Clang with libc++ produces the most efficient code. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu 19.10 the packages are `clang-9 libc++-9-dev libc++abi-9-dev lld-9`.
-You will also need make and cmake 3.15 or newer. You can get it from https://github.com/Kitware/CMake/releases/download/. To install, simply untar into /usr/local, like so:
+You will also need make and cmake 3.15 of newer. You can get it from https://github.com/Kitware/CMake/releases/download/. To install, simply untar into /usr/local, like so:
 
     wget https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.tar.gz
     tar zxf cmake-3.17.0-Linux-x86_64.tar.gz
