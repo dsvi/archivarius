@@ -10,7 +10,7 @@ namespace archi{
 class Catalogue
 {
 public:
-	Catalogue(std::filesystem::path &arc_path, std::string_view password);
+	Catalogue(std::filesystem::path &arc_path, std::string_view password, bool create_new);
 
 	std::filesystem::path archive_path();
 

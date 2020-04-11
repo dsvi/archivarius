@@ -30,7 +30,7 @@ void restore(Restore_settings &cfg)
 	try{
 		Buffer tmp;
 		tmp.resize(128*1024);
-		Catalogue cat(cfg.archive_path, cfg.password);
+		Catalogue cat(cfg.archive_path, cfg.password, false);
 		auto num_ids = cat.num_states();
 		if (num_ids == 0)
 			throw Exception("the archive is empty.");
@@ -100,10 +100,10 @@ void restore(Restore_settings &cfg)
 						in = content_path;
 						sin.name(content_path);
 						num_pumped = 0;
-						fname = ref.fname;
 						filters = Filtrator_in(ref.filters);
 						sin << filters << in;
 						cs.set_for(ref.csum);
+						fname = ref.fname;
 					}
 					pump(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
 					File_sink out(re_path);

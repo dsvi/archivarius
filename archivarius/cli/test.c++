@@ -209,14 +209,14 @@ void test()
 	this_thread::sleep_for(2s);
 	run({"archive", "cfg-file=test-1s.conf"});
 	{
-		Catalogue cat(atest_arc, password);
+		Catalogue cat(atest_arc, password, false);
 		ASSERT(cat.num_states() == 1);
 		if (cat.num_states() != 1)
 			throw runtime_error("GC test failed");
 		// lock test
 		bool failed = false;
 		try{
-			Catalogue cat1(atest_arc, password);
+			Catalogue cat1(atest_arc, password, false);
 		}
 		catch(...){
 			failed = true;

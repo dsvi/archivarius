@@ -87,7 +87,7 @@ void Archive_settings::add(const fs::path &file_path)
 void Archive_settings::archive()
 {
 	try{
-		Catalogue cat(archive_path, password);
+		Catalogue cat(archive_path, password, true);
 		catalog = &cat;
 		auto prev = catalog->latest_fs_state();
 		auto next = catalog->empty_fs_state();

@@ -173,7 +173,7 @@ int run(int argc, const char *argv[]){
 	if (cmd_line.command() == "list"){
 		auto tp = get_archive_params(cmd_line, cfg_path);
 		cmd_line.check_unused_arguments();
-		Catalogue cat(tp.archive_path, tp.password);
+		Catalogue cat(tp.archive_path, tp.password, false);
 		auto times = cat.state_times();
 		for (size_t i = 0; i < times.size(); i++){
 			fmt::print("{:-<5}-{}\n", i, to_human_readable_time(times[i]));
@@ -184,7 +184,7 @@ int run(int argc, const char *argv[]){
 		auto tp = get_archive_params(cmd_line, cfg_path);
 		uint id = cmd_line.param_uint_opt("id").value_or(0);
 		cmd_line.check_unused_arguments();
-		Catalogue cat(tp.archive_path, tp.password);
+		Catalogue cat(tp.archive_path, tp.password, false);
 		auto st = cat.fs_state(id);
 		for (Filesystem_state::File &file: st.files()){
 			fmt::print(fg(fmt::terminal_color::green), "{}\n", file.path);

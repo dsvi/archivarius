@@ -17,7 +17,7 @@ void test(Test_settings &cfg)
 	try{
 		Buffer tmp;
 		tmp.resize(128*1024);
-		Catalogue cat(cfg.archive_path, cfg.password);
+		Catalogue cat(cfg.archive_path, cfg.password, false);
 		typedef tuple<string, u64> Discovered_key;
 		std::map<Discovered_key, u64> discovered_refs;
 		cfg.progress_status(tr_txt("Checking versions."));

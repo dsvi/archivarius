@@ -60,12 +60,17 @@ Filters_in get_filters(const proto::Filters &pf){
 	return ret;
 }
 
-Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key)
+Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool create_new)
 {
-	fs::create_directories(arc_path);
 	cat_file_ = arc_path / cat_filename;
-	if (!fs::exists(cat_file_))
-		File_sink f(cat_file_);
+	if (!fs::exists(cat_file_)){
+		if (create_new){
+			fs::create_directories(arc_path);
+			File_sink f(cat_file_);
+		}
+		else
+			throw Exception("A valid archive doesn't exist at the give path. Can't open {0}")(cat_file_);
+	}
 	file_lock_ = lock(cat_file_);
 	if (fs::file_size(cat_file_) == 0){
 		clean_up();
