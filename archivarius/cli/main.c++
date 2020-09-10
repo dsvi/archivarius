@@ -217,8 +217,14 @@ int run(int argc, const char *argv[]){
 		rs.password = move(tp.password);
 		rs.to = cmd_line.param_str("target-dir");
 		rs.from_ndx = cmd_line.param_uint_opt("id").value_or(0);
-		if (auto pref = cmd_line.param_str_opt("prefix"); pref)
-			rs.prefix = *pref;
+		if (auto pref = cmd_line.param_str_opt("prefix"); pref){
+			auto p = *pref;
+			while (!p.empty() and p.front() == '/')
+				p.erase(0,1);
+			while (!p.empty() and p.back() == '/')
+				p.pop_back();
+			rs.prefix = p;
+		}
 		cmd_line.check_unused_arguments();
 		rs.warning = move(report_warning);
 		rs.progress = [](uint progress_in_permil){

@@ -11,7 +11,7 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
 
-set(ARCHIVARIUS_STATIC_BUILD OFF CACHE BOOL "Build static version of the program, without dependency on any shared library.")
+option(ARCHIVARIUS_STATIC_BUILD "Build static version of the program, without dependency on any shared library." OFF)
 
 if (ARCHIVARIUS_STATIC_BUILD)
     #SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
