@@ -22,10 +22,6 @@ private:
 	void archive();
 	void add(const std::filesystem::path &file_path);
 	void recursive_add_from_dir(const std::filesystem::path &dir_path);
-	// just add content_ref to it
-	std::tuple<Filesystem_state::File, bool> make_file(
-	    const std::filesystem::path &entry,
-	          std::filesystem::path &&archive_path);
 
 	std::unordered_set<std::filesystem::path> force_to_archive;// relative to archive_path. list of files to 'compact'
 	Catalogue *catalog;

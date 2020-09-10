@@ -9,36 +9,6 @@ namespace fs = std::filesystem;
 
 namespace archi{
 
-
-std::tuple<Filesystem_state::File, bool> Archive_settings::make_file(const std::filesystem::path &file_path, std::filesystem::path &&archive_path)
-{
-	auto sts = symlink_status(file_path);
-	Filesystem_state::File f;
-	f.path = move(archive_path);
-	auto type = sts.type();
-	if (type == fs::file_type::regular)
-		f.type = Filesystem_state::FILE;
-	else if (type == fs::file_type::directory)
-		f.type = Filesystem_state::DIR;
-	else if (type == fs::file_type::symlink)
-		f.type = Filesystem_state::SYMLINK;
-	else
-		return {f, false};
-	if (f.type != Filesystem_state::SYMLINK){
-		f.unix_permissions = to_int(sts.permissions());
-		f.mod_time = to_posix_time(last_write_time(file_path));
-		if (process_acls){
-			f.acl = get_acl(file_path);
-			if (f.type == Filesystem_state::DIR)
-				f.default_acl = get_default_acl(file_path);
-		}
-	}
-	else
-		f.symlink_target = fs::read_symlink(file_path);
-	return {f, true};
-}
-
-
 void Archive_settings::recursive_add_from_dir(const fs::path &dir_path)
 try {
 	std::vector<fs::path> dirs;
@@ -60,20 +30,39 @@ catch(std::exception &exp){
 void Archive_settings::add(const fs::path &file_path)
 {
 	try{
-		auto rel_path = root.empty() ? file_path : file_path.lexically_relative(root);
-		auto [file, is_valid] = make_file(file_path, move(rel_path));
-		if (!is_valid)
-		  return;
-		if (file.type == Filesystem_state::FILE){
-			auto sz = fs::file_size(file_path);
-			if (sz != 0){
-				if (force_to_archive.contains(file.path))
-					file.content_ref = long_term_content_->add(file_path);
-				else {
-					ASSERT(file.mod_time);
-					file.content_ref = prev_->get_ref_if_exist(file.path, *file.mod_time);
-					if (!file.content_ref)
-						file.content_ref = normal_content_->add(file_path);
+		Filesystem_state::File file;
+		auto path_for_archive = root.empty() ? file_path : file_path.lexically_relative(root);
+		file.path = move(path_for_archive);
+		auto sts = symlink_status(file_path);
+		auto type = sts.type();
+		if (type == fs::file_type::regular)
+			file.type = Filesystem_state::FILE;
+		else if (type == fs::file_type::directory)
+			file.type = Filesystem_state::DIR;
+		else if (type == fs::file_type::symlink){
+			file.type = Filesystem_state::SYMLINK;
+			file.symlink_target = fs::read_symlink(file_path);
+		} else
+			return;
+		if (file.type != Filesystem_state::SYMLINK){
+			file.unix_permissions = to_int(sts.permissions());
+			file.mod_time = to_posix_time(last_write_time(file_path));
+			if (process_acls){
+				file.acl = get_acl(file_path);
+				if (file.type == Filesystem_state::DIR)
+					file.default_acl = get_default_acl(file_path);
+			}
+			if (file.type == Filesystem_state::FILE){
+				auto sz = fs::file_size(file_path);
+				if (sz != 0){
+					if (force_to_archive.contains(file.path))
+						file.content_ref = long_term_content_->add(file_path);
+					else {
+						ASSERT(file.mod_time);
+						file.content_ref = prev_->get_ref_if_exist(file.path, *file.mod_time);
+						if (!file.content_ref)
+							file.content_ref = normal_content_->add(file_path);
+					}
 				}
 			}
 		}
