@@ -1,6 +1,6 @@
 /*
-* Botan 2.13.0 Amalgamation
-* (C) 1999-2018 The Botan Authors
+* Botan 2.15.0 Amalgamation
+* (C) 1999-2020 The Botan Authors
 *
 * Botan is released under the Simplified BSD License (see license.txt)
 */
@@ -29,7 +29,7 @@
 
 /*
 * This file was automatically generated running
-* 'configure.py --amalgamation --minimized-build --single-amalgamation-file --enable-modules=chacha20poly1305,blake2,system_rng'
+* 'configure.py --amalgamation --minimized-build --disable-shared --enable-modules=chacha20poly1305,chacha_avx2,blake2,system_rng'
 *
 * Target
 *  - Compiler: g++ -fstack-protector -m64 -pthread -std=c++11 -D_REENTRANT -O3
@@ -38,7 +38,7 @@
 */
 
 #define BOTAN_VERSION_MAJOR 2
-#define BOTAN_VERSION_MINOR 13
+#define BOTAN_VERSION_MINOR 15
 #define BOTAN_VERSION_PATCH 0
 #define BOTAN_VERSION_DATESTAMP 0
 
@@ -58,16 +58,17 @@
 #define BOTAN_LIB_LINK ""
 #define BOTAN_LINK_FLAGS "-fstack-protector -m64 -pthread"
 
-#define BOTAN_SYSTEM_CERT_BUNDLE "/etc/ssl/ca-bundle.pem"
+#define BOTAN_SYSTEM_CERT_BUNDLE "/etc/ssl/certs/ca-certificates.crt"
 
 #ifndef BOTAN_DLL
-  #define BOTAN_DLL __attribute__((visibility("default")))
+  #define BOTAN_DLL 
 #endif
 
 /* Target identification and feature test macros */
 
 #define BOTAN_TARGET_OS_IS_LINUX
 
+#define BOTAN_TARGET_OS_HAS_ATOMICS
 #define BOTAN_TARGET_OS_HAS_CLOCK_GETTIME
 #define BOTAN_TARGET_OS_HAS_DEV_RANDOM
 #define BOTAN_TARGET_OS_HAS_FILESYSTEM
@@ -113,6 +114,7 @@
 #define BOTAN_HAS_AEAD_MODES 20131128
 #define BOTAN_HAS_BLAKE2B 20130131
 #define BOTAN_HAS_CHACHA 20180807
+#define BOTAN_HAS_CHACHA_AVX2 20180418
 #define BOTAN_HAS_CIPHER_MODES 20180124
 #define BOTAN_HAS_CPUID 20170917
 #define BOTAN_HAS_ENTROPY_SOURCE 20151120
@@ -121,6 +123,8 @@
 #define BOTAN_HAS_MAC 20150626
 #define BOTAN_HAS_MODES 20150626
 #define BOTAN_HAS_POLY1305 20141227
+#define BOTAN_HAS_SIMD_32 20131128
+#define BOTAN_HAS_SIMD_AVX2 20180824
 #define BOTAN_HAS_STREAM_CIPHER 20131128
 #define BOTAN_HAS_SYSTEM_RNG 20141202
 #define BOTAN_HAS_UTIL_FUNCTIONS 20180903
@@ -199,13 +203,10 @@
 
 /*
 * Specifies (in order) the list of entropy sources that will be used
-* to seed an in-memory RNG. The first in the default list: "rdseed"
-* and "rdrand" do not count as contributing any entropy but are
-* included as they are fast and help protect against a seriously
-* broken system RNG.
+* to seed an in-memory RNG.
 */
 #define BOTAN_ENTROPY_DEFAULT_SOURCES \
-   { "rdseed", "rdrand", "p9_darn", "getentropy", "dev_random", \
+   { "rdseed", "hwrng", "p9_darn", "getentropy", "dev_random", \
      "system_rng", "proc_walk", "system_stats" }
 
 /* Multiplier on a block cipher's native parallelism */
@@ -302,6 +303,12 @@
 #define BOTAN_PUBLIC_API(maj,min) BOTAN_DLL
 
 /**
+* Used to annotate API exports which are public, but are now deprecated
+* and which will be removed in a future major release.
+*/
+#define BOTAN_DEPRECATED_API(msg) BOTAN_DLL BOTAN_DEPRECATED(msg)
+
+/**
 * Used to annotate API exports which are public and can be used by
 * applications if needed, but which are intentionally not documented,
 * and which may change incompatibly in a future major version.
@@ -374,17 +381,26 @@
     #define BOTAN_DEPRECATED(msg) __attribute__ ((deprecated(msg)))
     #define BOTAN_DEPRECATED_HEADER(hdr) _Pragma("message \"this header is deprecated\"")
 
+    #if !defined(BOTAN_IS_BEING_BUILT) && !defined(BOTAN_AMALGAMATION_H_)
+      #define BOTAN_FUTURE_INTERNAL_HEADER(hdr) _Pragma("message \"this header will be made internal in the future\"")
+    #endif
 
   #elif defined(_MSC_VER)
     #define BOTAN_DEPRECATED(msg) __declspec(deprecated(msg))
     #define BOTAN_DEPRECATED_HEADER(hdr) __pragma(message("this header is deprecated"))
 
+    #if !defined(BOTAN_IS_BEING_BUILT) && !defined(BOTAN_AMALGAMATION_H_)
+      #define BOTAN_FUTURE_INTERNAL_HEADER(hdr) __pragma(message("this header will be made internal in the future"))
+    #endif
 
   #elif defined(__GNUC__)
     /* msg supported since GCC 4.5, earliest we support is 4.8 */
     #define BOTAN_DEPRECATED(msg) __attribute__ ((deprecated(msg)))
     #define BOTAN_DEPRECATED_HEADER(hdr) _Pragma("GCC warning \"this header is deprecated\"")
 
+    #if !defined(BOTAN_IS_BEING_BUILT) && !defined(BOTAN_AMALGAMATION_H_)
+      #define BOTAN_FUTURE_INTERNAL_HEADER(hdr) _Pragma("GCC warning \"this header will be made internal in the future\"")
+    #endif
   #endif
 
 #endif
@@ -659,7 +675,7 @@ namespace Botan {
 * <dt>Message Authentication Codes<dd>
 *        @ref CBC_MAC "CBC-MAC", CMAC, HMAC, Poly1305, SipHash, ANSI_X919_MAC
 * <dt>Random Number Generators<dd>
-*        AutoSeeded_RNG, HMAC_DRBG, RDRAND_RNG, System_RNG
+*        AutoSeeded_RNG, HMAC_DRBG, Processor_RNG, System_RNG
 * <dt>Key Derivation<dd>
 *        HKDF, @ref KDF1 "KDF1 (IEEE 1363)", @ref KDF1_18033 "KDF1 (ISO 18033-2)", @ref KDF2 "KDF2 (IEEE 1363)",
 *        @ref sp800_108.h "SP800-108", @ref SP800_56C "SP800-56C", @ref PKCS5_PBKDF1 "PBKDF1 (PKCS#5),
@@ -713,6 +729,13 @@ using s32bit = std::int32_t;
   #error BOTAN_MP_WORD_BITS must be 32 or 64
 #endif
 
+/*
+* Should this assert fail on your system please contact the developers
+* for assistance in porting.
+*/
+static_assert(sizeof(std::size_t) == 8 || sizeof(std::size_t) == 4,
+              "This platform has an unexpected size for size_t");
+
 }
 
 namespace Botan {
@@ -738,7 +761,7 @@ BOTAN_PUBLIC_API(2,3) void deallocate_memory(void* p, size_t elems, size_t elem_
 /**
 * Ensure the allocator is initialized
 */
-void initialize_allocator();
+void BOTAN_UNSTABLE_API initialize_allocator();
 
 class Allocator_Initializer
    {
@@ -789,7 +812,10 @@ inline bool constant_time_compare(const uint8_t x[],
    }
 
 /**
-* Zero out some bytes
+* Zero out some bytes. Warning: use secure_scrub_memory instead if the
+* memory is about to be freed or otherwise the compiler thinks it can
+* elide the writes.
+*
 * @param ptr a pointer to memory to zero
 * @param bytes the number of bytes to zero in ptr
 */
@@ -816,10 +842,8 @@ template<typename T> inline void clear_mem(T* ptr, size_t n)
    clear_bytes(ptr, sizeof(T)*n);
    }
 
-
-
 // is_trivially_copyable is missing in g++ < 5.0
-#if !__clang__ && __GNUG__ && __GNUC__ < 5
+#if (BOTAN_GCC_VERSION > 0 && BOTAN_GCC_VERSION < 500)
 #define BOTAN_IS_TRIVIALLY_COPYABLE(T) true
 #else
 #define BOTAN_IS_TRIVIALLY_COPYABLE(T) std::is_trivially_copyable<T>::value
@@ -3483,6 +3507,22 @@ class BOTAN_PUBLIC_API(2,1) CPUID final
          }
 
       /**
+      * Check if the processor supports hardware AES instructions
+      */
+      static bool has_hw_aes()
+         {
+#if defined(BOTAN_TARGET_CPU_IS_X86_FAMILY)
+         return has_aes_ni();
+#elif defined(BOTAN_TARGET_CPU_IS_ARM_FAMILY)
+         return has_arm_aes();
+#elif defined(BOTAN_TARGET_CPU_IS_PPC_FAMILY)
+         return has_power_crypto();
+#else
+         return false;
+#endif
+         }
+
+      /**
       * Check if the processor supports carryless multiply
       * (CLMUL, PMULL)
       */
@@ -3492,6 +3532,8 @@ class BOTAN_PUBLIC_API(2,1) CPUID final
          return has_clmul();
 #elif defined(BOTAN_TARGET_CPU_IS_ARM_FAMILY)
          return has_arm_pmull();
+#elif defined(BOTAN_TARGET_ARCH_IS_PPC64)
+         return has_power_crypto();
 #else
          return false;
 #endif
@@ -4029,7 +4071,7 @@ class BOTAN_PUBLIC_API(2,0) RandomNumberGenerator
 typedef RandomNumberGenerator RNG;
 
 /**
-* Hardware_RNG exists to tag hardware RNG types (PKCS11_RNG, TPM_RNG, RDRAND_RNG)
+* Hardware_RNG exists to tag hardware RNG types (PKCS11_RNG, TPM_RNG, Processor_RNG)
 */
 class BOTAN_PUBLIC_API(2,0) Hardware_RNG : public RandomNumberGenerator
    {
