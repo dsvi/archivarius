@@ -4,6 +4,11 @@
 namespace archi{
 
 
+Exception::Exception(Exception::Tag t)
+{
+	tag_ = t;
+}
+
 Exception::Exception(std::string &&error_message) : fmt_(error_message)
 {
 
@@ -30,6 +35,19 @@ std::string message(std::exception &e)
 		msg += message(e);
 	}
 	return msg;
+}
+
+bool has_tag(std::exception &e, Exception::Tag t)
+{
+	if ( auto p = dynamic_cast<Exception*>(&e); p )
+		if ( p->tag() == t )
+			return true;
+	try {
+		std::rethrow_if_nested(e);
+	} catch(std::exception& e) {
+		return has_tag(e, t);
+	}
+	return false;
 }
 
 

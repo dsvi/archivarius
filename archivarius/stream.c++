@@ -68,14 +68,24 @@ void Stream_out::pump(u8 *from, u64 size)
 		if (size)
 			pump_next(from, size);
 	}
-	catch(...){
-		throw_with_nested( Exception( "Error writing file {0}" )(name_) );
+	catch(exception &){
+		throw_default_error();
 	}
 }
 
 void Stream_out::finish()
 {
-	finish_next();
+	try{
+		finish_next();
+	}
+	catch(exception &){
+		throw_default_error();
+	}
+}
+
+void Stream_out::throw_default_error()
+{
+	throw_with_nested( Exception( "Error writing file {0}" )(name_).tag(error_tag_) );
 }
 
 void Stream_out::put_uint(u64 v)

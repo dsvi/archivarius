@@ -1,5 +1,6 @@
 #pragma once
 #include "precomp.h"
+#include "exception.h"
 #include "file_content_ref.h"
 #include "stream.h"
 #include "filters.h"
@@ -29,6 +30,11 @@ public:
 		u64 compressed; // can be 0
 	};
 	Compression_ratio compression_statistic();
+
+	// when error happened at output ( add() or finish() ), we dont know what had already reached the disk.
+	// so it's better to abort the whole thing
+	static
+	Exception::Tag unrecoverable_output_problem;
 private:
 	std::filesystem::path arc_path_;
 	std::string   fname_;

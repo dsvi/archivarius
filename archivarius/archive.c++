@@ -24,6 +24,8 @@ try {
 		recursive_add_from_dir(dir);
 }
 catch(std::exception &exp){
+	if (has_tag(exp, File_content_creator::unrecoverable_output_problem))
+		throw;
 	warning(fmt::format(tr_txt("Can't get directory contents for {0}:"), dir_path), message(exp));
 }
 
@@ -69,6 +71,8 @@ void Archive_settings::add(const fs::path &file_path)
 		next_->add(move(file));
 	}
 	catch(std::exception &exp){
+		if (has_tag(exp, File_content_creator::unrecoverable_output_problem))
+			throw;
 		warning(fmt::format(tr_txt("Skipping {0}:"), file_path), message(exp));
 	}
 }

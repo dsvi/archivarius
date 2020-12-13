@@ -3,6 +3,7 @@
 #include "piping.h"
 #include "piping_xxhash.h"
 #include "buffer.h"
+#include "exception.h"
 
 namespace archi{
 
@@ -43,9 +44,27 @@ public:
 	void put_uint64(u64 v);
 	void pump(u8 *from, u64 size) override;
 	void finish() override;
+
+	// will be added to all the exceptions thrown from this class
+	void error_tag(Exception::Tag t){
+		error_tag_ = t;
+	}
+	// run io related functions in the context of current stream, so its exceptions will be caught,
+	// and sane messages will be formed, and tags will be added
+	void run(std::function<void()> &&f){
+		try{
+			f();
+		}
+		catch(std::exception&){
+			throw_default_error();
+		}
+	}
 private:
+	Exception::Tag error_tag_;
 	std::string name_;
-	std::vector<u8> buff_;
+	std::vector<u8> buff_{10};
+	[[ noreturn ]]
+	void throw_default_error();
 };
 
 inline
