@@ -61,8 +61,6 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 	ASSERT(ref.space_taken); // ths shouldn't really happen
 	if (ref.space_taken == 0) // ... but just in case it did
 		ref.space_taken = ref.to - ref.from +1;
-	if (file_sink_.bytes_written() > min_file_size_)
-		out_.finish(); // so for the last file, this doesn't happen at destructor time.
 	return ref;
 }
 
