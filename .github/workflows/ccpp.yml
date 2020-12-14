@@ -5,18 +5,18 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     
     steps:
     - uses: actions/checkout@v1
     - name: prepare
       run: 
-        sudo apt-get install libacl1-dev libzstd1-dev clang-9 libc++-9-dev lld-9 libc++abi-9-dev 
+        sudo apt-get install libacl1-dev libzstd-dev clang libc++-dev lld libc++abi-dev 
     - name: configure
       run: 
         mkdir build &&
         cd build &&
-        CXX=clang++-9 CC=clang-9 cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
+        CXX=clang++ CC=clang cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
     - name: build
       #run: cd build && cmake --build . --target archivarius
       run: |
