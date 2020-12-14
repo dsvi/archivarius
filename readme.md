@@ -28,7 +28,10 @@ It's simple (less then 10k lines of C++ code) and easy to use.
 
 You can get a pre-built static binary for linux with no side dependencies [here.](https://github.com/dsvi/archivarius/releases)
 
-Or you can build it yourself from sources. The only dependencies are libacl and libzstd (`libacl1-dev libzstd1-dev` package for Ubuntu) and a C++20 conformant compiler:
+Or you can build it yourself from sources. The only dependencies are libacl and libzstd (`libacl1-dev libzstd-dev` package for Ubuntu 20.04) and a C++20 conformant compiler. Clang with libc++ produces the most efficient code for the tool. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu 20.04 the packages are `clang libc++-dev libc++abi-dev lld`.
+You will also need ninja or make, and cmake 3.15 or newer. You can get it from your package manager or https://github.com/Kitware/CMake/releases/
+
+Now you are ready to configure the build
 
     git clone https://github.com/dsvi/archivarius.git
     cd archivarius
@@ -36,21 +39,14 @@ Or you can build it yourself from sources. The only dependencies are libacl and 
     mkdir build
     cd build
 
-Clang with libc++ produces the most efficient code. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu 19.10 the packages are `clang-9 libc++-9-dev libc++abi-9-dev lld-9`.
-You will also need make and cmake 3.15 of newer. You can get it from https://github.com/Kitware/CMake/releases/download/. To install, simply untar into /usr/local, like so:
-
-    wget https://github.com/Kitware/CMake/releases/download/v3.17.0/cmake-3.17.0-Linux-x86_64.tar.gz
-    tar zxf cmake-3.17.0-Linux-x86_64.tar.gz
-    rsync -au ./cmake-3.17.0-Linux-x86_64/ /usr/local/
-
-Now you are ready to configure the build
-
-    CXX=clang++-9 CC=clang-9 cmake ..
-
 If you prefer a static build, with all the dependencies built into, use the `ARCHIVARIUS_STATIC_BUILD=ON` option. This way the resulting executable depends only on the linux kernel.
 
-    CXX=clang++-9 CC=clang-9 cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
+    CXX=clang++ CC=clang cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
 
+Otherwise:
+
+    CXX=clang++ CC=clang cmake ..
+    
 Then run the build:
 
     cmake --build . --target archivarius
