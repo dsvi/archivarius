@@ -15,7 +15,7 @@ It's reliable:
 
 - It never overwrites files. It only adds new ones, and deletes the obsolete ones. So even in case of power outage while archiving, your archive is safe.
 
-It's simple (less then 10k lines of C++ code) and easy to use.
+It's simple (less then 5k lines of C++ code) and easy to use.
 
 ## Supported attributes
 
@@ -46,7 +46,7 @@ If you prefer a static build, with all the dependencies built into, use the `ARC
 Otherwise:
 
     CXX=clang++ CC=clang cmake ..
-    
+
 Then run the build:
 
     cmake --build . --target archivarius
@@ -62,7 +62,7 @@ To restore an archive run:
 
     archivarius restore archive=path/to/archive target-dir=/path/to/restore/archive/to/
 
-## Licence 
+## Licence
 
 The software is provided under [Zlib licence](https://en.wikipedia.org/wiki/Zlib_License):
 
