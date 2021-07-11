@@ -35,6 +35,8 @@ public:
 	Checksum digest() =0;
 	virtual
 	void reset() =0;
+	virtual
+	~Checksumer_base(){};
 };
 
 

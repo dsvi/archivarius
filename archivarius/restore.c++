@@ -113,6 +113,7 @@ void restore(Restore_settings &cfg)
 					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
 					if (ref.csum != cs.checksum())
 						cfg.warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path), "" );
+					sout.finish();
 				}
 				catch(std::exception &e){
 					/* TRANSLATORS: This is about path from and to  */

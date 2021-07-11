@@ -80,8 +80,7 @@ private:
 	void finish() override;
 };
 
-void checked_fclose(FILE *f);
-typedef std::unique_ptr<std::FILE, decltype(&checked_fclose)> File_ptr;
+typedef std::unique_ptr<std::FILE, decltype(&std::fclose)> File_ptr;
 
 class File_source : public Source{
 public:
@@ -105,9 +104,7 @@ public:
 	operator bool(){
 		return static_cast<bool>(file_);
 	}
-	/// closes the file if open, and resetes bytes_written(). basically object returns into default constructed state
-	/// exception safe. throws only if no current exception is pending
-	void reset();
+
 private:
 	virtual
 	void pump(u8 *from, u64 size) override;

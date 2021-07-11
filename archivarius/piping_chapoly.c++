@@ -67,6 +67,7 @@ void Pipe_chapoly_out::finish()
 	buf_.insert(buf_.end(), till_top, 0);
 	encryptor_.finish(buf_);
 	pump_next(buf_.data(), buf_.size());
+	finish_next();
 }
 
 
