@@ -6,15 +6,16 @@
 
 /*
 Directory structure:
-~/atest-src/ - files for initial seed
-~/atest-tmp/ - working dir, to where initial seed files will be copied
-~/atest-add/ - from this dir files in working dir will be updated gradually, with each test step
-~/atest-rmv  - list of files, which will be gradually removed with each test step
-~/atest-arc/ - archive will be stored here
+~/temp/atest/src/ - files for initial seed
+~/temp/atest/tmp/ - working dir, to where initial seed files will be copied
+~/temp/atest/add/ - from this dir files in working dir will be updated gradually, with each test step
+~/temp/atest/rmv  - list of the files, which will be removed with each test step one by one
+~/temp/atest/arc/ - archive will be stored here
 */
 
 int run(int argc, const char *argv[]);
 
+using namespace fmt;
 using namespace std;
 using namespace archi;
 namespace fs = std::filesystem;
@@ -27,7 +28,7 @@ struct fmt::formatter<fs::file_time_type> {
 	template <typename FormatContext>
 	auto format(const fs::file_time_type &p, FormatContext &ctx) {
 		auto cftime = fs::file_time_type::clock::to_time_t(p);
-		return format_to(ctx.begin(), "{}", std::asctime(std::localtime(&cftime)));
+		return format_to(ctx.out(), "{}", std::asctime(std::localtime(&cftime)));
 	}
 };
 
@@ -139,10 +140,10 @@ void run(vector<const char*> params){
 
 void extract(size_t i, fs::path arc, fs::path to){
 	fs::remove_all(to);
-	auto a = "archive={}"_format(arc);
-	auto t = "target-dir={}"_format(to);
-	auto id = "id={}"_format(i);
-	auto pwrd = "password={}"_format(password);
+	auto a = format("archive={}", arc);
+	auto t = format("target-dir={}", to);
+	auto id = format("id={}", i);
+	auto pwrd = format("password={}", password);
 	vector<const char *> params{"restore", a.c_str(), t.c_str(), id.c_str()};
 	if (!password.empty())
 		params.push_back(pwrd.c_str());
@@ -155,11 +156,11 @@ void test()
 {
 	fs::path hf = getenv("HOME");
 	ASSERT(!hf.empty());
-	fs::path atest_src = hf / "atest-src";
-	fs::path atest_tmp = hf / "atest-tmp";
-	fs::path atest_add = hf / "atest-add";
-	fs::path atest_rmv = hf / "atest-rmv";
-	fs::path atest_arc = hf / "atest-arc";
+	fs::path atest_src = hf / "temp/atest/src";
+	fs::path atest_tmp = hf / "temp/atest/tmp";
+	fs::path atest_add = hf / "temp/atest/add";
+	fs::path atest_rmv = hf / "temp/atest/rmv";
+	fs::path atest_arc = hf / "temp/atest/arc";
 	fs::remove_all(atest_tmp);
 	fs::remove_all(atest_arc);
 	fs::create_directory(atest_tmp);

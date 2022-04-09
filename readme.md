@@ -26,16 +26,24 @@ It's simple (less then 5k lines of C++ code) and easy to use.
 
 ## Getting it
 
-You can get a pre-built static binary for linux with no side dependencies [here.](https://github.com/dsvi/archivarius/releases)
+### Pre built binary
+
+You can get a pre-built static binary for x64 linux, with no side dependencies [here.](https://github.com/dsvi/archivarius/releases)
+
+### Building via docker
+
+The easiest way to build. Just run the `docker-build.sh` and get the binary at `docker-build-out/`
+The binary has no dependency on any library and can be used with any linux x64 distribution.
+
+### Building the classic way
 
 Or you can build it yourself from sources. The only dependencies are libacl and libzstd (`libacl1-dev libzstd-dev` package for Ubuntu 20.04) and a C++20 conformant compiler. Clang with libc++ produces the most efficient code for the tool. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu 20.04 the packages are `clang libc++-dev libc++abi-dev lld`.
-You will also need ninja or make, and cmake 3.15 or newer. You can get it from your package manager or https://github.com/Kitware/CMake/releases/
+You will also need ninja or make, and cmake.
 
 Now you are ready to configure the build
 
     git clone https://github.com/dsvi/archivarius.git
     cd archivarius
-    git checkout latest
     mkdir build
     cd build
 

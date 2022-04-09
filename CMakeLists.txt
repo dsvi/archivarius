@@ -18,8 +18,12 @@ if (ARCHIVARIUS_STATIC_BUILD)
     SET(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+set(CMAKE_CXX_EXTENSIONS NO)
+
 project(archivarius  
-    VERSION 0.0.8
+    VERSION 0.0.9
     DESCRIPTION "Archivarius lib and CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")

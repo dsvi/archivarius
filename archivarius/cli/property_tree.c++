@@ -51,7 +51,7 @@ property_tree::Property property_tree::from_file(std::filesystem::path &filepath
 				}
 				if (line == "}"){
 					if (stack.size() == 1)
-						throw Exception("} does not match any opened bracket {");
+						throw Exception("The closing bracket } does not match any opened bracket {");
 					Property p = move(stack.back());
 					stack.pop_back();
 					p.post_kids_whitespaces_ = pre_ws;

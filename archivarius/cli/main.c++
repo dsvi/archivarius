@@ -176,7 +176,7 @@ int run(int argc, const char *argv[]){
 		Catalogue cat(tp.archive_path, tp.password, false);
 		auto times = cat.state_times();
 		for (size_t i = 0; i < times.size(); i++){
-			fmt::print("{:-<5}-{}\n", i, to_human_readable_time(times[i]));
+			fmt::print("{:-<5}─{}\n", i, to_human_readable_time(times[i]));
 		}
 	}
 	else
@@ -275,7 +275,7 @@ int main(int argc, const char *argv[]){
 #endif
 	}
 	catch(std::exception &e){
-		print(stderr, fg(fmt::terminal_color::red), message(e));
+		print(stderr, fg(fmt::terminal_color::red), "{}", message(e));
 		return 1;
 	}
 }

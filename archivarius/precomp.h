@@ -5,7 +5,6 @@
 #include <cassert>
 #include <charconv>
 #include <cstdio>
-#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <exception>
@@ -13,24 +12,29 @@
 #include <forward_list>
 #include <fstream>
 #include <iomanip>
+#include <iostream>
 #include <iterator>
 #include <list>
 #include <memory>
 #include <optional>
 #include <regex>
+#include <sstream>
 #include <string_view>
 #include <time.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
+//#include <ranges>
+
+#include <range/v3/all.hpp>
 
 #include <botan_all.h>
 
+#define FMT_CONSTEVAL
 #include <fmt/format.h>
 #include <fmt/color.h>
 #include <fmt/chrono.h>
-using namespace fmt::literals;
 
 template <>
 struct fmt::formatter<std::filesystem::path> {
@@ -39,12 +43,9 @@ struct fmt::formatter<std::filesystem::path> {
 
 	template <typename FormatContext>
 	auto format(const std::filesystem::path &p, FormatContext &ctx) {
-		return format_to(ctx.begin(), "{}", p.string());
+		return format_to(ctx.out(), "{}", p.string());
 	}
 };
-
-
-#include <range/v3/all.hpp>
 
 #define XXH_CPU_LITTLE_ENDIAN 1
 #include "xxhash.h"

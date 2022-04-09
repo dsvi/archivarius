@@ -57,7 +57,7 @@ private:
 	// includes the catalogue filename itself.
 	// basically files which are not in the returned set can be safely deleted.
 	std::unordered_set<std::string> used_files();
-	// remoes everything which is not in used_files
+	// removes everything which is not in used_files
 	void clean_up();
 	void throw_inconsistent(uint line);
 	File_content_ref map_ref(File_content_ref &r);
