@@ -70,7 +70,7 @@ To restore an archive run:
 
     archivarius restore archive=path/to/archive target-dir=/path/to/restore/archive/to/
 
-## Licence
+## License
 
 The software is provided under [Zlib licence](https://en.wikipedia.org/wiki/Zlib_License):
 
