@@ -14,8 +14,6 @@ void erase_if(C &c, F &&f ){
 }
 void find_and_replace(std::string& where, const std::string &what, const std::string &replace_to);
 
-void init_epoch();
-
 // returns unique filename in /p dir
 std::filesystem::path make_unique_filename(const std::filesystem::path &dir, std::string_view prefix);
 

@@ -25,6 +25,7 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
+
 //#include <ranges>
 
 #include <range/v3/all.hpp>
@@ -32,20 +33,10 @@
 #include <botan_all.h>
 
 #define FMT_CONSTEVAL
+#include "cfmt.h"
 #include <fmt/format.h>
-#include <fmt/color.h>
 #include <fmt/chrono.h>
-
-template <>
-struct fmt::formatter<std::filesystem::path> {
-	template <typename ParseContext>
-	constexpr auto parse(ParseContext &ctx) { return ctx.begin(); }
-
-	template <typename FormatContext>
-	auto format(const std::filesystem::path &p, FormatContext &ctx) {
-		return format_to(ctx.out(), "{}", p.string());
-	}
-};
+#include <fmt/std.h>
 
 #define XXH_CPU_LITTLE_ENDIAN 1
 #include "xxhash.h"
@@ -105,7 +96,12 @@ typedef uint64_t                 u64;
 typedef unsigned int             uint;
 
 // posix time in nanoseconds
-using Time = u64;
-static const u64 Time_ticks_in_second = 1'000'000'000;
+typedef u64 Time;
+typedef std::chrono::nanoseconds Time_accuracy;
+inline
+auto to_sys_clock(Time t){
+	 using namespace std::chrono;
+	 return system_clock::time_point{duration_cast<system_clock::duration>(Time_accuracy(t))};
+}
 
 }

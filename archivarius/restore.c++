@@ -45,7 +45,7 @@ void restore(Restore_settings &cfg)
 			erase_if(files, [&](auto &f){
 				// this has to compare full path elements. not parts of them
 				auto pref_it = cfg.prefix.begin();
-				for (auto &pe : f.get().path){
+                for (const auto &pe : f.get().path){
 					if (pref_it == cfg.prefix.end())
 						return false;
 					ASSERT(!pref_it->empty());

@@ -22,7 +22,7 @@ jobs:
         cd build && cmake --build . --target archivarius
         strip archivarius      
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: archivarius
         path: build/archivarius

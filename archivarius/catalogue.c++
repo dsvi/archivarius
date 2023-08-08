@@ -76,12 +76,6 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 		clean_up();
 		if (!key.empty()){
 			enc_.emplace();
-			using namespace chrono;
-			//TODO: change to C++2a utc_clock
-			auto t = duration_cast<nanoseconds>(system_clock::now().time_since_epoch()).count();
-			std::vector<u8> iv(&t, &t + sizeof (t));
-			iv.resize(enc_->iv_size());
-			enc_->iv(iv);
 			enc_->set_password(key);
 		}
 		return;
@@ -110,7 +104,6 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 				ein.iv(iv);
 				ein.set_password(key);
 				enc_ = ein;
-				enc_->inc_iv();
 			}
 			if (f.has_zstd_compression())
 				filters.cmp_in.emplace();
@@ -265,6 +258,7 @@ void Catalogue::commit()
 			f->mutable_zstd_compression();
 			if (enc_){
 				auto enc = f->mutable_chapoly_encryption();
+				enc_->randomize_iv();
 				enc->set_iv(enc_->iv(), enc_->iv_size());
 			}
 			put_message(hdr, buf, out, cs_pipe);

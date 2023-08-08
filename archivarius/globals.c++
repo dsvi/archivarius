@@ -1,7 +1,5 @@
 #include "globals.h"
-#include "platform.h"
 #include "exception.h"
-#include "catalogue.h"
 
 using namespace std;
 namespace fs = filesystem;
@@ -26,31 +24,21 @@ const char *tr_txt(const char *s)
 	return s;
 }
 
-static
-std::filesystem::file_time_type posix_epoch;
-
-void init_epoch()
-{
-	//TODO: switch to c++20 ?
-	tm start;
-	start.tm_year=70;
-	start.tm_mon=0;
-	start.tm_mday=1;
-	start.tm_hour=0;
-	start.tm_min=0;
-	start.tm_sec=0;
-	time_t t = mktime(&start);
-	posix_epoch = std::filesystem::file_time_type::clock::from_time_t(t);
-}
 
 Time to_posix_time(std::filesystem::file_time_type time)
 {
-	return chrono::duration_cast<chrono::nanoseconds>(time - posix_epoch).count();
+	using namespace chrono;
+	auto system_time = file_clock::to_sys(time);
+	// not a big deal if doesn't pass.
+	//static_assert(is_same<decltype(system_time)::duration::period, Time_accuracy::period>::value);
+	return time_point_cast<Time_accuracy>(system_time).time_since_epoch().count();
 }
 
 std::filesystem::file_time_type from_posix_time(Time t)
 {
-	return posix_epoch + std::chrono::nanoseconds(t);
+	using namespace chrono;
+	time_point<system_clock, Time_accuracy> sys_time{ Time_accuracy(t) };
+	return file_clock::from_sys(sys_time);
 }
 
 fs::path make_unique_filename(const filesystem::path &dir, string_view prefix)

@@ -46,6 +46,7 @@ message Fs_record{
   required string pathname = 1;
   required File_type type = 2;
   optional uint64 modified_nanoseconds = 3; // POSIX time. Is not set for symlinks
+  //TODO: wrong name?
   optional Ref_to_refcount ref = 4;     // only exists for regular files of sizes more than 0
   optional string symlink_target = 5;
   optional uint32 unix_permissions = 6; // equal to std::filesystem::perms

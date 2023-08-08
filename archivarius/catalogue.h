@@ -39,7 +39,6 @@ public:
 		return content_refs_ | ranges::view::all;
 	}
 
-
 	void commit();
 private:
 

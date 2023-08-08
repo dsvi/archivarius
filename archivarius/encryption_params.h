@@ -33,8 +33,8 @@ public:
 
 	/// set random key and iv
 	void randomize();
-	/// increment iv by 1
-	void inc_iv();
+	/// set random iv
+	void randomize_iv();
 	/// set key from arbitrary string
 	void set_password(std::string_view kw);
 	static constexpr

@@ -11,13 +11,12 @@ void Encryption_params::randomize()
 	rng.randomize(key_, sizeof (key_));
 }
 
-void Encryption_params::inc_iv()
+void Encryption_params::randomize_iv()
 {
-	for (auto &v : iv_){
-		if (++v != 0)
-			break;
-	}
+	auto &rng = Botan::system_rng();
+	rng.randomize(iv_, sizeof (iv_));
 }
+
 
 void Encryption_params::set_password(std::string_view kw)
 {

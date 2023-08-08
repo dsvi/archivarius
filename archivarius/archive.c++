@@ -11,6 +11,7 @@ namespace archi{
 
 void Archive_settings::recursive_add_from_dir(const fs::path &dir_path)
 try {
+	// adding files first helps compression
 	std::vector<fs::path> dirs;
 	for (auto &e : fs::directory_iterator(dir_path)){
 		auto p = e.path();
@@ -181,9 +182,12 @@ void Archive_settings::archive()
 		// TODO: get rid of
 		if (zstd){
 			auto cs = normal_content_->compression_statistic();
+			auto csl = long_term_content_->compression_statistic();
+			cs.original += csl.original;
+			cs.compressed += csl.compressed;
 			if (cs.original){
 				auto percent = cs.compressed *100 / cs.original;
-				fmt::print("Archive compressed to {}% of original size\n", percent);
+				fmt::print(tr_txt("Archive compressed to {}% of original size\n"), percent);
 			}
 		}
 		next.commit();
