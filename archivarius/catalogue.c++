@@ -195,7 +195,7 @@ Filesystem_state Catalogue::latest_fs_state()
 Filesystem_state Catalogue::empty_fs_state()
 {
 	Filters_out f;
-	f.cmp_out = {14};
+	f.cmp_out = {3};
 	if (enc_)
 		f.enc_chapo_out.emplace().randomize();
 	return Filesystem_state(cat_file_.parent_path(), f);
@@ -264,7 +264,7 @@ void Catalogue::commit()
 			put_message(hdr, buf, out, cs_pipe);
 		}
 		Filtrator_out filtr;
-		filtr.compression({22});
+		filtr.compression({3});
 		if (enc_)
 			filtr.encryption(*enc_);
 		out >> cs_pipe >> filtr >> dst;

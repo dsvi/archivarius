@@ -17,18 +17,13 @@
 #include <list>
 #include <memory>
 #include <optional>
-#include <regex>
-#include <sstream>
+#include <ranges>
 #include <string_view>
 #include <time.h>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
 #include <vector>
-
-//#include <ranges>
-
-#include <range/v3/all.hpp>
 
 #include <botan_all.h>
 

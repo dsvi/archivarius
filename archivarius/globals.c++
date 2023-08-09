@@ -46,15 +46,13 @@ fs::path make_unique_filename(const filesystem::path &dir, string_view prefix)
 	time_t t = time(nullptr);
 	if (t == -1)
 		throw Exception("Can't get current time");
-	auto st = localtime(&t);
-	ostringstream name;
-	name << put_time(st, "%Y-%m-%d %H:%M:%S");
+	string name = fmt::format("{:%g-%m-%d %H:%M:%S}", chrono::time_point_cast<chrono::seconds>(chrono::system_clock::now()));
 	fs::path file;
 	fs::path fname;
 	size_t count = 0;
 	do {
 		fname = prefix;
-		fname += name.str();
+		fname += name;
 		if (count++)
 			fname += string("#") + to_string(count -2);
 		file = dir;

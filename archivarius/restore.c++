@@ -72,9 +72,12 @@ void restore(Restore_settings &cfg)
 			}
 		}
 		{ // restore non empty files
-			auto refs_only = files | ::ranges::view::remove_if([](auto &a){return !a.get().content_ref.has_value();});
+			auto refs_only = files | views::filter([](auto &a){return a.get().content_ref.has_value();});
 			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs( refs_only.begin(), refs_only.end() );
-			::ranges::action::sort(sorted_by_refs, [](auto a, auto b){
+			//TODO: the same for C++23
+//			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs =
+//				files | views::filter([](auto &a){return a.get().content_ref.has_value();}) | ranges::to<vector>();
+			ranges::sort(sorted_by_refs, [](auto a, auto b){
 				return a.get().content_ref.value() < b.get().content_ref.value();
 			});
 			uint progress = numeric_limits<uint>::max();

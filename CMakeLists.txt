@@ -9,6 +9,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
+set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) # enable LTO on all compilers
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
@@ -20,7 +21,7 @@ if (ARCHIVARIUS_STATIC_BUILD)
     SET(CMAKE_EXE_LINKER_FLAGS "-static")
 endif()
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
@@ -41,9 +42,6 @@ endif()
 install(CODE "set(CMAKE_INSTALL_LOCAL_ONLY true)")
 
 add_subdirectory("libs/botan")
-set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
-option(RANGES_ASSERTIONS "Enable assertions." OFF)
-add_subdirectory("libs/range-v3")
 add_subdirectory("libs/protobuf/cmake")
 
 FetchContent_Declare(
@@ -134,7 +132,7 @@ set(archivarius-src
 configure_file(${PROJECT_SOURCE_DIR}/archivarius/version.h.in ${PROJECT_SOURCE_DIR}/archivarius/version.h)
 
 add_executable(archivarius ${archivarius-src})
-target_link_libraries(archivarius PRIVATE botan fmt::fmt zstd range-v3 libprotobuf-lite acl)
+target_link_libraries(archivarius PRIVATE botan fmt::fmt zstd libprotobuf-lite acl)
 
 install(TARGETS ${PROJECT_NAME})
 

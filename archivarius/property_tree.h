@@ -19,7 +19,7 @@ public:
 
 	auto
 	subs(){
-		return  kids_ | ranges::view::all;
+		return  kids_ | std::views::all;
 	}
 	bool has_subs(){
 		return !kids_.empty();

@@ -18,7 +18,7 @@ public:
 
 	// from newest to oldest
 	auto state_times(){
-		return fs_state_files_ | ranges::view::transform([](auto &fs){return fs.time_created;});
+		return fs_state_files_ | std::views::transform([](auto &fs){return fs.time_created;});
 	}
 	Time state_time(size_t ndx){
 		ASSERT(ndx < fs_state_files_.size());
@@ -36,7 +36,7 @@ public:
 
 	// returns sorted
 	auto content_refs(){
-		return content_refs_ | ranges::view::all;
+		return content_refs_ | std::views::all;
 	}
 
 	void commit();
