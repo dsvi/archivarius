@@ -106,38 +106,38 @@ void compare(Fs_state &a, Fs_state &b){
 	for (auto &pa : a){
 		if (b.find(pa.first) == b.end()){
 			ASSERT(0);
-			throw runtime_error(fmt::format("{0} does not exist in another state", pa.first));
+			throw runtime_error(format("{0} does not exist in another state", pa.first));
 		}
 		auto &da = pa.second;
 		auto &db = b[pa.first];
 		try{
 			if (da.type != db.type){
 				ASSERT(0);
-				throw runtime_error(fmt::format("type dont match\n{0}\n{1}", da.type, db.type));
+				throw runtime_error(format("type dont match\n{0}\n{1}", da.type, db.type));
 			}
 			if (da.time != db.time){
 				ASSERT(0);
-				throw runtime_error(fmt::format("times dont match\n{0}\n{1}", da.time, db.time));
+				throw runtime_error(format("times dont match\n{0}\n{1}", da.time, db.time));
 			}
 			if (da.type == File::FILE && da.size != db.size){
 				ASSERT(0);
-				throw runtime_error(fmt::format("fsize dont match\n{0}\n{1}", da.size, db.size));
+				throw runtime_error(format("fsize dont match\n{0}\n{1}", da.size, db.size));
 			}
 			if (da.unix_permissions != db.unix_permissions){
 				ASSERT(0);
-				throw runtime_error(fmt::format("this time permissions are the problem\n{0}\n{1}",(u16) da.unix_permissions, (u16)db.unix_permissions));
+				throw runtime_error(format("this time permissions are the problem\n{0}\n{1}",(u16) da.unix_permissions, (u16)db.unix_permissions));
 			}
 			if (da.acl != db.acl){
 				ASSERT(0);
-				throw runtime_error(fmt::format("acl dont match\n{0}\n{1}", da.acl, db.acl));
+				throw runtime_error(format("acl dont match\n{0}\n{1}", da.acl, db.acl));
 			}
 			if (da.default_acl != db.default_acl){
 				ASSERT(0);
-				throw runtime_error(fmt::format("default acl dont match\n{0}\n{1}", da.default_acl, db.default_acl));
+				throw runtime_error(format("default acl dont match\n{0}\n{1}", da.default_acl, db.default_acl));
 			}
 		}
 		catch(...){
-			throw_with_nested(fmt::format("file {0}:", pa.first));
+			throw_with_nested(format("file {0}:", pa.first));
 		}
 		b.erase(pa.first);
 	}
@@ -178,8 +178,8 @@ void test()
 	fs::remove_all(atest_tmp);
 	fs::remove_all(atest_arc);
 	fs::create_directory(atest_tmp);
-	fmt::print("cp --reflink -a {}/* {}\n", atest_src, atest_tmp);
-	system(fmt::format("cp --reflink -a {}/* {}\n", atest_src, atest_tmp).c_str());
+	print("cp --reflink -a {}/* {}\n", atest_src, atest_tmp);
+	system(format("cp --reflink -a {}/* {}\n", atest_src, atest_tmp).c_str());
 	vector<string> rmv_list;
 	{
 		ifstream i = ifstream(atest_rmv);
@@ -196,26 +196,27 @@ void test()
 	auto to_remove = rmv_list.begin();
 	vector<Fs_state> states;
 	for (bool quit = false; !quit; ){
-		fmt::print("{}%\n", 100*states.size()/total);
+		print("{}%\n", 100*states.size()/total);
 		states.push_back(state_for(atest_tmp));
 		run({"archive", "cfg-file=test.conf"});
 		quit = true;
 		if (to_add != end(fs::directory_iterator())){
-			fmt::print("cp --reflink -a {} {}/\n", to_add->path(), atest_tmp);
-			system(fmt::format("cp --reflink -a {} {}/\n", to_add->path(), atest_tmp).c_str());
+			print("cp --reflink -a {} {}/\n", to_add->path(), atest_tmp);
+			system(format("cp --reflink -a {} {}/\n", to_add->path(), atest_tmp).c_str());
 			to_add++;
 			quit = false;
 		}
 		if (to_remove != end(rmv_list)){
-			fmt::print("removing {}\n", (atest_tmp / *to_remove).string());
+			print("removing {}\n", (atest_tmp / *to_remove).string());
 			fs::remove_all(atest_tmp / *to_remove);
 			to_remove++;
 			quit = false;
 		}
 	}
+	print("extract and check\n");
 	auto last_state = states.back();
 	for (size_t i = 0; i < states.size(); i++){
-		fmt::print("{}%\n", i * 100 /states.size());
+		print("{}%\n", i * 100 /states.size());
 		auto j = states.size() - 1 - i;
 		extract(j, atest_arc, atest_tmp);
 		auto fs = state_for(atest_tmp);

@@ -829,7 +829,7 @@ const char* Chacha_Encryption_filter::_InternalParse(const char* ptr, ::PROTOBUF
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // optional bytes key = 2;
+      // required bytes key = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
           auto str = _internal_mutable_key();
@@ -871,7 +871,7 @@ failure:
         1, this->_internal_iv(), target);
   }
 
-  // optional bytes key = 2;
+  // required bytes key = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->WriteBytesMaybeAliased(
         2, this->_internal_key(), target);
@@ -885,27 +885,47 @@ failure:
   return target;
 }
 
-size_t Chacha_Encryption_filter::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:proto.Chacha_Encryption_filter)
+size_t Chacha_Encryption_filter::RequiredFieldsByteSizeFallback() const {
+// @@protoc_insertion_point(required_fields_byte_size_fallback_start:proto.Chacha_Encryption_filter)
   size_t total_size = 0;
 
-  // required bytes iv = 1;
   if (_internal_has_iv()) {
+    // required bytes iv = 1;
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_iv());
   }
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
 
-  // optional bytes key = 2;
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000002u) {
+  if (_internal_has_key()) {
+    // required bytes key = 2;
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_key());
   }
+
+  return total_size;
+}
+size_t Chacha_Encryption_filter::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:proto.Chacha_Encryption_filter)
+  size_t total_size = 0;
+
+  if (((_has_bits_[0] & 0x00000003) ^ 0x00000003) == 0) {  // All required fields are present.
+    // required bytes iv = 1;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_iv());
+
+    // required bytes key = 2;
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_key());
+
+  } else {
+    total_size += RequiredFieldsByteSizeFallback();
+  }
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     total_size += _internal_metadata_.unknown_fields().size();
@@ -947,7 +967,7 @@ void Chacha_Encryption_filter::CopyFrom(const Chacha_Encryption_filter& from) {
 }
 
 bool Chacha_Encryption_filter::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
   return true;
 }
 

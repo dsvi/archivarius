@@ -4,7 +4,7 @@
 #include "file_content_ref.h"
 #include "stream.h"
 #include "filters.h"
-#include "checksumer.h"
+#include "piping_csum.h"
 
 namespace archi{
 
@@ -41,7 +41,7 @@ private:
 	Stream_in     in_;
 	Stream_out    out_;
 	File_sink     file_sink_;
-	Checksumer    cs_;
+	Pipe_csum_out cs_;
 	u64 bytes_pumped_;
 	u64 min_file_size_;
 	Buffer buff_;

@@ -1,8 +1,6 @@
 #pragma once
 #include "precomp.h"
-#include "stream.h"
 #include "piping_zstd.h"
-#include "piping_xxhash.h"
 #include "piping_chapoly.h"
 #include "piping_chacha.h"
 

@@ -106,29 +106,29 @@ void Stream_out::put_uint64(u64 v)
 	pump((u8*)&v, sizeof(v));
 }
 
-void read_message(Buffer &message, Stream_in &in, Pipe_xxhash_in &cs_pipe)
+void read_message(Buffer &message, Stream_in &in, Checksumer_xxhash &cs)
 {
 	auto msize = in.get_uint();
 	message.resize(msize);
-	cs_pipe.reset();
+	cs.reset();
 	auto res = in.pump(message.raw(), msize);
 	if (res.pumped_size != msize)
 		throw Exception("Malformed file: {0}")(in.name());
-	auto cs_now = cs_pipe.digest();
+	auto cs_now = cs.checksum();
 	auto cs_was = in.get_uint64();
 	if (cs_now != cs_was)
 		throw Exception("Control sums don't match. Corrupted file.");
 }
 
-void put_message(google::protobuf::MessageLite &msg, Buffer &buff, Stream_out &out, Pipe_xxhash_out &cs_pipe)
+void put_message(google::protobuf::MessageLite &msg, Buffer &buff, Stream_out &out, Checksumer_xxhash &csr)
 {
 	auto msize = msg.ByteSizeLong();
 	buff.resize(msize);
 	msg.SerializeToArray(buff.raw(), msize);
 	out.put_uint(msize);
-	cs_pipe.reset();
+	csr.reset();
 	out.pump(buff.raw(), msize);
-	auto cs = cs_pipe.digest();
+	auto cs = csr.checksum();
 	out.put_uint64(get<Xx_hash>(cs));
 }
 

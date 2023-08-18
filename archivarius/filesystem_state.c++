@@ -1,9 +1,10 @@
 #include "filesystem_state.h"
+#include "checksumer_xxhash.h"
 #include "globals.h"
 #include "exception.h"
-#include "piping_zstd.h"
-
+#include "piping_csum.h"
 #include "format.pb.h"
+#include "stream.h"
 
 using namespace std;
 namespace fs = filesystem;
@@ -47,9 +48,12 @@ Filesystem_state::Filesystem_state(
 	auto fn = arc_path_ / file_name();
 	Filtrator_in filtr(f);
 	File_source file(fn);
-	Pipe_xxhash_in cs;
+	auto cs_tmp = make_unique<Checksumer_xxhash>();
+	auto &cs = *cs_tmp.get();
+	Pipe_csum_in cs_in(move(cs_tmp));
+
 	Stream_in in(fn);
-	in << cs << filtr << file;
+	in << cs_in << filtr << file;
 
 	Buffer buf;
 	google::protobuf::Arena arena;
@@ -117,9 +121,11 @@ void Filesystem_state::commit()
 	if (fs::exists(fn))
 		throw Exception("File {0} already exist")(fn.native());
 	File_sink file(fn);
-	Pipe_xxhash_out cs;
+	auto cs_tmp = make_unique<Checksumer_xxhash>();
+	auto &cs = *cs_tmp.get();
+	Pipe_csum_out cs_out(move(cs_tmp));
 	Stream_out out(fn);
-	out >> cs >> filtrator_ >> file;
+	out >> cs_out >> filtrator_ >> file;
 
 	google::protobuf::Arena arena;
 	proto::Fs_state *state = google::protobuf::Arena::CreateMessage<proto::Fs_state>(&arena);

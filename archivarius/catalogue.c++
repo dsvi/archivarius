@@ -1,7 +1,8 @@
+#include "checksumer_xxhash.h"
+#include "piping_csum.h"
 #include "precomp.h"
 #include "catalogue.h"
 #include "exception.h"
-#include "piping_xxhash.h"
 #include "piping_zstd.h"
 #include "stream.h"
 #include "buffer.h"
@@ -83,7 +84,9 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 
 	try {
 		File_source src(cat_file_);
-		Pipe_xxhash_in cs_pipe;
+		auto csumer_tmp = make_unique<Checksumer_xxhash>();
+		auto &csumer_xxhash = *csumer_tmp.get();
+		Pipe_csum_in cs_pipe(move(csumer_tmp));
 		Stream_in in(cat_file_);
 
 		in << cs_pipe << src;
@@ -92,7 +95,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 			throw Exception("Unsupported file version {0}. Max supported is {1}")(version, current_version);
 		Buffer buf;
 		google::protobuf::Arena arena;
-		auto header = get_message<proto::Catalog_header>(buf, in, cs_pipe, arena);
+		auto header = get_message<proto::Catalog_header>(buf, in, csumer_xxhash, arena);
 		Filters_in filters;
 		if (header->has_filters()){
 			auto &f = header->filters();
@@ -113,7 +116,7 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 		Filtrator_in fltr(filters);
 		in << cs_pipe << fltr << src;
 
-		auto catalog = get_message<proto::Catalogue>(buf, in, cs_pipe, arena);
+		auto catalog = get_message<proto::Catalogue>(buf, in, csumer_xxhash, arena);
 		// TODO: add more checks?
 		for (auto &file: catalog->state_files()){
 			Fs_state_file state;
@@ -136,14 +139,19 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 				ref.ref_count_ = r.ref_count();
 				ref.space_taken = r.space_taken();
 				ASSERT(ref.space_taken);
-				if (r.has_xxhash())
+				if (r.has_xxhash()){
 					ref.csum.emplace<Xx_hash>(r.xxhash());
+				}
+				else
 				if (r.has_blake2b()){
 					auto &pb2b = r.blake2b();
 					Blake2b_hash &b2b = ref.csum.emplace<Blake2b_hash>();
 					if (pb2b.size() != sizeof(b2b))
 						throw Exception("Wrong blake2b size. Likely corrupt file.");
 					copy_n(pb2b.begin(), sizeof(b2b), b2b.begin());
+				}
+				else{
+					throw Exception("Checksum is not set. Likely corrupt file.");
 				}
 				ASSERT(ref.ref_count_ <= fs_state_files_.size());
 				content_refs_.insert(ref);
@@ -247,7 +255,9 @@ void Catalogue::commit()
 		new_file += ".tmp";
 		File_sink dst(new_file);
 		Stream_out out(new_file);
-		Pipe_xxhash_out cs_pipe;
+		auto csumer_tmp = make_unique<Checksumer_xxhash>();
+		auto &csumer_xxhash = *csumer_tmp.get();
+		Pipe_csum_out cs_pipe(move(csumer_tmp));
 		out >> cs_pipe >> dst;
 
 		out.put_uint(current_version);
@@ -261,7 +271,7 @@ void Catalogue::commit()
 				enc_->randomize_iv();
 				enc->set_iv(enc_->iv(), enc_->iv_size());
 			}
-			put_message(hdr, buf, out, cs_pipe);
+			put_message(hdr, buf, out, csumer_xxhash);
 		}
 		Filtrator_out filtr;
 		filtr.compression({3});
@@ -305,7 +315,7 @@ void Catalogue::commit()
 			if (auto h = get_if<Blake2b_hash>(&r.csum))
 				ref->set_blake2b(h, sizeof(*h));
 		}
-		put_message(*cat_msg, buf, out, cs_pipe);
+		put_message(*cat_msg, buf, out, csumer_xxhash);
 		out.finish();
 		#ifdef COMPRESS_STAT
 		if (cat_msg->ByteSizeLong())

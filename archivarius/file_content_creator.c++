@@ -1,4 +1,5 @@
 #include "file_content_creator.h"
+#include "checksumer_blake2b.h"
 #include "globals.h"
 
 
@@ -26,7 +27,7 @@ void File_content_creator::enable_encryption()
 {
 	ASSERT(!file_sink_);
 	enc_.emplace();
-	cs_.set_for(Blake2b_hash());
+	cs_.csumer(make_unique<Checksumer_blake2b>());
 }
 
 File_content_ref File_content_creator::add(const std::filesystem::path &file_name)
@@ -38,7 +39,7 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 	File_source src(file_name);
 	in_.name(file_name);
 	in_ << src;
-	cs_.reset();
+	cs_.csumer()->reset();
 	File_content_ref ref;
 	ref.filters = filters_.get_filters();
 	ref.fname = fname_;
@@ -52,7 +53,7 @@ File_content_ref File_content_creator::add(const std::filesystem::path &file_nam
 	}while (!res.eof);
 	ref.to = bytes_pumped_;
 	out_.run([&]{
-		ref.csum = cs_.checksum();
+		ref.csum = cs_.csumer()->checksum();
 		filters_.flush_der_kompressor();
 	});
 	ref.space_taken = file_sink_.bytes_written() - bytes_actually_wirtten;
@@ -73,6 +74,8 @@ void File_content_creator::create_file()
 {
 	try{
 		out_.finish();
+		if (cs_.csumer() == nullptr)
+			cs_.csumer(make_unique<Checksumer_xxhash>());
 		fs::path file = arc_path_;
 		fname_ = make_unique_filename(arc_path_, "c");
 		file /= fname_;
@@ -82,7 +85,7 @@ void File_content_creator::create_file()
 			enc_->randomize();
 			filters_.encryption(*enc_);
 		}
-		out_ >> cs_.pipe() >> filters_ >> file_sink_;
+		out_ >> cs_ >> filters_ >> file_sink_;
 	}catch(...){
 		throw_with_nested(Exception(unrecoverable_output_problem));
 	}

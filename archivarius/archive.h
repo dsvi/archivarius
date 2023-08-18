@@ -5,7 +5,7 @@
 
 namespace archi{
 
-class Archive_settings{
+class Archive_action{
 public:
 	std::string name;
 	std::filesystem::path archive_path;
@@ -18,8 +18,9 @@ public:
 	std::optional<Zstd_out> zstd;
 	std::function<void(std::string &&header, std::string &&warning_message)> warning;
 	bool process_acls;
-private:
+
 	void archive();
+private:
 	void add(const std::filesystem::path &file_path);
 	void recursive_add_from_dir(const std::filesystem::path &dir_path);
 
@@ -29,13 +30,8 @@ private:
 	File_content_creator *long_term_content_;
 	Filesystem_state *prev_;
 	Filesystem_state *next_;
-	friend void archive(Archive_settings a);
+	friend void archive(Archive_action a);
 };
-
-inline
-void archive(Archive_settings a){
-	a.archive();
-}
 
 
 }

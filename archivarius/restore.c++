@@ -2,6 +2,7 @@
 #include "exception.h"
 #include "catalogue.h"
 #include "globals.h"
+#include "piping_csum.h"
 #include "platform.h"
 #include "piping.h"
 #include "checksumer.h"
@@ -25,40 +26,40 @@ void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 		fs::permissions(target, static_cast<fs::perms>(*attr.unix_permissions));
 }
 
-void restore(Restore_settings &cfg)
+void Restore_action::restore()
 {
 	try{
 		Buffer tmp;
 		tmp.resize(128*1024);
-		Catalogue cat(cfg.archive_path, cfg.password, false);
+		Catalogue cat(archive_path, password, false);
 		auto num_ids = cat.num_states();
 		if (num_ids == 0)
 			throw Exception("the archive is empty.");
-		auto state = cat.fs_state(cfg.from_ndx);
+		auto state = cat.fs_state(from_ndx);
 		auto all_files = state.files();
 		vector<reference_wrapper<Filesystem_state::File>> files(all_files.begin(), all_files.end());
 		auto mk_re_path = [&](fs::path &p){
-			ASSERT(cfg.prefix.empty() or p.string().starts_with(cfg.prefix.string()));
-			return cfg.to / p.lexically_relative(cfg.prefix.parent_path());
+			ASSERT(prefix.empty() or p.string().starts_with(prefix.string()));
+			return to / p.lexically_relative(prefix.parent_path());
 		};
-		if (!cfg.prefix.empty()){
+		if (!prefix.empty()){
 			erase_if(files, [&](auto &f){
 				// this has to compare full path elements. not parts of them
-				auto pref_it = cfg.prefix.begin();
+				auto pref_it = prefix.begin();
                 for (const auto &pe : f.get().path){
-					if (pref_it == cfg.prefix.end())
+					if (pref_it == prefix.end())
 						return false;
 					ASSERT(!pref_it->empty());
 					if (pe != *pref_it)
 						return true;
 					++pref_it;
 				}
-				if (pref_it == cfg.prefix.end())
+				if (pref_it == prefix.end())
 					return false;
 				return true;
 			});
 			if (files.empty())
-				cfg.warning(tr_txt("The archive does not contain anything with the given prefix"),"");
+				warning(tr_txt("The archive does not contain anything with the given prefix"),"");
 		}
 		for (Filesystem_state::File &file : files){ // restore dirs
 			if (file.type != Filesystem_state::DIR)
@@ -68,7 +69,7 @@ void restore(Restore_settings &cfg)
 				fs::create_directories(re_path);
 			}
 			catch(std::exception &e){
-				cfg.warning(format(tr_txt("Can't restore directory {0} to {1}: "), file.path, re_path), message(e));
+				warning(format(tr_txt("Can't restore directory {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
 		{ // restore non empty files
@@ -80,19 +81,19 @@ void restore(Restore_settings &cfg)
 			ranges::sort(sorted_by_refs, [](auto a, auto b){
 				return a.get().content_ref.value() < b.get().content_ref.value();
 			});
-			uint progress = numeric_limits<uint>::max();
+			uint reported_progress = numeric_limits<uint>::max();
 			uint cur_ref_id = 0;
 			File_source in;
 			Stream_in sin;
 			Filtrator_in filters;
 			decltype(File_content_ref::fname) fname;
 			decltype(File_content_ref::from)  num_pumped;
-			Checksumer cs;
+			Pipe_csum_out cs_out;
 			for (auto fr : sorted_by_refs){
 				uint p = cur_ref_id++ *1000 / sorted_by_refs.size();
-				if (p != progress){
-					cfg.progress(p);
-					progress = p;
+				if (p != reported_progress){
+					progress(p);
+					reported_progress = p;
 				}
 				auto &file = fr.get();
 				auto &ref = file.content_ref.value();
@@ -105,22 +106,22 @@ void restore(Restore_settings &cfg)
 						num_pumped = 0;
 						filters = Filtrator_in(ref.filters);
 						sin << filters << in;
-						cs.set_for(ref.csum);
+						cs_out.csumer_for(ref.csum);
 						fname = ref.fname;
 					}
 					pump(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
 					File_sink out(re_path);
 					Stream_out sout;
-					cs.reset();
-					sout >> cs.pipe() >> out;
+					cs_out.csumer()->reset();
+					sout >> cs_out >> out;
 					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
-					if (ref.csum != cs.checksum())
-						cfg.warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path), "" );
+					if (ref.csum != cs_out.csumer()->checksum())
+						warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path), "" );
 					sout.finish();
 				}
 				catch(std::exception &e){
 					/* TRANSLATORS: This is about path from and to  */
-					cfg.warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
+					warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 				}
 			}
 		}
@@ -140,7 +141,7 @@ void restore(Restore_settings &cfg)
 			}
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
-				cfg.warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
+				warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
 		sort(files.begin(), files.end(), [](auto a, auto b){
@@ -152,18 +153,18 @@ void restore(Restore_settings &cfg)
 				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
-				cfg.warning(format(tr_txt("Can't restore attributes for {0}: "), re_path), message(e));
+				warning(format(tr_txt("Can't restore attributes for {0}: "), re_path), message(e));
 			}
 		}
 	}
 	catch(std::exception &e){
 		string msg;
-		if (cfg.name.empty())
+		if (name.empty())
 			/* TRANSLATORS: This is about path from and to  */
-			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}"), cfg.archive_path, cfg.to), message(e));
+			warning(format(tr_txt("Error while restoring from {0} to {1}"), archive_path, to), message(e));
 		else
 			/* TRANSLATORS: First argument is name, second - path*/
-			cfg.warning(format(tr_txt("Error while restoring from {0} to {1}"), cfg.name, cfg.to), message(e));
+			warning(format(tr_txt("Error while restoring from {0} to {1}"), name, to), message(e));
 	}
 }
 

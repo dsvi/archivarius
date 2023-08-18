@@ -1,7 +1,7 @@
 #pragma once
+#include "checksumer_xxhash.h"
 #include "precomp.h"
 #include "piping.h"
-#include "piping_xxhash.h"
 #include "buffer.h"
 #include "exception.h"
 
@@ -88,16 +88,16 @@ void Stream_out::name(std::string &&name)
 	name_ = std::move(name);
 }
 
-void read_message(Buffer &message, Stream_in &in, Pipe_xxhash_in &cs_pipe);
+void read_message(Buffer &message, Stream_in &in, Checksumer_xxhash &cs);
 template<class T>
-T *get_message(Buffer &tmp, Stream_in &in, Pipe_xxhash_in &cs_pipe, google::protobuf::Arena &arena){
+T *get_message(Buffer &tmp, Stream_in &in, Checksumer_xxhash &cs_pipe, google::protobuf::Arena &arena){
 	T *msg = google::protobuf::Arena::CreateMessage<T>(&arena);
 	read_message(tmp, in, cs_pipe);
 	msg->ParseFromArray(tmp.raw(), tmp.size());
 	return msg;
 }
 
-void put_message(google::protobuf::MessageLite &msg, Buffer &buff, Stream_out &out, Pipe_xxhash_out &cs_pipe);
+void put_message(google::protobuf::MessageLite &msg, Buffer &buff, Stream_out &out, Checksumer_xxhash &csr);
 
 
 }

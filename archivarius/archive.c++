@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 
 namespace archi{
 
-void Archive_settings::recursive_add_from_dir(const fs::path &dir_path)
+void Archive_action::recursive_add_from_dir(const fs::path &dir_path)
 try {
 	// adding files first helps compression
 	std::vector<fs::path> dirs;
@@ -30,7 +30,7 @@ catch(std::exception &exp){
 	warning(fmt::format(tr_txt("Can't get directory contents for {0}:"), dir_path), message(exp));
 }
 
-void Archive_settings::add(const fs::path &file_path)
+void Archive_action::add(const fs::path &file_path)
 {
 	try{
 		Filesystem_state::File file;
@@ -78,7 +78,7 @@ void Archive_settings::add(const fs::path &file_path)
 	}
 }
 
-void Archive_settings::archive()
+void Archive_action::archive()
 {
 	try{
 		Catalogue cat(archive_path, password, true);

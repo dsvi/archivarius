@@ -28,16 +28,6 @@ bool operator != (const Checksum &a, const Checksum &b){
 	return !(a == b);
 }
 
-class Checksumer_base
-{
-public:
-	virtual
-	Checksum digest() =0;
-	virtual
-	void reset() =0;
-	virtual
-	~Checksumer_base(){};
-};
 
 
 }

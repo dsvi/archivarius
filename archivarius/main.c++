@@ -134,7 +134,7 @@ int run(int argc, const char *argv[]){
 				if (name and c.name != *name)
 					continue;
 				task_found = true;
-				Archive_settings arc;
+				Archive_action arc;
 				cfmt::cprint("╼╾╼╾╼▏{fy}{}{fd}▕╾╼╾╼╾╼╾╼╾╼╾\n",c.name);
 				arc.name = c.name;
 				arc.archive_path = c.archive;
@@ -155,7 +155,7 @@ int run(int argc, const char *argv[]){
 				}
 				arc.warning = move(report_warning);
 				arc.process_acls = c.process_acl;
-				archive(move(arc));
+				arc.archive();
 			} catch (std::exception &e) {
 				cfmt::cprint(stderr, tr_txt("{fr}Stopped processing the task.{fd}\n"));
 				auto msg = message(e);
@@ -188,15 +188,15 @@ int run(int argc, const char *argv[]){
 			cfmt::cprint("{fg}{}{fd}\n", file.path.string());
 			switch (file.type){
 			case Filesystem_state::File_type::FILE:
-				fmt::print(tr_txt("Is a file\n"));
+				fmt::print(tr_txt("File\n"));
 				if (file.content_ref.has_value())
 					fmt::print("Stored in: {}\n", file.content_ref->fname);
 				break;
 			case Filesystem_state::File_type::DIR:
-				fmt::print(tr_txt("Is a directory\n"));
+				fmt::print(tr_txt("Directory\n"));
 				break;
 			case Filesystem_state::File_type::SYMLINK:
-				fmt::print(tr_txt("Is a symlink to: {}\n"), file.symlink_target);
+				fmt::print(tr_txt("Symlink to: {}\n"), file.symlink_target);
 				break;
 			default:
 				ASSERT(0);
@@ -208,7 +208,7 @@ int run(int argc, const char *argv[]){
 	}
 	else
 	if (cmd_line.command() == "restore"){
-		Restore_settings rs;
+		Restore_action rs;
 		auto tp = get_archive_params(cmd_line, cfg_path);
 		rs.archive_path = move(tp.archive_path);
 		rs.name = move(tp.name);
@@ -226,11 +226,11 @@ int run(int argc, const char *argv[]){
 		cmd_line.check_unused_arguments();
 		rs.warning = move(report_warning);
 		rs.progress = report_progress;
-		restore(rs);
+		rs.restore();
 	}
 	else
 	if (cmd_line.command() == "test"){
-		Test_settings ts;
+		Test_action ts;
 		ts.warning = move(report_warning);
 		auto tp = get_archive_params(cmd_line, cfg_path);
 		ts.archive_path = move(tp.archive_path);
@@ -241,7 +241,7 @@ int run(int argc, const char *argv[]){
 			fmt::print("{}\n", status_text);
 		};
 		ts.progress = report_progress;
-		test(ts);
+		ts.test();
 		fmt::print(tr_txt("Test finished.\n"));
 	}
 	else

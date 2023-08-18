@@ -604,7 +604,7 @@ class Chacha_Encryption_filter :
   std::string* _internal_mutable_iv();
   public:
 
-  // optional bytes key = 2;
+  // required bytes key = 2;
   bool has_key() const;
   private:
   bool _internal_has_key() const;
@@ -636,6 +636,9 @@ class Chacha_Encryption_filter :
   // @@protoc_insertion_point(class_scope:proto.Chacha_Encryption_filter)
  private:
   class _Internal;
+
+  // helper for ByteSizeLong()
+  size_t RequiredFieldsByteSizeFallback() const;
 
   ::PROTOBUF_NAMESPACE_ID::internal::InternalMetadataWithArenaLite _internal_metadata_;
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
@@ -2808,7 +2811,7 @@ inline void Chacha_Encryption_filter::unsafe_arena_set_allocated_iv(
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:proto.Chacha_Encryption_filter.iv)
 }
 
-// optional bytes key = 2;
+// required bytes key = 2;
 inline bool Chacha_Encryption_filter::_internal_has_key() const {
   bool value = (_has_bits_[0] & 0x00000002u) != 0;
   return value;

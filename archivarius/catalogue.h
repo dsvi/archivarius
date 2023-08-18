@@ -2,7 +2,6 @@
 #include "file_content_ref.h"
 #include "filesystem_state.h"
 #include "platform.h"
-#include "globals.h"
 
 namespace archi{
 

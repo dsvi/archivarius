@@ -4,7 +4,7 @@
 
 namespace archi{
 
-struct Restore_settings{
+struct Restore_action{
 	std::string name; // optional
 	std::filesystem::path archive_path;
 	size_t from_ndx;
@@ -13,9 +13,10 @@ struct Restore_settings{
 	std::filesystem::path prefix; // optional
 	std::function<void(std::string &&header, std::string &&warning_message)> warning;
 	std::function<void(uint progress_in_permil)> progress;
+
+	void restore();
 };
 
-void restore(Restore_settings &cfg);
 
 
 }

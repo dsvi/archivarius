@@ -20,7 +20,7 @@ message Chapoly_Encryption_filter{
 
 message Chacha_Encryption_filter{
   required bytes iv = 1;
-  optional bytes key  = 2;
+  required bytes key = 2;
 }
 
 message Filters{
