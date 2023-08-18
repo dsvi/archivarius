@@ -6,7 +6,7 @@ rm -rf docker-build-out
 docker build --tag archivarius-build .
 mkdir docker-build-out
 id=$(docker create archivarius-build)
-docker cp $id:/build/build/archivarius docker-build-out/
+docker cp $id:/src/build/archivarius docker-build-out/
 docker rm $id
 docker image rm archivarius-build
 
