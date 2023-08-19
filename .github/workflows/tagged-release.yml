@@ -1,25 +1,29 @@
-name: "tagged-release"
+name: tagged-release
+
 
 on:
-  push:
-    tags:
-      - "v*"
+    push:
+        tags:
+        - "v*"
 
 jobs:
-  tagged-release:
-    name: "Tagged Release"
-    runs-on: "ubuntu-latest"
+    tagged-release:
+        name: "Tagged Release"
+        runs-on: ubuntu-latest
+        steps:
+            - name: 'Checkout source code'
+              uses: 'actions/checkout@v3'
+              with:
+                    fetch-depth: 0
+            - name: "Build"
+              run: ./docker-build.sh
 
-    steps:
-      - name: "Build"
-        run: |
-            ./docker-build.sh
 
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          draft: true
-          prerelease: false
-          files: |
-             docker-build-out/archivarius           
-            
+            - uses: "marvinpinto/action-automatic-releases@latest"
+              with:
+                repo_token: "${{ secrets.GITHUB_TOKEN }}"
+                draft: true
+                prerelease: false
+                files: |
+                        docker-build-out/archivarius
+
