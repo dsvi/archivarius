@@ -9,13 +9,9 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    #- name: prepare
-    #  run: 
-    #    sudo apt-get install docker.io
     - name: build
       run: |
         ./docker-build.sh
-        #strip archivarius
 
     - uses: actions/upload-artifact@v3
       with:
