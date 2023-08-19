@@ -5,24 +5,19 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     
     steps:
     - uses: actions/checkout@v1
-    - name: prepare
-      run: 
-        sudo apt-get install libacl1-dev libzstd-dev clang libc++-dev lld libc++abi-dev ninja-build
-    - name: configure
-      run: 
-        mkdir build &&
-        cd build &&
-        CXX=clang++ CC=clang cmake -DARCHIVARIUS_STATIC_BUILD=ON -GNinja ..
+    #- name: prepare
+    #  run: 
+    #    sudo apt-get install docker.io
     - name: build
       run: |
-        cd build && cmake --build . --target archivarius
-        strip archivarius      
+        ./docker-build.sh
+        #strip archivarius
 
     - uses: actions/upload-artifact@v3
       with:
         name: archivarius
-        path: build/archivarius
+        path: docker-build-out/archivarius
