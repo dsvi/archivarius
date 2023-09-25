@@ -48,7 +48,7 @@ set(BOTAN_MODULES_LIST
     system_rng
 )
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
-    string(APPEND BOTAN_MODULES_LIST ,chacha_avx2)
+    list(APPEND BOTAN_MODULES_LIST chacha_avx2)
 endif()
 add_subdirectory("libs/botan")
 
