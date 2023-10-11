@@ -24,14 +24,12 @@
 #include <unordered_set>
 #include <variant>
 #include <vector>
+#include <format>
+#include <print>
 
 #include <botan_all.h>
 
-#define FMT_CONSTEVAL
-#include "cfmt.h"
-#include <fmt/format.h>
-#include <fmt/chrono.h>
-#include <fmt/std.h>
+#include <coformat.h>
 
 #define XXH_CPU_LITTLE_ENDIAN 1
 #include "xxhash.h"
@@ -51,15 +49,15 @@
 #define ASSERT(x)
 #endif
 
-namespace std{
-    template<> struct hash<std::filesystem::path>    {
-	      typedef std::filesystem::path argument_type;
-	      typedef std::size_t result_type;
-	      result_type operator()(argument_type const& a) const noexcept				{
-					return std::filesystem::hash_value(a);
-				}
-    };
-}
+template<>
+struct std::formatter<std::filesystem::path> : std::formatter<std::string>
+{
+	template<class FormatContext>
+	auto format(const std::filesystem::path &p, FormatContext &fc) const
+	{
+		return std::formatter<std::string>::format(p.string(), fc);
+	}
+};
 
 namespace archi{
 

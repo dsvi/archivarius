@@ -319,7 +319,7 @@ void Catalogue::commit()
 		out.finish();
 		#ifdef COMPRESS_STAT
 		if (cat_msg->ByteSizeLong())
-			fmt::print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg->ByteSizeLong());
+			print("Catalog compressed to {}% of original size\n", dst.bytes_written() *100/cat_msg->ByteSizeLong());
 		#endif
 		fs_sync();
 		fs::rename(new_file, cat_file_);

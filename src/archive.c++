@@ -5,6 +5,7 @@
 #include "file_content_creator.h"
 
 using namespace std;
+using namespace coformat;
 namespace fs = std::filesystem;
 
 namespace archi{
@@ -27,7 +28,7 @@ try {
 catch(std::exception &exp){
 	if (has_tag(exp, File_content_creator::unrecoverable_output_problem))
 		throw;
-	warning(fmt::format(tr_txt("Can't get directory contents for {0}:"), dir_path), message(exp));
+	warning(cformat(tr_txt("Can't get directory contents for {b}{0}{nb}:"), dir_path), message(exp));
 }
 
 void Archive_action::add(const fs::path &file_path)
@@ -63,8 +64,13 @@ void Archive_action::add(const fs::path &file_path)
 					else {
 						ASSERT(file.mod_time);
 						file.content_ref = prev_->get_ref_if_exist(file.path, *file.mod_time);
-						if (!file.content_ref)
+						if (!file.content_ref){
+							if (is_colorized()){
+								println("{}", file.path.string().substr(0,100));
+								clear_previous_line();
+							}
 							file.content_ref = normal_content_->add(file_path);
+						}
 					}
 				}
 			}
@@ -74,7 +80,7 @@ void Archive_action::add(const fs::path &file_path)
 	catch(std::exception &exp){
 		if (has_tag(exp, File_content_creator::unrecoverable_output_problem))
 			throw;
-		warning(fmt::format(tr_txt("Skipping {0}:"), file_path), message(exp));
+		warning(cformat(tr_txt("Skipping {b}{0}{nb}:"), file_path), message(exp));
 	}
 }
 
@@ -169,7 +175,7 @@ void Archive_action::archive()
 		else{
 			for (auto &file : files_to_archive){
 				if (!exists(file)){
-					warning(fmt::format(tr_txt("Path {0} does not exist"), file), "");
+					warning(cformat(tr_txt("Path {b}{0}{nb} does not exist"), file), "");
 					continue;
 				}
 				add(file);
@@ -187,9 +193,11 @@ void Archive_action::archive()
 			cs.compressed += csl.compressed;
 			if (cs.original){
 				auto percent = cs.compressed *100 / cs.original;
-				fmt::print(tr_txt("Archive compressed to {}% of original size\n"), percent);
+				cprint(tr_txt("Archive compressed to {}% of original size\n"), percent);
 			}
 		}
+		if (next.files().size() == 0)
+			throw Exception(tr_txt("New version is empty. It will not be stored because of this."));
 		next.commit();
 		catalog->add_fs_state(move(next));
 		if (max_storage_time){
@@ -215,7 +223,7 @@ void Archive_action::archive()
 		catalog->commit();
 	}
 	catch(std::exception &e){
-		warning(fmt::format(tr_txt("Error while archiving {0}:"), name), message(e));
+		warning(cformat(tr_txt("Error while archiving {fy}{0}{fd}:"), name), message(e));
 	}
 }
 

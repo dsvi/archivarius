@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.22)
 
 include(FetchContent)
- 
+include(cmake/AddFromArchive.cmake)
+
 # Set the default CMAKE_BUILD_TYPE to Release.
 # This should be done before the project command since the latter can set
 # CMAKE_BUILD_TYPE itself (it does so for nmake).
@@ -26,15 +27,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 project(archivarius
-    VERSION 1.0.0
+    VERSION 1.1.0
     DESCRIPTION "Archivarius lib and CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message("Using libc++")
     string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
     string(APPEND CMAKE_CXX_FLAGS " -Wno-unqualified-std-cast-call")
-    # -lc++abi is required for static build to work
-    string(APPEND CMAKE_EXE_LINKER_FLAGS " -fuse-ld=lld -lc++abi")
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -fuse-ld=lld")
     #string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer")
 endif()
 
@@ -50,17 +50,10 @@ set(BOTAN_MODULES_LIST
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     list(APPEND BOTAN_MODULES_LIST chacha_avx2)
 endif()
-add_subdirectory("libs/botan")
-
-add_subdirectory("libs/protobuf/cmake")
-
-
-FetchContent_Declare(
-    fmt
-    URL https://github.com/fmtlib/fmt/archive/refs/tags/10.0.0.tar.gz
-    URL_HASH SHA256=ede1b6b42188163a3f2e0f25ad5c0637eca564bd8df74d02e31a311dd6b37ad8
-)
-FetchContent_MakeAvailable(fmt)
+add_subdirectory(libs/botan)
+add_from_archive(libs/protobuf-3.20.2.7z cmake)
+add_subdirectory(libs/coformat)
+add_subdirectory(libs/progress-bar)
 
 if (ARCHIVARIUS_STATIC_BUILD)
     set(ZSTD_LEGACY_SUPPORT OFF)
@@ -72,18 +65,18 @@ if (ARCHIVARIUS_STATIC_BUILD)
     )
     FetchContent_MakeAvailable(zstd)
     target_include_directories(libzstd_static PUBLIC $<BUILD_INTERFACE:${zstd_SOURCE_DIR}/lib>)
-    add_library(zstd ALIAS libzstd_static)
+    set(ZSTD_LIB_NAME libzstd_static)
+else()
+    set(ZSTD_LIB_NAME zstd)
 endif()
 
 set(archivarius-src
-src/archivarius.h
 src/archive.c++
 src/archive.h
 src/buffer.c++
 src/buffer.h
 src/catalogue.c++
 src/catalogue.h
-src/cfmt.h
 src/checksum.h
 src/checksumer.h
 src/checksumer_blake2b.c++
@@ -144,9 +137,9 @@ src/xxhash.h
 configure_file(${PROJECT_SOURCE_DIR}/src/version.h.in ${PROJECT_SOURCE_DIR}/src/version.h)
 
 add_executable(archivarius ${archivarius-src})
-target_link_libraries(archivarius PRIVATE botan fmt::fmt zstd libprotobuf-lite acl)
+target_link_libraries(archivarius PRIVATE botan coformat progress-bar ${ZSTD_LIB_NAME} libprotobuf-lite acl)
 
-install(TARGETS ${PROJECT_NAME})
+install(TARGETS archivarius)
 
 set(CPACK_BINARY_DEB "ON")
 set(CPACK_BINARY_TXZ "ON")

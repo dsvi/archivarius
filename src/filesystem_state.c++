@@ -92,9 +92,9 @@ void Filesystem_state::add(Filesystem_state::File &&f)
 	files_[f.path] = move(f);
 }
 
-std::optional<File_content_ref> Filesystem_state::get_ref_if_exist(std::filesystem::path &archive_path, Time modified_time)
+std::optional<File_content_ref> Filesystem_state::get_ref_if_exist(std::filesystem::path &path_in_archive, Time modified_time)
 {
-	auto it = files_.find(archive_path);
+	auto it = files_.find(path_in_archive);
 	if (it == files_.end())
 		return optional<File_content_ref>();
 	if (it->second.mod_time.value() != modified_time)
@@ -155,7 +155,7 @@ void Filesystem_state::commit()
 	out.finish();
   #ifdef COMPRESS_STAT
 	if (state->ByteSizeLong())
-		fmt::print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state->ByteSizeLong());
+		print("Filesystem state compressed to {}% of original size\n", file.bytes_written() *100/state->ByteSizeLong());
   #endif
 }
 

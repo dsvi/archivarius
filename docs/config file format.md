@@ -14,27 +14,28 @@ In the mentioned order.
 
 Example:
  
-	task home folder backup {
+	task home backup {
 		archive /media/me/backup/
 		max-storage-time 6m
 		root /home/me/
 		exclude {
 			.cache
+			.local/share/Trash/
 			.steam
 			Steam
-			Downloads
+			.local/share/Steam
 		}
 		password ma qwerty goes here
 		compression on
 	}
 
-The opening { must be on the same line. The closing } must be on it's own line.  
+The opening **{** must be on the same line. The closing **}** must be on it's own line.  
 Lines starting with # are ignored.
 
-Keys are:
+### Keywords are:
 
 ### task
-Followed by a required name. The top level element.
+Followed by a required name. The top level element. Can be multiple in a file.
 
 ### archive
 *required.* Path to where archive will be stored

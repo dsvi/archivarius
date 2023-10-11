@@ -19,6 +19,7 @@ namespace archi{
 //	return result;
 //}
 
+// for future translations
 const char *tr_txt(const char *s)
 {
 	return s;
@@ -46,7 +47,7 @@ fs::path make_unique_filename(const filesystem::path &dir, string_view prefix)
 	time_t t = time(nullptr);
 	if (t == -1)
 		throw Exception("Can't get current time");
-	string name = fmt::format("{:%g-%m-%d %H:%M:%S}", chrono::time_point_cast<chrono::seconds>(chrono::system_clock::now()));
+	string name = format("{:%g-%m-%d %H:%M:%S}", chrono::time_point_cast<chrono::seconds>(chrono::system_clock::now()));
 	fs::path file;
 	fs::path fname;
 	size_t count = 0;

@@ -36,7 +36,7 @@ public:
 	Time time_created();
 
 	std::optional<File_content_ref> get_ref_if_exist(
-	                                                std::filesystem::path &archive_path,
+	                                                std::filesystem::path &path_in_archive,
 	                                                Time modified_time );
 
 	// for (File &file: fss.files())...

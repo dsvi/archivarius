@@ -42,7 +42,7 @@ You will also need ninja or make, and cmake.
 
 Now you are ready to configure the build
 
-    git clone https://github.com/dsvi/archivarius.git
+    git clone --depth=1 https://gitlab.com/44100Hz/archivarius.git
     cd archivarius
     mkdir build
     cd build

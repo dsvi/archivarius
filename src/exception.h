@@ -24,8 +24,8 @@ public:
 	explicit
 	Exception(const char*fmt_string);
 	template<class... Args>
-	Exception operator()(const Args&... a){
-		fmt_ = fmt::format(fmt_, a...);
+	Exception operator()(Args&&... a){
+		fmt_ = coformat::cformat(fmt_, std::forward<Args>(a)...);
 		return *this;
 	}
 	const char *what() const noexcept override;

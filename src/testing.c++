@@ -2,7 +2,7 @@
 #include "catalogue.h"
 #include "precomp.h"
 #include "platform.h"
-#include "cfmt.h"
+#include "coformat.h"
 #include "testing.h"
 
 /*
@@ -16,8 +16,7 @@ Directory structure:
 
 int run(int argc, const char *argv[]);
 
-using namespace fmt;
-using namespace cfmt;
+using namespace coformat;
 using namespace std;
 using namespace archi;
 namespace fs = std::filesystem;
@@ -43,26 +42,27 @@ struct File {
 };
 
 template <>
-struct fmt::formatter<File::Type> : fmt::formatter<std::string_view>{
-    template <typename FormatContext>
-    auto format(File::Type p, FormatContext &ctx) {
-        using Type = File::Type;
-        if (p == Type::FILE)
-            return format_to(ctx.out(), "File");
-        if (p == Type::DIR)
-            return format_to(ctx.out(), "Dir");
-        if (p == Type::SYMLINK)
-            return format_to(ctx.out(), "Symlink");
-        return format_to(ctx.out(), "{}", (int) p);
-    }
+struct std::formatter<File::Type> : std::formatter<std::string>{
+	template<class FormatContext>
+	auto format(File::Type &p, FormatContext &ctx) const {
+		using Type = File::Type;
+		if (p == Type::FILE)
+			return std::formatter<std::string>::format("File", ctx);
+		if (p == Type::DIR)
+			return std::formatter<std::string>::format("Dir", ctx);
+		if (p == Type::SYMLINK)
+			return std::formatter<std::string>::format("Symlink", ctx);
+		throw format_error(std::format("What is this File::Type? {}", (size_t) p));
+	}
 };
 
+using chrono_base_formatter = std::formatter<std::chrono::sys_time<Time_accuracy>>;
 template <>
-struct fmt::formatter<Filetime> : fmt::formatter<std::chrono::time_point<std::chrono::system_clock, Time_accuracy>>{
-	template <typename FormatContext>
-	auto format(const Filetime &p, FormatContext &ctx) {
+struct std::formatter<Filetime> : chrono_base_formatter{
+	template<class FormatContext>
+	auto format(const Filetime &p, FormatContext &ctx) const {
 		auto sys_time = Filetime::clock::to_sys(p);
-		return format_to(ctx.out(), "{}", sys_time);
+		return chrono_base_formatter::format(sys_time, ctx);
 	}
 };
 
@@ -113,15 +113,15 @@ void compare(Fs_state &a, Fs_state &b){
 		try{
 			if (da.type != db.type){
 				ASSERT(0);
-				throw runtime_error(format("type dont match\n{0}\n{1}", da.type, db.type));
+				throw runtime_error(cformat("type dont match\n{}\n{}", da.type, db.type));
 			}
 			if (da.time != db.time){
 				ASSERT(0);
-				throw runtime_error(format("times dont match\n{0}\n{1}", da.time, db.time));
+				throw runtime_error(cformat("times dont match\n{}\n{}", da.time, db.time));
 			}
 			if (da.type == File::FILE && da.size != db.size){
 				ASSERT(0);
-				throw runtime_error(format("fsize dont match\n{0}\n{1}", da.size, db.size));
+				throw runtime_error(format("fsize dont match\n{}\n{}", da.size, db.size));
 			}
 			if (da.unix_permissions != db.unix_permissions){
 				ASSERT(0);
@@ -164,7 +164,11 @@ void extract(size_t i, fs::path arc, fs::path to){
 	run(params);
 }
 
-#pragma GCC diagnostic ignored "-Wunused-result"
+static
+void run_command(std::string &&cmd){
+	println("{}", cmd);
+	system(cmd.c_str());
+}
 
 void test()
 {
@@ -178,8 +182,7 @@ void test()
 	fs::remove_all(atest_tmp);
 	fs::remove_all(atest_arc);
 	fs::create_directory(atest_tmp);
-	print("cp --reflink -a {}/* {}\n", atest_src, atest_tmp);
-	system(format("cp --reflink -a {}/* {}\n", atest_src, atest_tmp).c_str());
+	run_command(format("cp --reflink -a {}/* {}", atest_src, atest_tmp));
 	vector<string> rmv_list;
 	{
 		ifstream i = ifstream(atest_rmv);
@@ -196,35 +199,34 @@ void test()
 	auto to_remove = rmv_list.begin();
 	vector<Fs_state> states;
 	for (bool quit = false; !quit; ){
-		print("{}%\n", 100*states.size()/total);
+		println("{}%", 100*states.size()/total);
 		states.push_back(state_for(atest_tmp));
-		run({"archive", "cfg-file=test.conf"});
+		run({"archive", "cfg-file=test/test.conf"});
 		quit = true;
 		if (to_add != end(fs::directory_iterator())){
-			print("cp --reflink -a {} {}/\n", to_add->path(), atest_tmp);
-			system(format("cp --reflink -a {} {}/\n", to_add->path(), atest_tmp).c_str());
+			run_command(format("cp --reflink -a {} {}/", to_add->path(), atest_tmp));
 			to_add++;
 			quit = false;
 		}
 		if (to_remove != end(rmv_list)){
-			print("removing {}\n", (atest_tmp / *to_remove).string());
+			println("removing {}", (atest_tmp / *to_remove).string());
 			fs::remove_all(atest_tmp / *to_remove);
 			to_remove++;
 			quit = false;
 		}
 	}
-	print("extract and check\n");
+	println("extract and check");
 	auto last_state = states.back();
 	for (size_t i = 0; i < states.size(); i++){
-		print("{}%\n", i * 100 /states.size());
+		println("{}%", i * 100 /states.size());
 		auto j = states.size() - 1 - i;
 		extract(j, atest_arc, atest_tmp);
 		auto fs = state_for(atest_tmp);
 		compare(fs, states[i]);
-		move_cursor_up();
+		clear_previous_line();
 	}
 	this_thread::sleep_for(2s);
-	run({"archive", "cfg-file=test-1s.conf"});
+	run({"archive", "cfg-file=test/test-1s.conf"});
 	{
 		Catalogue cat(atest_arc, password, false);
 		ASSERT(cat.num_states() == 1);

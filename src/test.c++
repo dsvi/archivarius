@@ -11,7 +11,7 @@
 namespace archi{
 
 using namespace std;
-using namespace fmt;
+using namespace coformat;
 
 void Test_action::test()
 {
@@ -79,22 +79,22 @@ void Test_action::test()
 				sout >> cs;
 				pump(sin, ref.to, &sout, fname, tmp, num_pumped);
 				if (ref.csum != cs.csumer()->checksum())
-					warning( fmt::format(tr_txt("File {0} is broken."), fname), "Control sums do not match." );
+					warning( cformat(tr_txt("File {0} is broken."), fname), "Control sums do not match." );
 			}
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
-				warning(format(tr_txt("Problem with {0}"), ref.fname), message(e));
+				warning(cformat(tr_txt("Problem with {0}"), ref.fname), message(e));
 			}
 		}
 	}
 	catch(std::exception &e){
 		string msg;
 		if (name.empty())
-			/* TRANSLATORS: This is about path from and to  */
-			warning(format(tr_txt("Error while testing {0}"), archive_path), message(e));
+			/* TRANSLATORS: This is about path  */
+			warning(cformat(tr_txt("Error while testing {0}"), archive_path), message(e));
 		else
-			/* TRANSLATORS: First argument is name, second - path*/
-			warning(format(tr_txt("Error while testing {0}"), name), message(e));
+			/* TRANSLATORS: argument is name */
+			warning(cformat(tr_txt("Error while testing {0}"), name), message(e));
 	}
 }
 

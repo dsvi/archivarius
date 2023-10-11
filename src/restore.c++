@@ -9,7 +9,7 @@
 #include "pump.h"
 
 using namespace std;
-using namespace fmt;
+using namespace coformat;
 namespace fs = filesystem;
 
 namespace archi{
@@ -69,7 +69,7 @@ void Restore_action::restore()
 				fs::create_directories(re_path);
 			}
 			catch(std::exception &e){
-				warning(format(tr_txt("Can't restore directory {0} to {1}: "), file.path, re_path), message(e));
+				warning(cformat(tr_txt("Can't restore directory {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
 		{ // restore non empty files
@@ -116,12 +116,12 @@ void Restore_action::restore()
 					sout >> cs_out >> out;
 					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
 					if (ref.csum != cs_out.csumer()->checksum())
-						warning( fmt::format(tr_txt("Control sums do not match for {0}"), re_path), "" );
+						warning(cformat(tr_txt("Control sums do not match for {0}"), re_path), "" );
 					sout.finish();
 				}
 				catch(std::exception &e){
 					/* TRANSLATORS: This is about path from and to  */
-					warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
+					warning(cformat(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 				}
 			}
 		}
@@ -141,7 +141,7 @@ void Restore_action::restore()
 			}
 			catch(std::exception &e){
 				/* TRANSLATORS: This is about path from and to  */
-				warning(format(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
+				warning(cformat(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 			}
 		}
 		sort(files.begin(), files.end(), [](auto a, auto b){
@@ -153,7 +153,7 @@ void Restore_action::restore()
 				apply_attribs(re_path, file);
 			}
 			catch(std::exception &e){
-				warning(format(tr_txt("Can't restore attributes for {0}: "), re_path), message(e));
+				warning(cformat(tr_txt("Can't restore attributes for {0}: "), re_path), message(e));
 			}
 		}
 	}
@@ -161,10 +161,10 @@ void Restore_action::restore()
 		string msg;
 		if (name.empty())
 			/* TRANSLATORS: This is about path from and to  */
-			warning(format(tr_txt("Error while restoring from {0} to {1}"), archive_path, to), message(e));
+			warning(cformat(tr_txt("Error while restoring from {0} to {1}"), archive_path, to), message(e));
 		else
 			/* TRANSLATORS: First argument is name, second - path*/
-			warning(format(tr_txt("Error while restoring from {0} to {1}"), name, to), message(e));
+			warning(cformat(tr_txt("Error while restoring from {0} to {1}"), name, to), message(e));
 	}
 }
 

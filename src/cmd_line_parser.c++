@@ -3,7 +3,7 @@
 #include "globals.h"
 
 using namespace std;
-using namespace fmt;
+using namespace coformat;
 using namespace archi;
 
 Cmd_line parse_command_line(int argc, const char *argv[])
@@ -30,6 +30,13 @@ Cmd_line parse_command_line(int argc, const char *argv[])
 	}
 }
 
+template<class T>
+static
+void check_required_parameter(std::optional<T> &p, std::string_view name) {
+	if (!p)
+		throw Exception("Required parameter '{0}' missing")(name);
+}
+
 std::optional<std::string> Cmd_line::param_str_opt(std::string_view name)
 {
 	auto n = std::string(name);
@@ -39,6 +46,13 @@ std::optional<std::string> Cmd_line::param_str_opt(std::string_view name)
 	auto ret = move(it->second);
 	params_.erase(it);
 	return ret;
+}
+
+std::string Cmd_line::param_str(std::string_view name)
+{
+	auto s = param_str_opt(name);
+	check_required_parameter(s, name);
+	return s.value();
 }
 
 std::optional<uint> Cmd_line::param_uint_opt(std::string_view name)
@@ -52,6 +66,13 @@ std::optional<uint> Cmd_line::param_uint_opt(std::string_view name)
 	catch(...){
 		throw_with_nested(Exception("Parameter '{0}' must be unsigned integer")(name));
 	}
+}
+
+uint Cmd_line::param_uint(std::string_view name)
+{
+	auto v = param_uint_opt(name);
+	check_required_parameter(v, name);
+	return v.value();
 }
 
 std::optional<bool> Cmd_line::param_bool_opt(std::string_view name)
@@ -73,7 +94,7 @@ void Cmd_line::check_unused_arguments()
 {
 	if (params_.empty())
 		return;
-	string msg = format(tr_txt("Following command line parameters are superfluous: "));
+	string msg = cformat(tr_txt("Following command line parameters are superfluous: "));
 	for (auto [key,v]: params_){
 		msg += key;
 		msg += ' ';
@@ -81,10 +102,4 @@ void Cmd_line::check_unused_arguments()
 	throw Exception(move(msg));
 }
 
-std::string Cmd_line::param_str(std::string_view name)
-{
-	auto s = param_str_opt(name);
-	if (!s)
-		throw Exception("Required parameter '{0}' missing")(name);
-	return s.value();
-}
+
