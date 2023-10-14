@@ -27,7 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 project(archivarius
-    VERSION 1.1.0
+    VERSION 1.1.1
     DESCRIPTION "Archivarius lib and CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
