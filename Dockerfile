@@ -1,4 +1,4 @@
-FROM ubuntu:23.10
+FROM ubuntu:22.04
 RUN apt-get update -y && apt-get upgrade -y
 RUN apt install -y wget lsb-release software-properties-common gnupg
 RUN bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"

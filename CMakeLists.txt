@@ -137,6 +137,7 @@ src/xxhash.h
 configure_file(${PROJECT_SOURCE_DIR}/src/version.h.in ${PROJECT_SOURCE_DIR}/src/version.h)
 
 add_executable(archivarius ${archivarius-src})
+target_precompile_headers(archivarius PRIVATE src/precomp.h)
 target_link_libraries(archivarius PRIVATE botan coformat progress-bar ${ZSTD_LIB_NAME} libprotobuf-lite acl)
 
 install(TARGETS archivarius)
@@ -149,7 +150,7 @@ set(CPACK_BINARY_TZ "OFF")
 
 set(CPACK_CMAKE_GENERATOR Ninja)
 # DEB only
-set(CPACK_PACKAGE_CONTACT https://github.com/dsvi/archivarius)
+set(CPACK_PACKAGE_CONTACT https://gitlab.com/44100Hz/archivarius)
 set(CPACK_DEBIAN_COMPRESSION_TYPE lzma)
 
 include(CPack)
