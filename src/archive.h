@@ -24,8 +24,8 @@ private:
 	void add(const std::filesystem::path &file_path);
 	void recursive_add_from_dir(const std::filesystem::path &dir_path);
 
-	std::unordered_set<std::filesystem::path> force_to_archive;// relative to archive_path. list of files to 'compact'
-	Catalogue *catalog;
+	std::unordered_set<std::filesystem::path> force_to_archive_;// relative to archive_path. list of files to 'compact'
+	Catalogue *catalog_;
 	File_content_creator *normal_content_;
 	File_content_creator *long_term_content_;
 	Filesystem_state *prev_;

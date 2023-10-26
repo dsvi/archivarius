@@ -1,4 +1,3 @@
-#include <tuple>
 #include "piping_csum.h"
 #include "test.h"
 #include "precomp.h"

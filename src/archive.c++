@@ -59,7 +59,7 @@ void Archive_action::add(const fs::path &file_path)
 			if (file.type == Filesystem_state::FILE){
 				auto sz = fs::file_size(file_path);
 				if (sz != 0){
-					if (force_to_archive.contains(file.path))
+					if (force_to_archive_.contains(file.path))
 						file.content_ref = long_term_content_->add(file_path);
 					else {
 						ASSERT(file.mod_time);
@@ -88,13 +88,13 @@ void Archive_action::archive()
 {
 	try{
 		Catalogue cat(archive_path, password, true);
-		catalog = &cat;
-		auto prev = catalog->latest_fs_state();
-		auto next = catalog->empty_fs_state();
+		catalog_ = &cat;
+		auto prev = catalog_->latest_fs_state();
+		auto next = catalog_->empty_fs_state();
 		prev_ = &prev;
 		next_ = &next;
 		// -=- GC -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-		force_to_archive.clear();
+		force_to_archive_.clear();
 		if (max_storage_time){
 			auto max_ref = cat.num_states();
 			if (max_ref != 0){
@@ -136,12 +136,12 @@ void Archive_action::archive()
 				for (auto &f : old_enough_to_compact ){
 					if (not content_files_to_compact.contains(f.content_fn))
 						continue;
-					force_to_archive.insert(*f.path);
+					force_to_archive_.insert(*f.path);
 					total_size += f.space_taken;
 				}
 				if (total_size < min_content_file_size and total_waste < 10*min_content_file_size){
 					//not enough even for one new content file, and less then 10 content files are wasted
-					force_to_archive.clear();
+					force_to_archive_.clear();
 				}
 			}
 		}
@@ -199,7 +199,7 @@ void Archive_action::archive()
 		if (next.files().size() == 0)
 			throw Exception(tr_txt("New version is empty. It will not be stored because of this."));
 		next.commit();
-		catalog->add_fs_state(move(next));
+		catalog_->add_fs_state(move(next));
 		if (max_storage_time){
 			try{
 				auto t = to_posix_time(fs::file_time_type::clock::now()) - *max_storage_time;
@@ -220,7 +220,7 @@ void Archive_action::archive()
 				throw; // rethrow because catalog might be in inconsistent state
 			}
 		}
-		catalog->commit();
+		catalog_->commit();
 	}
 	catch(std::exception &e){
 		warning(cformat(tr_txt("Error while archiving {fy}{0}{fd}:"), name), message(e));

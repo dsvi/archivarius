@@ -1,6 +1,5 @@
 #pragma once
 #include "precomp.h"
-#include "catalogue.h"
 
 namespace archi{
 
@@ -16,7 +15,6 @@ struct Restore_action{
 
 	void restore();
 };
-
 
 
 }
