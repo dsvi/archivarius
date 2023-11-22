@@ -20,7 +20,7 @@ Example:
 		root /home/me/
 		exclude {
 			.cache
-			.local/share/Trash/
+			.local/share/Trash
 			.steam
 			Steam
 			.local/share/Steam
@@ -54,10 +54,12 @@ Suffixes are:
 Where to start archiving from. The paths, stored in archive, will be relative to the `root`. Either `root` or `include` should be present
 
 ### include
-What to add to archive. It is relative to `root` if root is present. Either `root` or `include` must be present
+What to add to archive. It is relative to `root` if root is present. Either `root` or `include` must be present.
+Don't add trailing `/` to directories.
 
 ### exclude
 What not to add to archive. It is relative to `root` if root is present.
+Don't add trailing `/` to directories.
 
 ### password
 Password to archive
