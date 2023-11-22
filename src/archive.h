@@ -28,6 +28,7 @@ private:
 	Catalogue *catalog_;
 	File_content_creator *normal_content_;
 	File_content_creator *long_term_content_;
+	File_content_creator *big_content_;
 	Filesystem_state *prev_;
 	Filesystem_state *next_;
 	friend void archive(Archive_action a);

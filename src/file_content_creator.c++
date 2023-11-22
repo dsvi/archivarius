@@ -32,7 +32,7 @@ void File_content_creator::enable_encryption()
 
 File_content_ref File_content_creator::add(const std::filesystem::path &file_name)
 {
-	if (!file_sink_ || file_sink_.bytes_written() >= min_file_size_ || fs::file_size(file_name) >= min_file_size_){
+	if (!file_sink_ || file_sink_.bytes_written() >= min_file_size_){
 		create_file();
 		bytes_pumped_ = 0;
 	}

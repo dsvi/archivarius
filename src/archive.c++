@@ -69,7 +69,10 @@ void Archive_action::add(const fs::path &file_path)
 								println("{}", file.path.string().substr(0,100));
 								clear_previous_line();
 							}
-							file.content_ref = normal_content_->add(file_path);
+							if (sz >= min_content_file_size)
+								file.content_ref = big_content_->add(file_path);
+							else
+								file.content_ref = normal_content_->add(file_path);
 						}
 					}
 				}
@@ -147,19 +150,23 @@ void Archive_action::archive()
 		}
 
 		auto fccn = File_content_creator(archive_path);
-		fccn.min_file_size(min_content_file_size);
 		normal_content_ = &fccn;
+		normal_content_->min_file_size(min_content_file_size);
 		auto fccl = File_content_creator(archive_path);
-		fccl.min_file_size(min_content_file_size);
 		long_term_content_ = &fccl;
-
+		long_term_content_->min_file_size(min_content_file_size);
+		auto fccb = File_content_creator(archive_path);
+		big_content_ = &fccb;
+		big_content_->min_file_size(min_content_file_size);
 		if (!password.empty()){
 			long_term_content_->enable_encryption();
 			normal_content_->enable_encryption();
+			big_content_->enable_encryption();
 		}
 		if (zstd){
 			long_term_content_->enable_compression(*zstd);
 			normal_content_->enable_compression(*zstd);
+			big_content_->enable_compression(*zstd);
 		}
 		if (!root.empty()){
 			for (auto &file : files_to_archive)
@@ -185,12 +192,14 @@ void Archive_action::archive()
 		}
 		long_term_content_->finish();
 		normal_content_->finish();
+		big_content_->finish();
 		// TODO: get rid of
 		if (zstd){
 			auto cs = normal_content_->compression_statistic();
 			auto csl = long_term_content_->compression_statistic();
-			cs.original += csl.original;
-			cs.compressed += csl.compressed;
+			auto csb = big_content_->compression_statistic();
+			cs.original += csl.original + csb.original;
+			cs.compressed += csl.compressed + csb.compressed;
 			if (cs.original){
 				auto percent = cs.compressed *100 / cs.original;
 				cprint(tr_txt("Archive compressed to {}% of original size\n"), percent);

@@ -116,6 +116,7 @@ int run(int argc, const char *argv[]){
 	optional<Progress_bar> progress;
 	int return_code = 0;
 	auto report_warning = [&](std::string &&h, std::string &&w){
+		fflush(stdout); // to remove progress bar
 		cprint(stderr, "{fr}{}{fd}", h);
 		w.insert(0, "\n");
 		find_and_replace(w, "\n", "\n  ");
