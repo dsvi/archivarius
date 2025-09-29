@@ -27,7 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 project(archivarius
-    VERSION 1.1.2
+    VERSION 1.1.3
     DESCRIPTION "Archivarius lib and CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -58,13 +58,7 @@ add_subdirectory(libs/progress-bar)
 if (ARCHIVARIUS_STATIC_BUILD)
     set(ZSTD_LEGACY_SUPPORT OFF)
     set(ZSTD_MULTITHREAD_SUPPORT OFF)
-    FetchContent_Declare(
-        zstd
-        URL https://github.com/facebook/zstd/releases/download/v1.5.5/zstd-1.5.5.tar.zst
-        SOURCE_SUBDIR build/cmake
-    )
-    FetchContent_MakeAvailable(zstd)
-    target_include_directories(libzstd_static PUBLIC $<BUILD_INTERFACE:${zstd_SOURCE_DIR}/lib>)
+    add_from_archive_url(https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.zst build/cmake)
     set(ZSTD_LIB_NAME libzstd_static)
 else()
     set(ZSTD_LIB_NAME zstd)

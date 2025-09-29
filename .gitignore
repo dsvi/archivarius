@@ -1,3 +1,4 @@
 *.user
 *.autosave
+build
 src/version.h

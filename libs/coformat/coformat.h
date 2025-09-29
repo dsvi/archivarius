@@ -21,32 +21,32 @@ std::string cvformat( const std::locale& loc, std::string_view fmt, std::format_
 
 template< class... Args >
 std::string cformat( std::string_view fmt, Args&&... args ){
-	return cvformat(fmt, std::make_format_args(std::forward<Args>(args)...));
+	return cvformat(fmt, std::make_format_args(args...));
 }
 
 template< class... Args >
 std::string cformat( const std::locale& loc, std::string_view fmt, Args&&... args ){
-	return cvformat(loc, fmt, std::make_format_args(std::forward<Args>(args)...));
+	return cvformat(loc, fmt, std::make_format_args(args...));
 }
 
 template< class... Args >
 void cprint( std::FILE* stream, std::string_view fmt, Args&&... args ){
-	print(stream, "{}", cformat(fmt, std::forward<Args>(args)...));
+	std::print(stream, "{}", cformat(fmt, std::forward<Args>(args)...));
 }
 
 template< class... Args >
 void cprint(std::string_view fmt, Args&&... args ){
-	print("{}", cformat(fmt, std::forward<Args>(args)...));
+	std::print("{}", cformat(fmt, std::forward<Args>(args)...));
 }
 
 template< class... Args >
 void cprintln( std::FILE* stream, std::string_view fmt, Args&&... args ){
-	println(stream, "{}", cformat(fmt, std::forward<Args>(args)...));
+	std::println(stream, "{}", cformat(fmt, std::forward<Args>(args)...));
 }
 
 template< class... Args >
 void cprintln( std::string_view fmt, Args&&... args ){
-	println("{}", cformat(fmt, std::forward<Args>(args)...));
+	std::println("{}", cformat(fmt, std::forward<Args>(args)...));
 }
 
 }
