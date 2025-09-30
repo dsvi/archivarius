@@ -1,4 +1,5 @@
 *.user
 *.autosave
 build
+release
 src/version.h

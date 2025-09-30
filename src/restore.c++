@@ -73,11 +73,8 @@ void Restore_action::restore()
 			}
 		}
 		{ // restore non empty files
-			auto refs_only = files | views::filter([](auto &a){return a.get().content_ref.has_value();});
-			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs( refs_only.begin(), refs_only.end() );
-			//TODO: the same for C++23
-//			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs =
-//				files | views::filter([](auto &a){return a.get().content_ref.has_value();}) | ranges::to<vector>();
+			vector<reference_wrapper<Filesystem_state::File>> sorted_by_refs =
+				files | views::filter([](auto &a){return a.get().content_ref.has_value();}) | ranges::to<vector>();
 			ranges::sort(sorted_by_refs, [](auto a, auto b){
 				return a.get().content_ref.value() < b.get().content_ref.value();
 			});

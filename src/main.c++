@@ -23,24 +23,35 @@ struct Archive_params{
 };
 
 Archive_params get_archive_params(Cmd_line &cmd_line, string &cfg_path){
-	auto name = cmd_line.param_str_opt("name");
 	auto arch = cmd_line.param_str_opt("archive");
-	if ((name and arch) or (!name and !arch))
-		throw Exception("Either 'name' or 'archive' should be set in command line. But not both.");
+	auto name = cmd_line.param_str_opt("name");
+	if (name and arch)
+		throw Exception("Either 'name' or 'archive' may be set in command line. But not both.");
 	Archive_params ret;
 	if (arch){
 		ret.archive_path = *arch;
 		ret.password = cmd_line.param_str_opt("password").value_or("");
 	}
 	else {
-		auto cfgs = read_config(cfg_path);
-		for (auto &c : cfgs){
-			if (name and c.name != *name)
-				continue;
+		auto set_ret_from_cfg = [&](Config &c){
 			ret.name = c.name;
 			ret.archive_path = c.archive;
 			if (c.enc)
 				ret.password = c.enc->password;
+		};
+		auto cfgs = read_config(cfg_path);
+		if (!name){
+			if (cfgs.empty())
+				throw Exception("There are no tasks in the config.");
+			if (cfgs.size() > 1)
+				throw Exception("There is more than one task in the config, so 'name' must be set in command line.");
+			set_ret_from_cfg(cfgs.front());
+			return ret;
+		}		
+		for (auto &c : cfgs){
+			if (name and c.name != *name)
+				continue;
+			set_ret_from_cfg(c);
 			break;
 		}
 		if (ret.archive_path.empty())
