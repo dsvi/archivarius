@@ -28,7 +28,7 @@ It's simple (less then 5k lines of C++ code) and easy to use.
 
 ### Pre built binary
 
-You can get a pre-built static binary for x86_64 and arm64 linux, with no side dependencies (e.g. distro agnostic), at the releases section.
+You can get a pre-built static binary for x86_64, arm64 and riscv64 linux, with no dependencies (e.g. distro agnostic), at the releases section.
 
 ### Building via docker
 
