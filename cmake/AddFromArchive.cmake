@@ -11,6 +11,7 @@ function(add_from_archive_url archive_url)
         ${fc_name}
         URL ${archive_url}
         SOURCE_SUBDIR ${subdir}
+        EXCLUDE_FROM_ALL
     )
     FetchContent_MakeAvailable(${fc_name})
 endfunction()

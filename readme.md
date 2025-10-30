@@ -42,7 +42,7 @@ You will also need ninja or make, and cmake.
 
 Now you are ready to configure the build
 
-    git clone --depth=1 https://gitlab.com/44100Hz/archivarius.git
+    git clone --depth=1 https://github.com/dsvi/archivarius.git
     cd archivarius
     mkdir build
     cd build
@@ -69,6 +69,13 @@ The command `archive` tells archivarius to execute all the tasks in the config. 
 To restore an archive run:
 
     archivarius restore archive=path/to/archive target-dir=/path/to/restore/archive/to/
+
+### Bash autocompletion
+
+Make sure `archivarius` is in the `$PATH`
+
+
+Add `eval "$(archivarius bash)"` line to your `~/.bashrc`.
 
 ## License
 

@@ -55,7 +55,7 @@ private:
 	Time time_created_;
 	Filtrator_out filtrator_;
 
-	// Only Catalogue allaws to create fstates
+	// Only Catalogue is allawed to create fstates
 	friend class Catalogue;
 	// creates empty state
 	Filesystem_state(const std::filesystem::path &arc_path, Filters_out &f);

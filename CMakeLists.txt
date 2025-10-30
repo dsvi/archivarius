@@ -10,7 +10,6 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif ()
 
-set(CMAKE_POLICY_DEFAULT_CMP0069 NEW) # enable LTO on all compilers
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 endif()
@@ -27,8 +26,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 project(archivarius
-    VERSION 1.1.3
-    DESCRIPTION "Archivarius lib and CLI tool")
+    VERSION 1.1.4
+    DESCRIPTION "Archivarius CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     message("Using libc++")
@@ -50,10 +49,10 @@ set(BOTAN_MODULES_LIST
 if (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
     list(APPEND BOTAN_MODULES_LIST chacha_avx2)
 endif()
-add_subdirectory(libs/botan)
+add_subdirectory(libs/botan EXCLUDE_FROM_ALL)
 add_from_archive(libs/protobuf-3.20.2.7z cmake)
-add_subdirectory(libs/coformat)
-add_subdirectory(libs/progress-bar)
+add_subdirectory(libs/coformat EXCLUDE_FROM_ALL)
+add_subdirectory(libs/progress-bar EXCLUDE_FROM_ALL)
 
 if (ARCHIVARIUS_STATIC_BUILD)
     set(ZSTD_LEGACY_SUPPORT OFF)
@@ -144,7 +143,7 @@ set(CPACK_BINARY_TZ "OFF")
 
 set(CPACK_CMAKE_GENERATOR Ninja)
 # DEB only
-set(CPACK_PACKAGE_CONTACT https://gitlab.com/44100Hz/archivarius)
+set(CPACK_PACKAGE_CONTACT https://github.com/dsvi/archivarius)
 set(CPACK_DEBIAN_COMPRESSION_TYPE lzma)
 
 include(CPack)

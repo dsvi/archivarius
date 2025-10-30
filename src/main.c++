@@ -78,12 +78,13 @@ int run(int argc, const char *argv[]){
 		  "	             /usr/local/etc\n"
 		  "	             /etc\n"
 		  "	             and follows instructions in it\n"
-		  "	list       - list versions in an archive\n"
+		  "	list       - list versions in archive\n"
 		  "	list-files - list content of a version in archive\n"
-		  "	remove     - removes a version from archive\n"
-		  "	test       - check checksums in an archive, and report errors if they dont match\n"
-		  "	version    - prints version.\n\n"
-		  "params are in the form param1=value param2=value2\n"
+		  "	remove     - remove a version from archive\n"
+		  "	test       - check data consistency and checksums in archive\n"
+		  "	version    - print version.\n"
+		  "	bash       - add this to ~/.bashrc to get autocompletion: {i}eval \"$(archivarius bash)\"{d}\n\n"
+		  "params are in the form {i}param1=value param2=value2{d}\n"
 		  "params can be:\n"
 		  "	archive  - path to the archive. normally either this or 'name' should be set\n"
 		  "	name     - name of a task in the config file\n"
@@ -275,6 +276,13 @@ int run(int argc, const char *argv[]){
 	if (cmd_line.command() == "version"){
 		cmd_line.check_unused_arguments();
 		println("{}.{}.{}", VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+	}
+	else
+	if (cmd_line.command() == "bash"){
+		cmd_line.check_unused_arguments();
+		print("{}", 
+			#include "bash_autocomplete.inc"
+		);
 	}
 	else{
 		cprintln(stderr, tr_txt("{fr}unknown command:{fd} {}"), cmd_line.command());
