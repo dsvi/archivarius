@@ -60,6 +60,10 @@ struct std::formatter<std::filesystem::path> : std::formatter<std::string>
 	}
 };
 
+// glibc's <sys/types.h> defines a global `uint` (under __USE_MISC),
+// but musl's does not - define our own so global-scope uses keep working.
+// typedef unsigned int uint;
+
 namespace archi{
 
 /// for scoped enums

@@ -55,7 +55,7 @@ std::string Cmd_line::param_str(std::string_view name)
 	return s.value();
 }
 
-std::optional<uint> Cmd_line::param_uint_opt(std::string_view name)
+std::optional<unsigned> Cmd_line::param_uint_opt(std::string_view name)
 {
 	auto str = param_str_opt(name);
 	if (!str)
@@ -68,7 +68,7 @@ std::optional<uint> Cmd_line::param_uint_opt(std::string_view name)
 	}
 }
 
-uint Cmd_line::param_uint(std::string_view name)
+unsigned Cmd_line::param_uint(std::string_view name)
 {
 	auto v = param_uint_opt(name);
 	check_required_parameter(v, name);

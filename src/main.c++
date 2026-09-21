@@ -164,7 +164,7 @@ int run(int argc, const char *argv[]){
 				if (c.min_content_file_size)
 					arc.min_content_file_size = c.min_content_file_size;
 				else
-					arc.min_content_file_size = 2*1024*1024*1024ul;
+					arc.min_content_file_size = 1024*1024*1024ul;
 				if (c.max_storage_time_seconds)
 					arc.max_storage_time = *c.max_storage_time_seconds * Time_accuracy::period::den;
 				arc.password = c.enc.has_value() ? c.enc->password : "";

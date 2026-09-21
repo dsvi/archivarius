@@ -18,8 +18,9 @@ echo
 echo  =^..^=   =^..^=   =^..^=    =^..^=    =^..^=    =^..^=    =^..^=    =^..^=    =^..^=    =^..^=    =^..^=
 echo
 echo -e Output is at ${HI}./docker-build-out${NC} folder.
-echo -e You might want to use ${HI}docker image  prune --all${NC} to clean out the build leftovers
+echo -e You might want to use ${HI}docker builder prune -a -f${NC} to clean out the build leftovers
 echo
 
-#docker container prune --force
-#docker image  prune --all
+#docker builder prune -a -f
+
+

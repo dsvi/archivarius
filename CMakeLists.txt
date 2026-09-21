@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 include(FetchContent)
 include(cmake/AddFromArchive.cmake)
+include(cmake/CPM.cmake)
 
 # Set the default CMAKE_BUILD_TYPE to Release.
 # This should be done before the project command since the latter can set
@@ -26,7 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 project(archivarius
-    VERSION 1.1.4
+    VERSION 1.1.5
     DESCRIPTION "Archivarius CLI tool")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -34,11 +35,11 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     string(APPEND CMAKE_CXX_FLAGS " -stdlib=libc++")
     string(APPEND CMAKE_CXX_FLAGS " -Wno-unqualified-std-cast-call")
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -fuse-ld=lld")
+    # With -static the driver omits -lc++abi (all C++ runtime symbols such
+    # as __cxa_guard_* and operator new come from there), so add it explicitly.
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -lc++abi")
     #string(APPEND CMAKE_CXX_FLAGS_DEBUG " -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer")
 endif()
-
-# otherwise cmake --install tries to install all the dependeencies
-install(CODE "set(CMAKE_INSTALL_LOCAL_ONLY true)")
 
 set(BOTAN_ARCHIVE botan-2.15.0.tar.gz)
 set(BOTAN_MODULES_LIST
@@ -51,16 +52,21 @@ if (CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
 endif()
 add_subdirectory(libs/botan EXCLUDE_FROM_ALL)
 add_from_archive(libs/protobuf-3.20.2.7z cmake)
-add_subdirectory(libs/coformat EXCLUDE_FROM_ALL)
-add_subdirectory(libs/progress-bar EXCLUDE_FROM_ALL)
+CPMAddPackage("gh:dsvi/coformat#main")
+CPMAddPackage("gh:dsvi/progress-bar#main")
+set(ZSTD_LEGACY_SUPPORT OFF)
+set(ZSTD_MULTITHREAD_SUPPORT OFF)
+add_from_archive_url(https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.zst build/cmake)
 
 if (ARCHIVARIUS_STATIC_BUILD)
-    set(ZSTD_LEGACY_SUPPORT OFF)
-    set(ZSTD_MULTITHREAD_SUPPORT OFF)
-    add_from_archive_url(https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.zst build/cmake)
-    set(ZSTD_LIB_NAME libzstd_static)
+    # under -static the linker only searches for static archives
+    find_library(ACL_LIBRARY NAMES libacl.a)
 else()
-    set(ZSTD_LIB_NAME zstd)
+    find_library(ACL_LIBRARY NAMES acl)
+endif()
+
+if(NOT ACL_LIBRARY)
+    message(FATAL_ERROR "libacl not found")
 endif()
 
 set(archivarius-src
@@ -131,19 +137,4 @@ configure_file(${PROJECT_SOURCE_DIR}/src/version.h.in ${PROJECT_SOURCE_DIR}/src/
 
 add_executable(archivarius ${archivarius-src})
 target_precompile_headers(archivarius PRIVATE src/precomp.h)
-target_link_libraries(archivarius PRIVATE botan coformat progress-bar ${ZSTD_LIB_NAME} libprotobuf-lite acl)
-
-install(TARGETS archivarius)
-
-set(CPACK_BINARY_DEB "ON")
-set(CPACK_BINARY_TXZ "ON")
-set(CPACK_BINARY_STGZ "OFF")
-set(CPACK_BINARY_TGZ "OFF")
-set(CPACK_BINARY_TZ "OFF")
-
-set(CPACK_CMAKE_GENERATOR Ninja)
-# DEB only
-set(CPACK_PACKAGE_CONTACT https://github.com/dsvi/archivarius)
-set(CPACK_DEBIAN_COMPRESSION_TYPE lzma)
-
-include(CPack)
+target_link_libraries(archivarius PRIVATE botan coformat progress-bar libzstd_static libprotobuf-lite ${ACL_LIBRARY})

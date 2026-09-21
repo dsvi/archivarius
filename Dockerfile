@@ -1,7 +1,27 @@
-FROM ubuntu:24.04
-RUN apt update -y && apt-get upgrade -y
-RUN apt install -y ninja-build cmake libacl1-dev clang libc++-dev lld python-is-python3
-WORKDIR src
+FROM alpine:3.21
+
+RUN apk add --no-cache \
+        acl-dev \
+        acl-static \
+        attr-dev \
+        binutils \
+        clang \
+        cmake \
+        coreutils \
+        diffutils \
+        git \
+        lld \
+        libc++-dev \
+        libc++-static \
+        linux-headers \
+        llvm \
+        make \
+        ninja \
+        p7zip \
+        procps \
+        python3
+
+WORKDIR /src
 COPY . ./
 WORKDIR build
 RUN  CXX=clang++ CC=clang cmake -Wno-dev -DARCHIVARIUS_STATIC_BUILD=ON -GNinja ..

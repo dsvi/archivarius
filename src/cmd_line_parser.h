@@ -11,8 +11,8 @@ public:
 	void                check_unused_arguments();
 	std::string         param_str(std::string_view name);
 	std::optional<std::string> param_str_opt(std::string_view name);
-	uint                param_uint(std::string_view name);
-	std::optional<uint> param_uint_opt(std::string_view name);
+	unsigned                param_uint(std::string_view name);
+	std::optional<unsigned> param_uint_opt(std::string_view name);
 	std::optional<bool> param_bool_opt(std::string_view name);
 private:
 	std::string cmd_;

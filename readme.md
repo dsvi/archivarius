@@ -35,30 +35,6 @@ You can get a pre-built static binary for x86_64, arm64 and riscv64 linux, with 
 The easiest way to build. Just run the `docker-build.sh` and get the binary at `docker-build-out/`
 The binary has no dependency on any library and can be used with any linux distribution.
 
-### Building the classic way
-
-Or you can build it yourself from sources. The only system dependency is libacl and a C++23 compiler. Clang with libc++ produces the most efficient code for the tool. To build, make sure you have clang, libc++ and lld installed on your system. For ubuntu the packages are `clang libc++-dev libc++abi-dev lld`.
-You will also need ninja or make, and cmake.
-
-Now you are ready to configure the build
-
-    git clone --depth=1 https://github.com/dsvi/archivarius.git
-    cd archivarius
-    mkdir build
-    cd build
-
-If you prefer a static build, with all the dependencies built into, use the `ARCHIVARIUS_STATIC_BUILD=ON` option. This way the resulting executable depends only on the linux kernel.
-
-    CXX=clang++ CC=clang cmake -DARCHIVARIUS_STATIC_BUILD=ON ..
-
-Otherwise:
-
-    CXX=clang++ CC=clang cmake ..
-
-Then run the build:
-
-    cmake --build . --target archivarius
-
 ## Using it
 
 Create [archivarius.conf](./docs/config%20file%20format.md), and run the tool:

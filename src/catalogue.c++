@@ -9,15 +9,15 @@
 
 #include "format.pb.h"
 
-static const uint current_version = 0;
 
 using namespace std;
 namespace fs = std::filesystem;
 
-static const char * cat_filename = "catalog";
 
 namespace archi{
 
+static const char * cat_filename = "catalog";
+static const uint current_version = 0;
 
 void add_filters(proto::Filters *pf, Filters_in &f){
 	if (f.cmp_in)
