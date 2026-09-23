@@ -12,15 +12,11 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+    # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
+    string(APPEND CMAKE_CXX_FLAGS " -flto=full")
 endif()
 
 option(ARCHIVARIUS_STATIC_BUILD "Build static version of the program, without dependency on any shared library." ON)
-
-if (ARCHIVARIUS_STATIC_BUILD)
-    #SET(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
-    SET(CMAKE_EXE_LINKER_FLAGS "-static")
-endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
@@ -59,6 +55,7 @@ set(ZSTD_MULTITHREAD_SUPPORT OFF)
 add_from_archive_url(https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.zst build/cmake)
 
 if (ARCHIVARIUS_STATIC_BUILD)
+    string(APPEND CMAKE_EXE_LINKER_FLAGS " -static")
     # under -static the linker only searches for static archives
     find_library(ACL_LIBRARY NAMES libacl.a)
 else()
