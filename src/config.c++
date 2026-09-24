@@ -1,6 +1,6 @@
 #include "exception.h"
 #include "config.h"
-#include "property_tree.h"
+#include "property_tree/property_tree.h"
 
 using namespace std;
 namespace fs=filesystem;

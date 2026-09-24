@@ -1,5 +1,6 @@
 #include "property_tree.h"
-#include "exception.h"
+#include "file_reader.h"
+#include "../exception.h"
 
 using namespace std;
 using namespace archi;
@@ -19,36 +20,30 @@ void trim(string &s)
 property_tree::Property property_tree::from_file(std::filesystem::path &filepath)
 {
 	try{
-		auto is = ifstream();
-		is.exceptions(ios_base::badbit | ios_base::failbit);
-		is.open(filepath);
+		auto reader = File_reader::open(filepath);
 		auto orig_fn = make_shared<string>(filepath);
 		int ln = 0;
-		is.exceptions(ios_base::badbit);
 		try{
 			vector<Property> stack;
 			stack.emplace_back();
 			string pre_ws("");
 			string line;
-			while (!is.eof()){
-				getline(is, line);
-				if (is.eof() and line.empty())
-					break;
+			while (reader.read_line(line)){
 				ln++;
 				auto li = find_if(line.begin(), line.end(), [](int ch) {
 					return !std::isspace(ch);
 				});
 				pre_ws.append(line.begin(), li);
+				if (li == line.end()){
+					pre_ws += "\n";
+					continue;
+				}
 				if (*li == '#'){
 					pre_ws.append(li, line.end());
 					pre_ws += "\n";
 					continue;
 				}
 				trim(line);
-				if (line.empty()){
-					pre_ws += "\n";
-					continue;
-				}
 				if (line == "}"){
 					if (stack.size() == 1)
 						throw Exception("The closing bracket } does not match any opened bracket {");

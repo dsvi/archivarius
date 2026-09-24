@@ -67,6 +67,12 @@ if(NOT ACL_LIBRARY)
 endif()
 
 set(archivarius-src
+
+src/property_tree/file_reader.c++
+src/property_tree/file_reader.h
+src/property_tree/property_tree.c++
+src/property_tree/property_tree.h
+
 src/archive.c++
 src/archive.h
 src/buffer.c++
@@ -114,8 +120,6 @@ src/platform.c++
 src/platform.h
 src/precomp.c++
 src/precomp.h
-src/property_tree.c++
-src/property_tree.h
 src/pump.c++
 src/pump.h
 src/restore.c++
