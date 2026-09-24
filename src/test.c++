@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "exception.h"
 #include "pump.h"
+#include <progress_bar.h>
 #include "catalogue.h"
 #include "checksumer.h"
 
@@ -15,14 +16,16 @@ using namespace coformat;
 void Test_action::test()
 {
 	try{
-		Buffer tmp;
-		tmp.resize(128*1024);
+		Pump pump;
 		Catalogue cat(archive_path, password, false);
 		typedef tuple<string, u64> Discovered_key;
 		std::map<Discovered_key, u64> discovered_refs;
 		progress_status(tr_txt("Checking versions."));
-		for (size_t i = 0; i < cat.num_states(); i++){
-			progress(i * 1000 / cat.num_states());
+		auto num_states = cat.num_states();
+		progress->min = 0;
+		progress->max = num_states;
+		for (size_t i = 0; i < num_states; i++){
+			progress->update(i);
 			auto fs = cat.fs_state(i);
 			for (auto &f: fs.files()){
 				if (f.content_ref.has_value())
@@ -46,8 +49,14 @@ void Test_action::test()
 			warning(tr_txt("Some refs are used but are not in catalog."), "");
 
 		progress_status(tr_txt("Checking files content."));
-		auto total_refs = cat.content_refs().size();
-		uint reported_progress = numeric_limits<uint>::max();
+		u64 total_bytes = 0; // total bytes to check
+		for (auto &ref : cat.content_refs())
+			total_bytes += ref.to - ref.from;
+		progress->min = 0;
+		progress->max = total_bytes;
+		progress->update(0);
+		const u64 pump_chunk = max<u64>(100, total_bytes / 100); // Progress_bar can't indicate finer than 1%
+		u64 bytes_checked = 0;
 		File_source in;
 		Stream_in sin;
 		Stream_out sout;
@@ -55,13 +64,7 @@ void Test_action::test()
 		Pipe_csum_out cs;
 		decltype(File_content_ref::fname) fname;
 		decltype(File_content_ref::from)  num_pumped;
-		for (decltype(total_refs) i = 0; auto ref : cat.content_refs()){
-			ASSERT(total_refs);
-			uint p = i++ *1000 / total_refs;
-			if (p != reported_progress){
-				progress(p);
-				reported_progress = p;
-			}
+		for (auto ref : cat.content_refs()){
 			try {
 				if (fname != ref.fname){
 					auto content_path = cat.archive_path() / ref.fname;
@@ -73,10 +76,13 @@ void Test_action::test()
 					sin << filters << in;
 					cs.csumer_for(ref.csum);
 				}
-				pump(sin, ref.from, nullptr, fname, tmp, num_pumped);
+				pump.pump(sin, ref.from, nullptr, fname, num_pumped);
 				cs.csumer()->reset();
 				sout >> cs;
-				pump(sin, ref.to, &sout, fname, tmp, num_pumped);
+				while (num_pumped < ref.to){
+					pump.pump(sin, min(ref.to, num_pumped + pump_chunk), &sout, fname, num_pumped);
+					progress->update(bytes_checked + num_pumped - ref.from);
+				}
 				if (ref.csum != cs.csumer()->checksum())
 					warning( cformat(tr_txt("File {0} is broken."), fname), "Control sums do not match." );
 			}
@@ -84,6 +90,7 @@ void Test_action::test()
 				/* TRANSLATORS: This is about path from and to  */
 				warning(cformat(tr_txt("Problem with {0}"), ref.fname), message(e));
 			}
+			bytes_checked += ref.to - ref.from; // account for what would have been checked if the file was OK
 		}
 	}
 	catch(std::exception &e){

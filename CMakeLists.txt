@@ -52,6 +52,7 @@ CPMAddPackage("gh:dsvi/coformat#main")
 CPMAddPackage("gh:dsvi/progress-bar#main")
 set(ZSTD_LEGACY_SUPPORT OFF)
 set(ZSTD_MULTITHREAD_SUPPORT OFF)
+set(ZSTD_BUILD_DICTBUILDER OFF)
 add_from_archive_url(https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.zst build/cmake)
 
 if (ARCHIVARIUS_STATIC_BUILD)

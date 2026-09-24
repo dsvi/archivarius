@@ -5,7 +5,12 @@
 namespace archi{
 
 
-void pump(Stream_in &in, u64 to, Stream_out *out, std::string_view fname, Buffer &tmp, u64 &num_already_pumped )
+Pump::Pump()
+{
+	tmp.resize(128*1024);
+}
+
+void Pump::pump(Stream_in &in, u64 to, Stream_out *out, std::string_view fname, u64 &num_already_pumped )
 {
 	ASSERT(num_already_pumped <= to);
 	while (num_already_pumped < to){

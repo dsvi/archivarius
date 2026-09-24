@@ -138,11 +138,6 @@ int run(int argc, const char *argv[]){
 		if (progress)
 			progress->show();
 	};
-	auto report_progress = [&](uint progress_in_permil){
-		if (!progress)
-			progress.emplace();
-		progress->update(progress_in_permil/10);
-	};
 	if (cmd_line.command() == "archive"){
 		auto name = cmd_line.param_str_opt("name");
 		cmd_line.check_unused_arguments();
@@ -253,7 +248,7 @@ int run(int argc, const char *argv[]){
 		}
 		cmd_line.check_unused_arguments();
 		rs.warning = move(report_warning);
-		rs.progress = report_progress;
+		rs.progress = &progress.emplace();
 		rs.restore();
 	}
 	else
@@ -268,7 +263,7 @@ int run(int argc, const char *argv[]){
 		ts.progress_status = [](std::string &&status_text){
 			println("{}", move(status_text));
 		};
-		ts.progress = report_progress;
+		ts.progress = &progress.emplace();
 		ts.test();
 		cprintln(tr_txt("Test finished."));
 	}
@@ -290,7 +285,6 @@ int run(int argc, const char *argv[]){
 	}
 	return return_code;
 }
-
 
 
 int main(int argc, const char *argv[]){

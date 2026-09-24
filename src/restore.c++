@@ -7,6 +7,7 @@
 #include "piping.h"
 #include "checksumer.h"
 #include "pump.h"
+#include <progress_bar.h>
 
 using namespace std;
 using namespace coformat;
@@ -29,8 +30,7 @@ void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 void Restore_action::restore()
 {
 	try{
-		Buffer tmp;
-		tmp.resize(128*1024);
+		Pump pump;
 		Catalogue cat(archive_path, password, false);
 		auto num_ids = cat.num_states();
 		if (num_ids == 0)
@@ -78,8 +78,14 @@ void Restore_action::restore()
 			ranges::sort(sorted_by_refs, [](auto a, auto b){
 				return a.get().content_ref.value() < b.get().content_ref.value();
 			});
-			uint reported_progress = numeric_limits<uint>::max();
-			uint cur_ref_id = 0;
+			u64 total_bytes = 0; // total bytes to be written
+			for (auto &fr : sorted_by_refs)
+				total_bytes += fr.get().content_ref->to - fr.get().content_ref->from;
+			progress->min = 0;
+			progress->max = total_bytes;
+			progress->update(0);
+			const u64 pump_chunk = max<u64>(100, total_bytes / 100); // Progress_bar can't indicate finer than 1%
+			u64 bytes_written = 0;
 			File_source in;
 			Stream_in sin;
 			Filtrator_in filters;
@@ -87,11 +93,6 @@ void Restore_action::restore()
 			decltype(File_content_ref::from)  num_pumped;
 			Pipe_csum_out cs_out;
 			for (auto fr : sorted_by_refs){
-				uint p = cur_ref_id++ *1000 / sorted_by_refs.size();
-				if (p != reported_progress){
-					progress(p);
-					reported_progress = p;
-				}
 				auto &file = fr.get();
 				auto &ref = file.content_ref.value();
 				auto re_path = mk_re_path(file.path);
@@ -106,12 +107,15 @@ void Restore_action::restore()
 						cs_out.csumer_for(ref.csum);
 						fname = ref.fname;
 					}
-					pump(sin, ref.from, nullptr, ref.fname, tmp, num_pumped);
+					pump.pump(sin, ref.from, nullptr, ref.fname, num_pumped);
 					File_sink out(re_path);
 					Stream_out sout;
 					cs_out.csumer()->reset();
 					sout >> cs_out >> out;
-					pump(sin, ref.to, &sout, ref.fname, tmp, num_pumped);
+					while (num_pumped < ref.to){
+						pump.pump(sin, min(ref.to, num_pumped + pump_chunk), &sout, ref.fname, num_pumped);
+						progress->update(bytes_written + num_pumped - ref.from);
+					}
 					if (ref.csum != cs_out.csumer()->checksum())
 						warning(cformat(tr_txt("Control sums do not match for {0}"), re_path), "" );
 					sout.finish();
@@ -120,6 +124,7 @@ void Restore_action::restore()
 					/* TRANSLATORS: This is about path from and to  */
 					warning(cformat(tr_txt("Can't restore {0} to {1}: "), file.path, re_path), message(e));
 				}
+				bytes_written += ref.to - ref.from; // account for what would have been written if all went well
 			}
 		}
 		for (Filesystem_state::File &file : files){ // restore links and empty files

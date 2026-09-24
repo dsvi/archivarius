@@ -1,6 +1,8 @@
 #pragma once
 #include "precomp.h"
 
+class Progress_bar;
+
 namespace archi{
 
 struct Restore_action{
@@ -11,7 +13,7 @@ struct Restore_action{
 	std::string password;
 	std::filesystem::path prefix; // optional
 	std::function<void(std::string &&header, std::string &&warning_message)> warning;
-	std::function<void(uint progress_in_permil)> progress;
+	Progress_bar *progress = nullptr; // when set, restore() sets its min/max and updates it in bytes written
 
 	void restore();
 };
