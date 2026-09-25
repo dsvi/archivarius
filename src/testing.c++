@@ -1,6 +1,7 @@
 #include <thread>
 #include "catalogue.h"
 #include "precomp.h"
+#include "time.h"
 #include "platform.h"
 #include "coformat.h"
 #include "testing.h"
@@ -56,7 +57,7 @@ struct std::formatter<File::Type> : std::formatter<std::string>{
 	}
 };
 
-using chrono_base_formatter = std::formatter<std::chrono::sys_time<Time_accuracy>>;
+using chrono_base_formatter = std::formatter<std::chrono::sys_time<Time::Accuracy>>;
 template <>
 struct std::formatter<Filetime> : chrono_base_formatter{
 	template<class FormatContext>

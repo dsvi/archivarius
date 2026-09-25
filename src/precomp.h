@@ -93,13 +93,4 @@ typedef uint64_t                 u64;
 
 typedef unsigned int             uint;
 
-// posix time in nanoseconds
-typedef u64 Time;
-typedef std::chrono::nanoseconds Time_accuracy;
-inline
-auto to_sys_clock(Time t){
-	 using namespace std::chrono;
-	 return system_clock::time_point{duration_cast<system_clock::duration>(Time_accuracy(t))};
-}
-
 }

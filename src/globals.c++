@@ -26,22 +26,6 @@ const char *tr_txt(const char *s)
 }
 
 
-Time to_posix_time(std::filesystem::file_time_type time)
-{
-	using namespace chrono;
-	auto system_time = file_clock::to_sys(time);
-	// not a big deal if doesn't pass.
-	//static_assert(is_same<decltype(system_time)::duration::period, Time_accuracy::period>::value);
-	return time_point_cast<Time_accuracy>(system_time).time_since_epoch().count();
-}
-
-std::filesystem::file_time_type from_posix_time(Time t)
-{
-	using namespace chrono;
-	time_point<system_clock, Time_accuracy> sys_time{ Time_accuracy(t) };
-	return file_clock::from_sys(sys_time);
-}
-
 fs::path make_unique_filename(const filesystem::path &dir, string_view prefix)
 {
 	time_t t = time(nullptr);

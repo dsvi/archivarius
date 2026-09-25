@@ -1,4 +1,5 @@
 #pragma once
+#include "time.h"
 #include "file_content_ref.h"
 #include "filesystem_state.h"
 #include "platform.h"

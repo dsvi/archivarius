@@ -49,14 +49,16 @@ Followed by a required name. The top level element. Can be multiple in a file.
 ### max-storage-time
 
 The temporal depth of archive. For how long the versions will be stored.
-The value of the key is number with suffix. 6m means 'store for 6 month'. In this case versions older
-than 6 month will be deleted.
-Suffixes are:
-d - days
-w - weeks
-m - months
-y - years
+The value of the key is number with suffix. `6m` means 'store for 6 month'. In this case versions older
+than 6 month will be deleted. By default, older versions are never deleted.
 
+Suffixes are:
+
+    d - days
+    w - weeks
+    m - months
+    y - years
+    
 ### root
 
 Where to start archiving from. The paths, stored in archive, will be relative to the `root`. Either `root` or `include` should be present

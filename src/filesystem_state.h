@@ -1,5 +1,6 @@
 #pragma once
 #include "precomp.h"
+#include "time.h"
 #include "file_content_ref.h"
 #include "filters.h"
 

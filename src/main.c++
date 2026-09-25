@@ -1,4 +1,5 @@
 #include <progress_bar.h>
+#include "time.h"
 #include "restore.h"
 #include "archive.h"
 #include "globals.h"
@@ -60,11 +61,6 @@ Archive_params get_archive_params(Cmd_line &cmd_line, string &cfg_path){
 	return ret;
 }
 
-
-std::string to_human_readable_time(Time time)
-{
-	return format("{:%Y %B %d %H:%M:%S}", chrono::time_point_cast<chrono::seconds>(to_sys_clock(time)));
-}
 
 int run(int argc, const char *argv[]){
 	if (argc < 2){
@@ -161,7 +157,7 @@ int run(int argc, const char *argv[]){
 				else
 					arc.min_content_file_size = 1024*1024*1024ul;
 				if (c.max_storage_time_seconds)
-					arc.max_storage_time = *c.max_storage_time_seconds * Time_accuracy::period::den;
+					arc.max_storage_time = Time::from_seconds(*c.max_storage_time_seconds);
 				arc.password = c.enc.has_value() ? c.enc->password : "";
 				if (c.zstd){
 					arc.zstd.emplace();
@@ -188,7 +184,7 @@ int run(int argc, const char *argv[]){
 		Catalogue cat(tp.archive_path, tp.password, false);
 		auto times = cat.state_times();
 		for (size_t i = times.size(); i-- > 0; ){
-			println("{:┄<5}┄{}", i, to_human_readable_time(times[i]));
+			println("{:┄<5}┄{}", i, times[i].to_human_readable());
 		}
 	}
 	else
@@ -216,7 +212,7 @@ int run(int argc, const char *argv[]){
 				ASSERT(0);
 			}
 			if ( file.mod_time )
-				cprintln(tr_txt("Modification time: {}"), to_human_readable_time(file.mod_time.value()));
+				cprintln(tr_txt("Modification time: {}"), file.mod_time.value().to_human_readable());
 			print("\n");
 		}
 	}

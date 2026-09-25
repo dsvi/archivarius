@@ -1,5 +1,6 @@
 #pragma once
 #include "precomp.h"
+#include "time.h"
 #include "file_content_creator.h"
 #include "catalogue.h"
 

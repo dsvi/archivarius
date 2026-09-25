@@ -131,6 +131,8 @@ src/test.c++
 src/test.h
 src/testing.c++
 src/testing.h
+src/time.c++
+src/time.h
 src/version.h
 src/xxhash.h
 )

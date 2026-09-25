@@ -2,6 +2,7 @@
 #include "exception.h"
 #include "catalogue.h"
 #include "globals.h"
+#include "time.h"
 #include "piping_csum.h"
 #include "platform.h"
 #include "piping.h"
@@ -22,7 +23,7 @@ void apply_attribs(fs::path &target, Filesystem_state::File &attr){
 	if (!attr.default_acl.empty())
 		set_default_acl(target, attr.default_acl);
 	if (attr.mod_time)
-		fs::last_write_time(target, from_posix_time(*attr.mod_time));
+		fs::last_write_time(target, attr.mod_time->to_file_time());
 	if (attr.unix_permissions)
 		fs::permissions(target, static_cast<fs::perms>(*attr.unix_permissions));
 }

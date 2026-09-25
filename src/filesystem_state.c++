@@ -1,4 +1,5 @@
 #include "filesystem_state.h"
+#include "time.h"
 #include "checksumer_xxhash.h"
 #include "globals.h"
 #include "exception.h"
@@ -15,7 +16,7 @@ namespace archi{
 Filesystem_state::Filesystem_state(const std::filesystem::path &arc_path, Filters_out &f)
 {
 	filename_ = make_unique_filename(arc_path, "s");
-	time_created_ = to_posix_time(fs::file_time_type::clock::now());
+	time_created_ = Time::from_file_time(fs::file_time_type::clock::now());
 	arc_path_ = arc_path;
 	filtrator_.set_filters(f);
 }
@@ -73,7 +74,7 @@ Filesystem_state::Filesystem_state(
 			f.symlink_target = r.symlink_target();
 		else{
 			if (r.has_modified_nanoseconds())
-				f.mod_time = r.modified_nanoseconds();
+				f.mod_time = Time(r.modified_nanoseconds());
 			if (r.has_unix_permissions())
 				f.unix_permissions = r.unix_permissions();
 			if (r.has_posix_acl())
@@ -142,7 +143,7 @@ void Filesystem_state::commit()
 		if (SYMLINK == f.type)
 			rec->set_symlink_target(f.symlink_target);
 		if (f.mod_time)
-			rec->set_modified_nanoseconds(*f.mod_time);
+			rec->set_modified_nanoseconds(f.mod_time->nanoseconds());
 		if (f.unix_permissions)
 			rec->set_unix_permissions(*f.unix_permissions);
 		if (!f.acl.empty())

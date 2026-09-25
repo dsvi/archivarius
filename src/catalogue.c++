@@ -1,6 +1,7 @@
 #include "checksumer_xxhash.h"
 #include "piping_csum.h"
 #include "precomp.h"
+#include "time.h"
 #include "catalogue.h"
 #include "exception.h"
 #include "piping_zstd.h"
@@ -121,8 +122,8 @@ Catalogue::Catalogue(std::filesystem::path &arc_path, std::string_view key, bool
 		for (auto &file: catalog->state_files()){
 			Fs_state_file state;
 			state.name = file.name();
-			state.time_created = file.time_created();
-			ASSERT(state.time_created);
+			state.time_created = Time(file.time_created());
+			ASSERT(state.time_created.nanoseconds());
 			if (file.has_filters())
 				state.filters = get_filters(file.filters());
 			fs_state_files_.push_back(move(state));
@@ -284,7 +285,7 @@ void Catalogue::commit()
 		for (auto &fsf : fs_state_files_){
 			auto sfile = cat_msg->add_state_files();
 			sfile->set_name(fsf.name);
-			sfile->set_time_created(fsf.time_created);
+			sfile->set_time_created(fsf.time_created.nanoseconds());
 			if (fsf.filters){
 				auto f = sfile->mutable_filters();
 				add_filters(f, fsf.filters);

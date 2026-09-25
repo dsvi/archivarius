@@ -50,7 +50,7 @@ void Archive_action::add(const fs::path &file_path)
 			return;
 		if (file.type != Filesystem_state::SYMLINK){
 			file.unix_permissions = to_int(sts.permissions());
-			file.mod_time = to_posix_time(last_write_time(file_path));
+			file.mod_time = Time::from_file_time(last_write_time(file_path));
 			if (process_acls){
 				file.acl = get_acl(file_path);
 				if (file.type == Filesystem_state::DIR)
@@ -211,7 +211,7 @@ void Archive_action::archive()
 		catalog_->add_fs_state(move(next));
 		if (max_storage_time){
 			try{
-				auto t = to_posix_time(fs::file_time_type::clock::now()) - *max_storage_time;
+				auto t = Time::from_file_time(fs::file_time_type::clock::now()) - *max_storage_time;
 				size_t num_states_to_remove = 0;
 				ASSERT(cat.num_states());
 				for (size_t i = cat.num_states(); --i > 0;){ // leave at least one state
