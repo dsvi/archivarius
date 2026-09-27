@@ -43,6 +43,13 @@ void Restore_action::restore()
 			ASSERT(prefix.empty() or p.string().starts_with(prefix.string()));
 			return to / p.lexically_relative(prefix.parent_path());
 		};
+		// A directory is in the archive only if it was archived itself, while a file from it can be.
+		// (see 'include' taking priority over 'exclude'). So make sure there is somewhere to put it.
+		auto ensure_parent = [&](fs::path &p){
+			auto parent = p.parent_path();
+			if (!parent.empty() and not fs::is_directory(parent))
+				fs::create_directories(parent);
+		};
 		if (!prefix.empty()){
 			erase_if(files, [&](auto &f){
 				// this has to compare full path elements. not parts of them
@@ -109,6 +116,7 @@ void Restore_action::restore()
 						fname = ref.fname;
 					}
 					pump.pump(sin, ref.from, nullptr, ref.fname, num_pumped);
+					ensure_parent(re_path);
 					File_sink out(re_path);
 					Stream_out sout;
 					cs_out.csumer()->reset();
@@ -133,6 +141,7 @@ void Restore_action::restore()
 				continue;
 			auto re_path = mk_re_path(file.path);
 			try{
+				ensure_parent(re_path);
 				if (file.type == Filesystem_state::FILE){
 					if (file.content_ref)
 						continue;

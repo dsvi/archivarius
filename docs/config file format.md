@@ -39,15 +39,12 @@ Lines starting with # are ignored.
 ### Keywords are:
 
 ### task
-
 Followed by a required name. The top level element. Can be multiple in a file.
 
 ### archive
-
 *required.* Path to where archive will be stored
 
 ### max-storage-time
-
 The temporal depth of archive. For how long the versions will be stored.
 The value of the key is number with suffix. `6m` means 'store for 6 month'. In this case versions older
 than 6 month will be deleted. By default, older versions are never deleted.
@@ -60,13 +57,13 @@ Suffixes are:
     y - years
     
 ### root
+Where to start archiving from. The paths, stored in archive, will be relative to the `root`. Either `root` or `include` should be present. If `include` is not present, then archive everything from `root`
 
-Where to start archiving from. The paths, stored in archive, will be relative to the `root`. Either `root` or `include` should be present
+`.` and `..` are not allowed in a path.
 
 ### include
-
 What to add to archive. It is relative to `root` if `root` is present. Either `root` or `include` must be present.
-Don't add trailing `/` to directories. `include` has priority over exclude. So that
+`include` has priority over exclude. So that
 
     exclude {
     	dir
@@ -75,21 +72,17 @@ Don't add trailing `/` to directories. `include` has priority over exclude. So t
       dir/subdir
     }
 
-the `subdir` is still going to be added. 
+the `subdir` is still going to be added. `subdir` goes into the archive without its `dir`, but
+`dir` will be created when restoring.
 
 ### exclude
-
 What not to add to archive. It is relative to `root` if root is present.
-Don't add trailing `/` to directories.
 
 ### password
-
 Password to archive
 
 ### compression
-
 Whether to compress the archive. Can be 'on' or 'off'. By default archives are not compressed.
 
 ### acl
-
 Whether to store [ACLs](https://en.wikipedia.org/wiki/Access-control_list) in archive. Can be 'on' or 'off'. By default ACLs are ignored.

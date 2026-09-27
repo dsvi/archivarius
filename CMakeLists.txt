@@ -12,8 +12,8 @@ if (NOT CMAKE_BUILD_TYPE)
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
     string(APPEND CMAKE_CXX_FLAGS " -flto=full")
+    string(APPEND CMAKE_C_FLAGS   " -flto=full")
 endif()
 
 option(ARCHIVARIUS_STATIC_BUILD "Build static version of the program, without dependency on any shared library." ON)
@@ -120,7 +120,6 @@ src/piping_zstd.h
 src/platform.c++
 src/platform.h
 src/precomp.c++
-src/precomp.h
 src/pump.c++
 src/pump.h
 src/restore.c++
@@ -139,6 +138,27 @@ src/xxhash.h
 
 configure_file(${PROJECT_SOURCE_DIR}/src/version.h.in ${PROJECT_SOURCE_DIR}/src/version.h)
 
-add_executable(archivarius ${archivarius-src})
-target_precompile_headers(archivarius PRIVATE src/precomp.h)
-target_link_libraries(archivarius PRIVATE botan coformat progress-bar libzstd_static libprotobuf-lite ${ACL_LIBRARY})
+# Common dependencies of both executables.
+set(archivarius-deps
+    botan
+    coformat
+    progress-bar
+    libzstd_static
+    libprotobuf-lite
+    ${ACL_LIBRARY}
+)
+
+# Create an archivarius executable with the given name.
+# Any extra arguments (e.g. EXCLUDE_FROM_ALL) are passed through to add_executable().
+function(add_archivarius_tool name)
+    add_executable(${name} ${ARGN} ${archivarius-src})
+    target_precompile_headers(${name} PRIVATE src/precomp.h)
+    target_link_libraries(${name} PRIVATE ${archivarius-deps})
+endfunction()
+
+add_archivarius_tool(archivarius)
+# A build of the tool with the self-test compiled in (TEST define enables
+# test() from testing.c++ in main()). Excluded from the default build;
+# build it explicitly with: cmake --build . --target archivarius-test
+add_archivarius_tool(archivarius-test EXCLUDE_FROM_ALL)
+target_compile_definitions(archivarius-test PRIVATE TEST)

@@ -193,7 +193,6 @@ void Archive_action::archive()
 		long_term_content_->finish();
 		normal_content_->finish();
 		big_content_->finish();
-		// TODO: get rid of
 		if (zstd){
 			auto cs = normal_content_->compression_statistic();
 			auto csl = long_term_content_->compression_statistic();
@@ -202,7 +201,7 @@ void Archive_action::archive()
 			cs.compressed += csl.compressed + csb.compressed;
 			if (cs.original){
 				auto percent = cs.compressed *100 / cs.original;
-				cprint(tr_txt("Archive compressed to {}% of original size\n"), percent);
+				cprintln(tr_txt("Archive compressed to {}% of original size"), percent);
 			}
 		}
 		if (next.files().size() == 0)

@@ -68,6 +68,23 @@ void fill_compression(Config &to, Property &p){
 	throw Exception("'compression' can only be 'on' or 'off'");
 }
 
+// 'dir' and 'dir/' mean the same dir. The trailing separator has to go, so that the
+// path matches the ones reported by the directory iteration
+// '.' and '..' are not allowed in a path
+static
+fs::path normalize_path(string_view path, int line)
+{
+	fs::path p(path);
+	for (auto e : p)
+		if (e == "." or e == "..")
+			throw Exception("line {0}: '.' and '..' are not allowed in a path: {1}")
+					      (line, string(path));
+	auto ret = p.lexically_normal(); // gets rid of the repeated separators
+	if (ret.has_filename() or ret.parent_path() == ret)
+		return ret;
+	return ret.parent_path(); // get rid of the trailing separator
+}
+
 static const string conf_fn = "archivarius.conf"s;
 
 std::vector<Config> read_config(string_view filepath)
@@ -122,15 +139,15 @@ std::vector<Config> read_config(string_view filepath)
 						else if (taskp.name() == "root"){
 							if (!cfg.root.empty())
 								throw Exception("line {0}: 'root' is already defined")(taskp.orig_line());
-							cfg.root = taskp.value_str();
+							cfg.root = normalize_path(taskp.value_str(), taskp.orig_line());
 						}
 						else if (taskp.name() == "include"){
 							for (auto &pt : taskp.subs())
-								cfg.files_to_archive.push_back(pt.text());
+								cfg.files_to_archive.push_back(normalize_path(pt.text(), taskp.orig_line()));
 						}
 						else if (taskp.name() == "exclude"){
 							for (auto &ex : taskp.subs())
-								cfg.files_to_ignore.push_back(ex.text());
+								cfg.files_to_ignore.push_back(normalize_path(ex.text(), taskp.orig_line()));
 						}
 						else if (taskp.name() == "max-storage-time"){
 							if (cfg.max_storage_time_seconds)
