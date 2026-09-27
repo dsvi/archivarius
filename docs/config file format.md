@@ -65,8 +65,17 @@ Where to start archiving from. The paths, stored in archive, will be relative to
 
 ### include
 
-What to add to archive. It is relative to `root` if root is present. Either `root` or `include` must be present.
-Don't add trailing `/` to directories.
+What to add to archive. It is relative to `root` if `root` is present. Either `root` or `include` must be present.
+Don't add trailing `/` to directories. `include` has priority over exclude. So that
+
+    exclude {
+    	dir
+    }
+    include {
+      dir/subdir
+    }
+
+the `subdir` is still going to be added. 
 
 ### exclude
 
